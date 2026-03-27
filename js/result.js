@@ -11,11 +11,11 @@ function getTotals(prefix=""){
       let level;
 
       if(prefix === ""){
-        level = key[0];           // A
+        level = key[0];
       } else if(prefix.length === 1){
-        level = key.substring(1,2); // 1
-      } else if(prefix.length === 2){
-        level = key;              // A1.1
+        level = key.substring(1,2);
+      } else {
+        level = key;
       }
 
       if(!result[level]){
@@ -52,11 +52,11 @@ function render(prefix=""){
     let next;
 
     if(prefix === ""){
-      next = k; // A
+      next = k;
     } else if(prefix.length === 1){
-      next = prefix + k; // A1
+      next = prefix + k;
     } else {
-      next = k; // A1.1
+      next = k;
     }
 
     html += `
@@ -106,4 +106,29 @@ function save(){
 
 function goDashboard(){
   window.location = "dashboard.html";
+}
+
+/* ✅ EXPORT TO EXCEL */
+function exportExcel(){
+  let data = [];
+
+  for(let key in given){
+    let g = given[key] || 0;
+    let u = used[key] || 0;
+    let b = g - u;
+
+    data.push({
+      Category: key,
+      Given_LKR: g,
+      Used_LKR: u,
+      Balance: b
+    });
+  }
+
+  let ws = XLSX.utils.json_to_sheet(data);
+  let wb = XLSX.utils.book_new();
+
+  XLSX.utils.book_append_sheet(wb, ws, "Accounting");
+
+  XLSX.writeFile(wb, "Accounting_Report.xlsx");
 }
