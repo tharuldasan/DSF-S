@@ -1,20 +1,24 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
+  <meta charset="UTF-8">
   <title>History</title>
   <link rel="stylesheet" href="css/style.css">
 </head>
 <body>
+<div class="container">
+  <div class="card history-card">
+    <h2>History</h2>
 
-<h2>History</h2>
+    <h3>Draft Files</h3>
+    <div id="draft"></div>
 
-<h3>Draft Files</h3>
-<div id="draft"></div>
+    <h3>Finished Files</h3>
+    <div id="finished"></div>
 
-<h3>Finished Files</h3>
-<div id="finished"></div>
-
-<button onclick="back()">⬅</button>
+    <button onclick="back()" class="back-btn">⬅ Back to Dashboard</button>
+  </div>
+</div>
 
 <script src="js/history.js"></script>
 </body>
