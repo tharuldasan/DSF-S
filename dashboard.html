@@ -1,28 +1,29 @@
 <!DOCTYPE html>
-<html lang="en">
+<html>
 <head>
-  <meta charset="UTF-8">
   <title>Dashboard</title>
   <link rel="stylesheet" href="css/style.css">
 </head>
 <body>
+
 <div class="container">
-  <div class="card dashboard-card">
+  <div class="card">
     <h2>Dashboard</h2>
-    <div class="dashboard-buttons">
-      <button onclick="createNew()">➕ Create New</button>
-      <button onclick="goHistory()">📂 History</button>
-      <button onclick="logout()" class="logout-btn">Log Out</button>
-    </div>
+
+    <button onclick="createNew()">➕ Create New</button>
+    <button onclick="goHistory()">📂 History</button>
+    <button onclick="logout()" class="logout-btn">Log Out</button>
   </div>
 </div>
 
 <script src="js/dashboard.js"></script>
+
 <script>
 function logout(){
   localStorage.removeItem("user");
   window.location = "index.html";
 }
 </script>
+
 </body>
 </html>
