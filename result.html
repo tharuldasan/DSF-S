@@ -1,24 +1,27 @@
 <!DOCTYPE html>
-<html lang="en">
+<html>
 <head>
-  <meta charset="UTF-8">
   <title>Result</title>
   <link rel="stylesheet" href="css/style.css">
 </head>
 <body>
+
 <div class="container">
-  <div class="card result-card">
-    <h2>Totals</h2>
+  <div class="card">
+    <h2>Accounting Summary</h2>
+
     <div id="totals"></div>
-    <div class="btn-group">
+
+    <div>
+      <button onclick="goBack()">⬅ Back</button>
       <button onclick="enterUsed()">Enter Used Money</button>
-      <button onclick="save()">Finish & Save</button>
+      <button onclick="save()">Finish</button>
       <button onclick="goDashboard()">Dashboard</button>
     </div>
   </div>
 </div>
 
-<script src="js/utils.js"></script>
 <script src="js/result.js"></script>
+
 </body>
 </html>
