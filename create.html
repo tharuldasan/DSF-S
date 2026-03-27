@@ -1,18 +1,22 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
+  <meta charset="UTF-8">
   <title>Create Entry</title>
   <link rel="stylesheet" href="css/style.css">
 </head>
 <body>
-
-<h2 id="label">A1.1</h2>
-
-<input id="money" type="number" placeholder="Enter amount">
-<p>LKR will be added automatically</p>
-
-<button onclick="next()">Enter</button>
-<button onclick="back()">⬅</button>
+<div class="container">
+  <div class="card create-card">
+    <h2 id="label">A1.1</h2>
+    <input id="money" type="number" placeholder="Enter amount">
+    <p>LKR will be added automatically</p>
+    <div class="btn-group">
+      <button onclick="back()">⬅ Back</button>
+      <button onclick="next()">Enter</button>
+    </div>
+  </div>
+</div>
 
 <script src="js/utils.js"></script>
 <script src="js/create.js"></script>
