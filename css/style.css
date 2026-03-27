@@ -1,87 +1,85 @@
-/* General Reset */
 * {
   margin: 0;
   padding: 0;
   box-sizing: border-box;
-  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  font-family: 'Segoe UI', sans-serif;
 }
 
-/* Body & Container */
 body {
-  background: #f0f2f5;
+  background: linear-gradient(135deg, #1e3a8a, #0f172a);
+  min-height: 100vh;
   display: flex;
   justify-content: center;
   align-items: center;
-  height: 100vh;
 }
 
+/* Bigger container */
 .container {
   width: 100%;
-  max-width: 400px;
+  max-width: 800px;
   padding: 20px;
 }
 
-/* Cards */
+/* Card */
 .card {
-  background: #fff;
-  border-radius: 10px;
-  padding: 30px 20px;
-  box-shadow: 0 8px 20px rgba(0,0,0,0.1);
+  background: #ffffff;
+  border-radius: 15px;
+  padding: 35px;
+  box-shadow: 0 15px 40px rgba(0,0,0,0.25);
   text-align: center;
 }
 
-.card h2 {
-  margin-bottom: 20px;
-  color: #333;
-}
-
 /* Inputs */
-input[type="email"],
-input[type="password"],
-input[type="number"] {
-  width: 90%;
-  padding: 12px 15px;
-  margin: 10px 0;
+input {
+  width: 100%;
+  padding: 15px;
+  margin: 12px 0;
+  border-radius: 8px;
   border: 1px solid #ccc;
-  border-radius: 6px;
   font-size: 16px;
 }
 
 /* Buttons */
 button {
-  padding: 10px 20px;
-  margin: 10px 5px 0 5px;
+  padding: 12px 18px;
+  margin: 8px;
   border: none;
-  border-radius: 6px;
+  border-radius: 8px;
+  background: #2563eb;
+  color: white;
+  font-size: 15px;
   cursor: pointer;
-  font-size: 16px;
-  transition: 0.3s;
 }
 
 button:hover {
-  opacity: 0.85;
+  background: #1d4ed8;
 }
 
 .logout-btn {
-  background-color: #ff4d4f;
-  color: white;
+  background: #ef4444;
 }
 
-.dashboard-buttons button {
-  background-color: #1890ff;
-  color: white;
+/* Table */
+table {
   width: 100%;
-  margin: 10px 0;
+  border-collapse: collapse;
+  margin-top: 20px;
 }
 
-.btn-group button {
-  background-color: #1890ff;
+th, td {
+  padding: 14px;
+  border-bottom: 1px solid #ddd;
+}
+
+th {
+  background: #2563eb;
   color: white;
 }
 
-/* Totals */
-#totals p {
-  font-size: 16px;
-  margin: 8px 0;
-  color: #333;
+.clickable {
+  cursor: pointer;
+}
+
+.clickable:hover {
+  background: #f1f5f9;
 }
