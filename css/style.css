@@ -1,3 +1,4 @@
+/* RESET */
 * {
   margin: 0;
   padding: 0;
@@ -5,6 +6,7 @@
   font-family: 'Segoe UI', sans-serif;
 }
 
+/* BACKGROUND */
 body {
   background: url("../dso.jpg") no-repeat center center fixed;
   background-size: cover;
@@ -14,6 +16,7 @@ body {
   align-items: center;
 }
 
+/* DARK OVERLAY */
 body::before {
   content: "";
   position: fixed;
@@ -25,16 +28,55 @@ body::before {
   z-index: -1;
 }
 
+/* CONTAINER */
 .container {
   width: 100%;
-  max-width: 900px;
+  max-width: 950px;
+  padding: 20px;
 }
 
+/* CARD */
 .card {
   background: rgba(255,255,255,0.95);
-  padding: 30px;
-  border-radius: 15px;
+  border-radius: 20px;
+  padding: 35px;
+  box-shadow: 0 15px 40px rgba(0,0,0,0.3);
   text-align: center;
+}
+
+/* LOGIN CARD */
+.login-card {
+  max-width: 400px;
+  margin: auto;
+  border-radius: 25px;
+  padding: 40px;
+}
+
+/* INPUTS */
+input {
+  width: 100%;
+  padding: 14px;
+  margin: 12px 0;
+  border-radius: 12px;
+  border: 1px solid #ccc;
+  font-size: 15px;
+}
+
+/* BUTTONS */
+button {
+  padding: 12px 18px;
+  margin: 8px;
+  border: none;
+  border-radius: 12px;
+  background: #2563eb;
+  color: white;
+  font-size: 15px;
+  cursor: pointer;
+  transition: 0.3s;
+}
+
+button:hover {
+  background: #1d4ed8;
 }
 
 /* TABLE */
@@ -56,25 +98,58 @@ th {
   color: white;
 }
 
+/* CLICKABLE CELLS */
 .clickable {
   cursor: pointer;
+  transition: 0.2s;
 }
 
 .clickable:hover {
   background: #dbeafe;
+  transform: scale(1.02);
 }
 
-/* BUTTONS */
-button {
-  padding: 10px 15px;
-  margin: 8px;
-  border: none;
-  border-radius: 8px;
-  background: #2563eb;
-  color: white;
-  cursor: pointer;
+/* MODAL */
+.modal {
+  display: none;
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0,0,0,0.6);
+  justify-content: center;
+  align-items: center;
 }
 
-button:hover {
-  background: #1d4ed8;
+.modal-content {
+  background: white;
+  padding: 25px;
+  border-radius: 15px;
+  width: 320px;
+  text-align: center;
+  animation: popup 0.2s ease;
+}
+
+@keyframes popup {
+  from {
+    transform: scale(0.8);
+    opacity: 0;
+  }
+  to {
+    transform: scale(1);
+    opacity: 1;
+  }
+}
+
+.modal-content input {
+  width: 100%;
+  padding: 12px;
+  margin-top: 10px;
+  border-radius: 10px;
+  border: 1px solid #ccc;
+}
+
+.modal-buttons button {
+  margin: 10px;
 }
