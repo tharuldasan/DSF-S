@@ -1,32 +1,33 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <title>Result</title>
+  <title>Accounting</title>
   <link rel="stylesheet" href="css/style.css">
-
-  <!-- ✅ Excel Library -->
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
-  <link rel="icon" type="image/x-icon" href="./favicon.ico">
 </head>
 <body>
 
 <div class="container">
   <div class="card">
-    <h2>Accounting Summary</h2>
+
+    <h2 id="fileTitle"></h2>
 
     <div id="totals"></div>
 
     <div>
       <button onclick="goBack()">⬅ Back</button>
-      <button onclick="enterUsed()">Enter Used Money</button>
       <button onclick="save()">Finish</button>
-      <button onclick="exportExcel()">Export Excel</button>
       <button onclick="goDashboard()">Dashboard</button>
     </div>
+
   </div>
 </div>
 
 <script src="js/result.js"></script>
+
+<script>
+document.getElementById("fileTitle").innerText =
+  localStorage.getItem("fileName") || "New File";
+</script>
 
 </body>
 </html>
