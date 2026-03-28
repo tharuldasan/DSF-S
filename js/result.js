@@ -4,6 +4,9 @@ let used  = JSON.parse(localStorage.getItem("usedData")) || {};
 let level = "main";
 let current = "";
 
+let currentKey = "";
+let currentType = "";
+
 function formatRs(num){
   return "Rs. " + num.toLocaleString(undefined, {minimumFractionDigits:2});
 }
@@ -123,24 +126,59 @@ function goBack(){
   render();
 }
 
+/* MODAL SYSTEM */
 function edit(key,type){
-  let value = prompt("Enter amount for " + key);
-  if(value === null) return;
+  currentKey = key;
+  currentType = type;
 
-  value = Number(value) || 0;
+  document.getElementById("modalTitle").innerText = "Enter " + type + " for " + key;
+  document.getElementById("modalInput").value = "";
 
-  if(type === "given"){
-    given[key] = value;
+  document.getElementById("modal").style.display = "flex";
+}
+
+function closeModal(){
+  document.getElementById("modal").style.display = "none";
+}
+
+function saveModal(){
+  let value = Number(document.getElementById("modalInput").value) || 0;
+
+  if(currentType === "given"){
+    given[currentKey] = value;
     localStorage.setItem("givenData", JSON.stringify(given));
   }else{
-    used[key] = value;
+    used[currentKey] = value;
     localStorage.setItem("usedData", JSON.stringify(used));
   }
 
+  closeModal();
   render();
 }
 
-render();
+/* EXPORT */
+function exportExcel(){
+  let data = [];
+
+  for(let key in given){
+    let g = given[key] || 0;
+    let u = used[key] || 0;
+    let b = g - u;
+
+    data.push({
+      Category: key,
+      Given: g,
+      Used: u,
+      Balance: b
+    });
+  }
+
+  let ws = XLSX.utils.json_to_sheet(data);
+  let wb = XLSX.utils.book_new();
+
+  XLSX.utils.book_append_sheet(wb, ws, "Report");
+  XLSX.writeFile(wb, "Accounting.xlsx");
+}
 
 function save(){
   let files = JSON.parse(localStorage.getItem("files")||"[]");
@@ -158,3 +196,5 @@ function save(){
 function goDashboard(){
   window.location = "dashboard.html";
 }
+
+render();
