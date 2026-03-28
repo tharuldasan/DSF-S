@@ -1,5 +1,10 @@
-let given = JSON.parse(localStorage.getItem("givenData")) || {};
-let used  = JSON.parse(localStorage.getItem("usedData")) || {};
+let files = JSON.parse(localStorage.getItem("files")||"[]");
+let currentId = localStorage.getItem("currentFile");
+
+let file = files.find(f => f.id === currentId);
+
+let given = file.given;
+let used = file.used;
 
 let level = "main";
 let current = "";
@@ -126,7 +131,7 @@ function goBack(){
   render();
 }
 
-/* MODAL SYSTEM */
+/* MODAL */
 function edit(key,type){
   currentKey = key;
   currentType = type;
@@ -146,50 +151,58 @@ function saveModal(){
 
   if(currentType === "given"){
     given[currentKey] = value;
-    localStorage.setItem("givenData", JSON.stringify(given));
   }else{
     used[currentKey] = value;
-    localStorage.setItem("usedData", JSON.stringify(used));
   }
+
+  let files = JSON.parse(localStorage.getItem("files")||"[]");
+  let index = files.findIndex(f => f.id === currentId);
+
+  files[index].given = given;
+  files[index].used = used;
+
+  localStorage.setItem("files", JSON.stringify(files));
 
   closeModal();
   render();
 }
 
-/* EXPORT */
+/* EXPORT FIXED FORMAT */
 function exportExcel(){
   let data = [];
 
-  for(let key in given){
-    let g = given[key] || 0;
-    let u = used[key] || 0;
-    let b = g - u;
+  ["A","B","C","D","E"].forEach(letter=>{
+    for(let i=1;i<=5;i++){
+      for(let j=1;j<=5;j++){
 
-    data.push({
-      Category: key,
-      Given: g,
-      Used: u,
-      Balance: b
-    });
-  }
+        let key = `${letter}${i}.${j}`;
+
+        let g = given[key] || 0;
+        let u = used[key] || 0;
+        let b = g - u;
+
+        data.push({
+          Category: letter,
+          Sub: letter + i,
+          Item: key,
+          Given: formatRs(g),
+          Used: formatRs(u),
+          Balance: formatRs(b)
+        });
+
+      }
+    }
+  });
 
   let ws = XLSX.utils.json_to_sheet(data);
   let wb = XLSX.utils.book_new();
 
-  XLSX.utils.book_append_sheet(wb, ws, "Report");
-  XLSX.writeFile(wb, "Accounting.xlsx");
+  XLSX.utils.book_append_sheet(wb, ws, "Accounting");
+
+  XLSX.writeFile(wb, file.name + ".xlsx");
 }
 
 function save(){
-  let files = JSON.parse(localStorage.getItem("files")||"[]");
-
-  files.push({
-    name: localStorage.getItem("fileName") || "File",
-    given: given,
-    used: used
-  });
-
-  localStorage.setItem("files", JSON.stringify(files));
   alert("Saved!");
 }
 
