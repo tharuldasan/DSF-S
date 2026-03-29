@@ -2,14 +2,24 @@ function getUserKey(){
   return "files_" + localStorage.getItem("currentUser");
 }
 
+/* LOGOUT */
+function logout(){
+  localStorage.removeItem("currentUser");
+  localStorage.removeItem("currentFile");
+  window.location = "index.html";
+}
+
+/* OPEN CREATE MODAL */
 function createNew(){
   document.getElementById("createModal").style.display = "flex";
 }
 
+/* CLOSE MODAL */
 function closeCreateModal(){
   document.getElementById("createModal").style.display = "none";
 }
 
+/* CREATE FILE */
 function createFileConfirm(){
   let name = document.getElementById("fileNameInput").value.trim();
   if(!name) return;
@@ -23,8 +33,8 @@ function createFileConfirm(){
     for(let i=1;i<=5;i++){
       for(let j=1;j<=5;j++){
         let key = `${l}${i}.${j}`;
-        given[key]=0;
-        used[key]=0;
+        given[key] = 0;
+        used[key] = 0;
       }
     }
   });
@@ -32,7 +42,7 @@ function createFileConfirm(){
   let file = { id, name, given, used };
 
   let key = getUserKey();
-  let files = JSON.parse(localStorage.getItem(key)||"[]");
+  let files = JSON.parse(localStorage.getItem(key) || "[]");
 
   files.push(file);
 
@@ -43,6 +53,7 @@ function createFileConfirm(){
   window.location = "result.html";
 }
 
+/* GO HISTORY */
 function goHistory(){
   window.location = "history.html";
 }
