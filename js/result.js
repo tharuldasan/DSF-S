@@ -151,6 +151,8 @@ function closeModal(){
   document.getElementById("modal").style.display="none";
 }
 
+// ONLY CHANGE THIS PART INSIDE saveModal()
+
 function saveModal(){
   let val = Number(document.getElementById("modalInput").value)||0;
   let plus = document.getElementById("plusToggle").checked;
@@ -164,13 +166,17 @@ function saveModal(){
 
   file[currentType][currentKey] = newVal;
 
-  /* HISTORY SAVE */
+  /* 🔥 FIX: SEPARATE HISTORY */
   if(!file.history) file.history = {};
-  if(!file.history[currentKey]) file.history[currentKey] = [];
+  if(!file.history[currentKey]) {
+    file.history[currentKey] = {
+      given: [],
+      used: []
+    };
+  }
 
-  file.history[currentKey].push({
+  file.history[currentKey][currentType].push({
     date: getDate(),
-    type: currentType,
     status: plus ? "Added" : "Changed",
     amount: val
   });
