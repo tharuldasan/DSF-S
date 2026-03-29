@@ -9,15 +9,14 @@
 <div class="container">
   <div class="card">
 
-    <div style="display:flex; justify-content:space-between; align-items:center;">
-      <h2>Dashboard</h2>
-      <button onclick="logout()" style="background:#dc2626;">Log Out</button>
+    <h2 style="margin-bottom:20px;">Dashboard</h2>
+
+    <!-- BUTTON ROW -->
+    <div class="dashboard-actions">
+      <button onclick="createNew()">Create New</button>
+      <button onclick="goHistory()">History</button>
+      <button onclick="logout()" class="logout-btn">Log Out</button>
     </div>
-
-    <br>
-
-    <button onclick="createNew()">Create New</button>
-    <button onclick="goHistory()">History</button>
 
   </div>
 </div>
