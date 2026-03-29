@@ -55,53 +55,54 @@ function render(){
     </tr>
 
     <tr>
-      <th>Allo/Distribution</th><th>Expenditure</th><th>Balance</th>
-      <th>Allo/Distribution</th><th>Expenditure</th><th>Balance</th>
-      <th>Allo/Distribution</th><th>Expenditure</th><th>Balance</th>
-      <th>Allo/Distribution</th><th>Expenditure</th><th>Balance</th>
-      <th>Allo/Distribution</th><th>Expenditure</th><th>Balance</th>
+      ${["A","B","C","D","E"].map(() => `
+        <th>Allo/Distribution</th>
+        <th>Expenditure</th>
+        <th>Balance</th>
+      `).join("")}
     </tr>
   `;
 
   let count = 1;
 
-  for(let i=1;i<=5;i++){
-    for(let j=1;j<=5;j++){
+  for(let letter of ["A","B","C","D","E"]){
+    for(let i=1;i<=5;i++){
+      for(let j=1;j<=5;j++){
 
-      let category = `A${i}.${j}`; // display format
+        let keyBase = `${letter}${i}.${j}`;
 
-      html += `<tr>
-        <td>${count}</td>
-        <td>A${i}</td>
-        <td>${category}</td>
-      `;
-
-      ["A","B","C","D","E"].forEach(letter=>{
-        let key = `${letter}${i}.${j}`;
-
-        let g = given[key] || 0;
-        let u = used[key] || 0;
-        let b = g - u;
-
-        html += `
-        <td class="clickable"
-          onclick="edit('${key}','given')"
-          oncontextmenu="viewHistory(event,'${key}','given')">
-          ${formatRs(g)}
-        </td>
-
-        <td class="clickable"
-          onclick="edit('${key}','used')"
-          oncontextmenu="viewHistory(event,'${key}','used')">
-          ${formatRs(u)}
-        </td>
-
-        <td>${formatRs(b)}</td>
+        html += `<tr>
+          <td>${count}</td>
+          <td>${letter}${i}</td>
+          <td>${keyBase}</td>
         `;
-      });
 
-      html += `</tr>`;
-      count++;
+        ["A","B","C","D","E"].forEach(col=>{
+          let key = `${col}${i}.${j}`;
+
+          let g = given[key] || 0;
+          let u = used[key] || 0;
+
+          html += `
+          <td class="clickable"
+            onclick="edit('${key}','given')"
+            oncontextmenu="viewHistory(event,'${key}','given')">
+            ${formatRs(g)}
+          </td>
+
+          <td class="clickable"
+            onclick="edit('${key}','used')"
+            oncontextmenu="viewHistory(event,'${key}','used')">
+            ${formatRs(u)}
+          </td>
+
+          <td class="balance-cell">${formatRs(g-u)}</td>
+          `;
+        });
+
+        html += "</tr>";
+        count++;
+      }
     }
   }
 
