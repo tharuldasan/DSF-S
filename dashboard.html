@@ -3,7 +3,6 @@
 <head>
   <title>Dashboard</title>
   <link rel="stylesheet" href="css/style.css">
-  <link rel="icon" type="image/x-icon" href="./favicon.ico">
 </head>
 <body>
 
@@ -11,20 +10,25 @@
   <div class="card">
     <h2>Dashboard</h2>
 
-    <button onclick="createNew()">➕ Create New</button>
-    <button onclick="goHistory()">📂 History</button>
-    <button onclick="logout()" class="logout-btn">Log Out</button>
+    <button onclick="createNew()">Create New</button>
+    <button onclick="goHistory()">History</button>
+
+  </div>
+</div>
+
+<!-- CREATE FILE MODAL -->
+<div id="createModal" class="modal">
+  <div class="modal-content">
+    <h3>Create New File</h3>
+    <input id="fileNameInput" placeholder="Enter file name">
+    <div class="modal-buttons">
+      <button onclick="createFileConfirm()">Create</button>
+      <button onclick="closeCreateModal()">Cancel</button>
+    </div>
   </div>
 </div>
 
 <script src="js/dashboard.js"></script>
-
-<script>
-function logout(){
-  localStorage.removeItem("user");
-  window.location = "index.html";
-}
-</script>
 
 </body>
 </html>
