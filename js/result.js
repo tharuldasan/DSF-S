@@ -43,88 +43,70 @@ function render(){
   let html = `
   <table>
     <tr>
-      <th>DS</th>
-      <th>Government Institute</th>
-      <th>Category</th>
-      <th>Allo/Distribution</th>
-      <th>Expenditure</th>
-      <th>Balance</th>
+      <th rowspan="2">No</th>
+      <th rowspan="2">Government Institute</th>
+      <th rowspan="2">Category</th>
+
+      <th colspan="3">A</th>
+      <th colspan="3">B</th>
+      <th colspan="3">C</th>
+      <th colspan="3">D</th>
+      <th colspan="3">E</th>
+    </tr>
+
+    <tr>
+      <th>Allo/Distribution</th><th>Expenditure</th><th>Balance</th>
+      <th>Allo/Distribution</th><th>Expenditure</th><th>Balance</th>
+      <th>Allo/Distribution</th><th>Expenditure</th><th>Balance</th>
+      <th>Allo/Distribution</th><th>Expenditure</th><th>Balance</th>
+      <th>Allo/Distribution</th><th>Expenditure</th><th>Balance</th>
     </tr>
   `;
 
-  if(level==="main"){
-    ["A","B","C","D","E"].forEach(letter=>{
-      let g=0,u=0;
-      for(let k in given){
-        if(k.startsWith(letter)){
-          g+=given[k];
-          u+=used[k];
-        }
-      }
+  let count = 1;
 
-      html+=`
-      <tr class="clickable" onclick="goLevel('${letter}')">
-        <td>${letter}</td><td></td><td></td>
-        <td>${formatRs(g)}</td>
-        <td>${formatRs(u)}</td>
-        <td>${formatRs(g-u)}</td>
-      </tr>`;
-    });
-  }
-
-  else if(level==="A"){
-    for(let i=1;i<=5;i++){
-      let key=current+i;
-      let g=0,u=0;
-
-      for(let k in given){
-        if(k.startsWith(key)){
-          g+=given[k];
-          u+=used[k];
-        }
-      }
-
-      html+=`
-      <tr class="clickable" onclick="goLevel('${key}')">
-        <td>${current}</td><td>${key}</td><td></td>
-        <td>${formatRs(g)}</td>
-        <td>${formatRs(u)}</td>
-        <td>${formatRs(g-u)}</td>
-      </tr>`;
-    }
-  }
-
-  else{
+  for(let i=1;i<=5;i++){
     for(let j=1;j<=5;j++){
-      let key=current+"."+j;
-      let g=given[key]||0;
-      let u=used[key]||0;
 
-      html+=`
-      <tr>
-        <td>${current[0]}</td>
-        <td>${current}</td>
-        <td>${key}</td>
+      let category = `A${i}.${j}`; // display format
 
+      html += `<tr>
+        <td>${count}</td>
+        <td>A${i}</td>
+        <td>${category}</td>
+      `;
+
+      ["A","B","C","D","E"].forEach(letter=>{
+        let key = `${letter}${i}.${j}`;
+
+        let g = given[key] || 0;
+        let u = used[key] || 0;
+        let b = g - u;
+
+        html += `
         <td class="clickable"
-            onclick="edit('${key}','given')"
-            oncontextmenu="viewHistory(event,'${key}','given')">
-            ${formatRs(g)}
+          onclick="edit('${key}','given')"
+          oncontextmenu="viewHistory(event,'${key}','given')">
+          ${formatRs(g)}
         </td>
 
         <td class="clickable"
-            onclick="edit('${key}','used')"
-            oncontextmenu="viewHistory(event,'${key}','used')">
-            ${formatRs(u)}
+          onclick="edit('${key}','used')"
+          oncontextmenu="viewHistory(event,'${key}','used')">
+          ${formatRs(u)}
         </td>
 
-        <td>${formatRs(g-u)}</td>
-      </tr>`;
+        <td>${formatRs(b)}</td>
+        `;
+      });
+
+      html += `</tr>`;
+      count++;
     }
   }
 
-  html+="</table>";
-  div.innerHTML=html;
+  html += "</table>";
+  div.innerHTML = html;
 }
 
 function goLevel(val){
