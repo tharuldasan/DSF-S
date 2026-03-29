@@ -197,35 +197,77 @@ function viewHistory(e,key,type){
 
 /* EXPORT */
 function exportExcel(){
-  let rows=[];
-  let file=getCurrentFile();
+  let file = getCurrentFile();
+  let data = [];
 
+  let count = 1;
+
+  // HEADER ROW 1 (MAIN GROUPS)
+  let header1 = [
+    "No",
+    "Government Institute",
+    "Category",
+    "A","","",
+    "B","","",
+    "C","","",
+    "D","","",
+    "E","",""
+  ];
+
+  // HEADER ROW 2 (SUB HEADERS)
+  let header2 = [
+    "",
+    "",
+    "",
+    "Allo/Distribution","Expenditure","Balance",
+    "Allo/Distribution","Expenditure","Balance",
+    "Allo/Distribution","Expenditure","Balance",
+    "Allo/Distribution","Expenditure","Balance",
+    "Allo/Distribution","Expenditure","Balance"
+  ];
+
+  data.push(header1);
+  data.push(header2);
+
+  // DATA ROWS
   ["A","B","C","D","E"].forEach(letter=>{
     for(let i=1;i<=5;i++){
       for(let j=1;j<=5;j++){
-        let key=`${letter}${i}.${j}`;
-        let g=file.given[key]||0;
-        let u=file.used[key]||0;
 
-        rows.push([
-          letter, letter+i, key,
-          formatRs(g),
-          formatRs(u),
-          formatRs(g-u)
-        ]);
+        let key = `${letter}${i}.${j}`;
+
+        let row = [
+          count,
+          letter + i,
+          key
+        ];
+
+        ["A","B","C","D","E"].forEach(col=>{
+          let k = `${col}${i}.${j}`;
+
+          let g = file.given[k] || 0;
+          let u = file.used[k] || 0;
+          let b = g - u;
+
+          row.push(
+            formatRs(g),
+            formatRs(u),
+            formatRs(b)
+          );
+        });
+
+        data.push(row);
+        count++;
       }
     }
   });
 
-  let ws=XLSX.utils.aoa_to_sheet([
-    ["DS","Government Institute","Category","Allo/Distribution","Expenditure","Balance"],
-    ...rows
-  ]);
+  let ws = XLSX.utils.aoa_to_sheet(data);
 
-  let wb=XLSX.utils.book_new();
-  XLSX.utils.book_append_sheet(wb,ws,"Report");
+  let wb = XLSX.utils.book_new();
+  XLSX.utils.book_append_sheet(wb, ws, "Report");
 
-  XLSX.writeFile(wb,file.name+".xlsx");
+  XLSX.writeFile(wb, file.name + ".xlsx");
 }
 
 function goDashboard(){
