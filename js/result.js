@@ -183,25 +183,13 @@ function exportExcel(){
   let file = getCurrentFile();
   let data = [];
 
-  let count = 1;
-
-  // HEADER ROW 1 (MAIN GROUPS)
   let header1 = [
-    "No",
-    "Government Institute",
-    "Category",
-    "A","","",
-    "B","","",
-    "C","","",
-    "D","","",
-    "E","",""
+    "No","Government Institute","Category",
+    "A","","","B","","","C","","","D","","","E","",""
   ];
 
-  // HEADER ROW 2 (SUB HEADERS)
   let header2 = [
-    "",
-    "",
-    "",
+    "","","",
     "Allo/Distribution","Expenditure","Balance",
     "Allo/Distribution","Expenditure","Balance",
     "Allo/Distribution","Expenditure","Balance",
@@ -212,47 +200,89 @@ function exportExcel(){
   data.push(header1);
   data.push(header2);
 
-  // DATA ROWS
-  ["A","B","C","D","E"].forEach(letter=>{
+  let count = 1;
+
+  for(let letter of ["A","B","C","D","E"]){
     for(let i=1;i<=5;i++){
       for(let j=1;j<=5;j++){
 
-        let key = `${letter}${i}.${j}`;
-
         let row = [
           count,
-          letter + i,
-          key
+          letter+i,
+          `${letter}${i}.${j}`
         ];
 
         ["A","B","C","D","E"].forEach(col=>{
-          let k = `${col}${i}.${j}`;
+          let key = `${col}${i}.${j}`;
+          let g = file.given[key]||0;
+          let u = file.used[key]||0;
 
-          let g = file.given[k] || 0;
-          let u = file.used[k] || 0;
-          let b = g - u;
-
-          row.push(
-            formatRs(g),
-            formatRs(u),
-            formatRs(b)
-          );
+          row.push(g,u,g-u);
         });
 
         data.push(row);
         count++;
       }
     }
-  });
+  }
 
   let ws = XLSX.utils.aoa_to_sheet(data);
+
+  /* COLUMN WIDTHS */
+  ws['!cols'] = [
+    {wch:6},
+    {wch:20},
+    {wch:26},
+    ...Array(15).fill({wch:14.5})
+  ];
+
+  /* MERGE HEADERS */
+  ws['!merges'] = [
+    {s:{r:0,c:3}, e:{r:0,c:5}},
+    {s:{r:0,c:6}, e:{r:0,c:8}},
+    {s:{r:0,c:9}, e:{r:0,c:11}},
+    {s:{r:0,c:12}, e:{r:0,c:14}},
+    {s:{r:0,c:15}, e:{r:0,c:17}}
+  ];
+
+  /* STYLING */
+  for(let R=0; R<data.length; R++){
+    for(let C=0; C<18; C++){
+
+      let cell = ws[XLSX.utils.encode_cell({r:R,c:C})];
+      if(!cell) continue;
+
+      cell.s = {
+        border:{
+          top:{style:"thin"},
+          bottom:{style:"thin"},
+          left:{style:"thin"},
+          right:{style:"thin"}
+        },
+        alignment:{ horizontal: C===0 ? "left" : "center" }
+      };
+
+      /* HEADER COLORS */
+      if(R===0 && C>=3){
+        cell.s.fill = { fgColor:{rgb:"BFBFBF"} };
+      }
+
+      if(R===1){
+        cell.s.fill = { fgColor:{rgb:"808080"} };
+      }
+
+      /* BALANCE COLUMN COLOR */
+      if((C-3)%3===2 && C>=3){
+        cell.s.fill = { fgColor:{rgb:"BFBFBF"} };
+      }
+    }
+  }
 
   let wb = XLSX.utils.book_new();
   XLSX.utils.book_append_sheet(wb, ws, "Report");
 
   XLSX.writeFile(wb, file.name + ".xlsx");
 }
-
 function goDashboard(){
   window.location="dashboard.html";
 }
