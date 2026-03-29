@@ -219,3 +219,17 @@ th{
 .switch input:checked + .slider:before{
   transform:translateX(24px);
 }
+
+/* WIDE TABLE FIX */
+table {
+  font-size: 13px;
+}
+
+th {
+  white-space: nowrap;
+}
+
+/* SCROLL FOR LARGE TABLE */
+#totals {
+  overflow-x: auto;
+}
