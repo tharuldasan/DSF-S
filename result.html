@@ -3,8 +3,6 @@
 <head>
   <title>Accounting</title>
   <link rel="stylesheet" href="css/style.css">
-
-  <!-- Excel Library -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
 </head>
 <body>
@@ -19,18 +17,17 @@
     <div>
       <button onclick="goBack()">⬅ Back</button>
       <button onclick="exportExcel()">Export Excel</button>
-      <button onclick="save()">Finish</button>
       <button onclick="goDashboard()">Dashboard</button>
     </div>
 
   </div>
 </div>
 
-<!-- CUSTOM MODAL -->
+<!-- EDIT MODAL -->
 <div id="modal" class="modal">
   <div class="modal-content">
     <h3 id="modalTitle">Enter Amount</h3>
-    <input id="modalInput" type="number" placeholder="Enter amount">
+    <input id="modalInput" type="number">
     <div class="modal-buttons">
       <button onclick="saveModal()">Save</button>
       <button onclick="closeModal()">Cancel</button>
@@ -41,8 +38,18 @@
 <script src="js/result.js"></script>
 
 <script>
-document.getElementById("fileTitle").innerText =
-  localStorage.getItem("fileName") || "New File";
+function loadTitle(){
+  let user = localStorage.getItem("currentUser");
+  let files = JSON.parse(localStorage.getItem("files_" + user)||"[]");
+  let id = localStorage.getItem("currentFile");
+
+  let file = files.find(f => f.id === id);
+
+  document.getElementById("fileTitle").innerText =
+    file ? file.name : "File";
+}
+
+loadTitle();
 </script>
 
 </body>
