@@ -16,106 +16,96 @@ body {
   align-items: center;
 }
 
-/* DARK OVERLAY */
+/* OVERLAY */
 body::before {
   content: "";
   position: fixed;
-  top: 0;
-  left: 0;
   width: 100%;
   height: 100%;
   background: rgba(0,0,0,0.5);
+  top: 0;
+  left: 0;
   z-index: -1;
 }
 
 /* CONTAINER */
 .container {
   width: 100%;
-  max-width: 1000px;
+  max-width: 1100px;
   padding: 20px;
 }
 
 /* CARD */
 .card {
-  background: rgba(255,255,255,0.95);
+  background: rgba(255,255,255,0.96);
   border-radius: 20px;
-  padding: 35px;
-  box-shadow: 0 15px 40px rgba(0,0,0,0.3);
-  text-align: center;
-}
-
-/* LOGIN CARD */
-.login-card {
-  max-width: 400px;
-  margin: auto;
-  border-radius: 25px;
   padding: 40px;
+  box-shadow: 0 20px 50px rgba(0,0,0,0.3);
 }
 
-/* INPUTS */
-input {
-  width: 100%;
-  padding: 14px;
-  margin: 12px 0;
-  border-radius: 12px;
-  border: 1px solid #ccc;
-  font-size: 15px;
+/* TITLE */
+#fileTitle {
+  text-align: center;
+  font-size: 26px;
+  margin-bottom: 25px;
 }
 
-/* BUTTONS */
-button {
-  padding: 12px 18px;
-  margin: 8px;
-  border: none;
-  border-radius: 12px;
-  background: #2563eb;
-  color: white;
-  font-size: 15px;
-  cursor: pointer;
-  transition: 0.3s;
+/* ADD MODE ROW */
+.add-mode-row {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 15px;
+  margin-bottom: 25px;
+  font-size: 16px;
+  font-weight: 500;
 }
 
-button:hover {
-  background: #1d4ed8;
-}
-
-/* DASHBOARD BUTTON ROW */
-.dashboard-actions {
+/* ACTION BUTTONS */
+.action-buttons {
+  margin-top: 25px;
   display: flex;
   justify-content: center;
   gap: 15px;
   flex-wrap: wrap;
 }
 
-/* LOGOUT BUTTON */
-.logout-btn {
-  background: #dc2626;
+/* BUTTON */
+button {
+  padding: 12px 18px;
+  border: none;
+  border-radius: 12px;
+  background: #2563eb;
+  color: white;
+  font-size: 15px;
+  cursor: pointer;
+  transition: 0.25s;
 }
 
-.logout-btn:hover {
-  background: #b91c1c;
+button:hover {
+  background: #1d4ed8;
 }
 
 /* TABLE */
 table {
   width: 100%;
   border-collapse: collapse;
-  margin-top: 20px;
-  font-size: 14px;
+  margin-top: 10px;
 }
 
 th, td {
   border: 1px solid #ccc;
-  padding: 10px;
+  padding: 12px;
   text-align: center;
 }
 
 th {
   background: #2563eb;
   color: white;
+  font-size: 14px;
 }
 
-/* CLICKABLE CELLS */
+/* ROW HOVER */
 .clickable {
   cursor: pointer;
   transition: 0.2s;
@@ -123,18 +113,18 @@ th {
 
 .clickable:hover {
   background: #dbeafe;
-  transform: scale(1.02);
+  transform: scale(1.01);
 }
 
 /* MODAL */
 .modal {
   display: none;
   position: fixed;
-  top: 0;
-  left: 0;
   width: 100%;
   height: 100%;
   background: rgba(0,0,0,0.6);
+  top: 0;
+  left: 0;
   justify-content: center;
   align-items: center;
 }
@@ -143,23 +133,17 @@ th {
   background: white;
   padding: 25px;
   border-radius: 15px;
-  width: 320px;
+  width: 300px;
   text-align: center;
   animation: popup 0.2s ease;
 }
 
 @keyframes popup {
-  from {
-    transform: scale(0.8);
-    opacity: 0;
-  }
-  to {
-    transform: scale(1);
-    opacity: 1;
-  }
+  from {transform: scale(0.8); opacity:0;}
+  to {transform: scale(1); opacity:1;}
 }
 
-.modal-content input {
+.modal input {
   width: 100%;
   padding: 12px;
   margin-top: 10px;
@@ -167,25 +151,13 @@ th {
   border: 1px solid #ccc;
 }
 
-.modal-buttons button {
-  margin: 10px;
-}
-
-/* ADD MODE ROW */
-.add-mode-row {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 12px;
-  margin-bottom: 15px;
-  font-size: 16px;
-  font-weight: 500;
+.modal-buttons {
+  margin-top: 15px;
 }
 
 /* TOGGLE SWITCH */
 .switch {
   position: relative;
-  display: inline-block;
   width: 50px;
   height: 26px;
 }
@@ -196,13 +168,11 @@ th {
 
 .slider {
   position: absolute;
-  cursor: pointer;
-  background-color: #ccc;
+  background: #ccc;
   border-radius: 30px;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
+  width: 100%;
+  height: 100%;
+  cursor: pointer;
   transition: 0.3s;
 }
 
@@ -213,14 +183,13 @@ th {
   width: 20px;
   left: 3px;
   bottom: 3px;
-  background-color: white;
+  background: white;
   border-radius: 50%;
   transition: 0.3s;
 }
 
-/* ON STATE */
 .switch input:checked + .slider {
-  background-color: #2563eb;
+  background: #2563eb;
 }
 
 .switch input:checked + .slider:before {
