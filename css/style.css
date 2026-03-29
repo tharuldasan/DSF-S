@@ -233,3 +233,9 @@ th {
 #totals {
   overflow-x: auto;
 }
+
+/* BALANCE COLUMN */
+.balance-cell {
+  background: #e5e7eb;
+  font-weight: 500;
+}
