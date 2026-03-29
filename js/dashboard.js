@@ -1,37 +1,35 @@
 function getUserKey(){
-  let user = localStorage.getItem("currentUser");
-  return "files_" + user;
+  return "files_" + localStorage.getItem("currentUser");
 }
 
 function createNew(){
-  let name = prompt("Enter File Name:");
+  document.getElementById("createModal").style.display = "flex";
+}
+
+function closeCreateModal(){
+  document.getElementById("createModal").style.display = "none";
+}
+
+function createFileConfirm(){
+  let name = document.getElementById("fileNameInput").value.trim();
   if(!name) return;
 
   let id = "file_" + Date.now();
 
-  let keys = [];
+  let given = {};
+  let used = {};
+
   ["A","B","C","D","E"].forEach(l=>{
     for(let i=1;i<=5;i++){
       for(let j=1;j<=5;j++){
-        keys.push(`${l}${i}.${j}`);
+        let key = `${l}${i}.${j}`;
+        given[key]=0;
+        used[key]=0;
       }
     }
   });
 
-  let emptyGiven = {};
-  let emptyUsed = {};
-
-  keys.forEach(k=>{
-    emptyGiven[k]=0;
-    emptyUsed[k]=0;
-  });
-
-  let file = {
-    id,
-    name,
-    given: emptyGiven,
-    used: emptyUsed
-  };
+  let file = { id, name, given, used };
 
   let key = getUserKey();
   let files = JSON.parse(localStorage.getItem(key)||"[]");
@@ -41,6 +39,7 @@ function createNew(){
   localStorage.setItem(key, JSON.stringify(files));
   localStorage.setItem("currentFile", id);
 
+  closeCreateModal();
   window.location = "result.html";
 }
 
