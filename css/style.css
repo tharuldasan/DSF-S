@@ -31,7 +31,7 @@ body::before {
 /* CONTAINER */
 .container {
   width: 100%;
-  max-width: 950px;
+  max-width: 1000px;
   padding: 20px;
 }
 
@@ -77,6 +77,23 @@ button {
 
 button:hover {
   background: #1d4ed8;
+}
+
+/* DASHBOARD BUTTON ROW */
+.dashboard-actions {
+  display: flex;
+  justify-content: center;
+  gap: 15px;
+  flex-wrap: wrap;
+}
+
+/* LOGOUT BUTTON */
+.logout-btn {
+  background: #dc2626;
+}
+
+.logout-btn:hover {
+  background: #b91c1c;
 }
 
 /* TABLE */
