@@ -1,6 +1,5 @@
 function getUserKey(){
-  let user = localStorage.getItem("currentUser");
-  return "files_" + user;
+  return "files_" + localStorage.getItem("currentUser");
 }
 
 let currentId = localStorage.getItem("currentFile");
@@ -14,23 +13,28 @@ function saveFiles(files){
 }
 
 function getCurrentFile(){
-  let files = getFiles();
-  return files.find(f => f.id === currentId);
+  return getFiles().find(f => f.id === currentId);
 }
-
-let file = getCurrentFile();
 
 let level = "main";
 let current = "";
 let currentKey = "";
 let currentType = "";
 
+/* FORMAT */
 function formatRs(num){
   return "Rs. " + num.toLocaleString(undefined,{minimumFractionDigits:2});
 }
 
+/* DATE */
+function getDate(){
+  let d = new Date();
+  return `${(d.getMonth()+1).toString().padStart(2,'0')}/${d.getDate().toString().padStart(2,'0')}`;
+}
+
+/* RENDER */
 function render(){
-  file = getCurrentFile();
+  let file = getCurrentFile();
   let given = file.given;
   let used = file.used;
 
@@ -39,11 +43,11 @@ function render(){
   let html = `
   <table>
     <tr>
+      <th>DS</th>
+      <th>Government Institute</th>
       <th>Category</th>
-      <th>Sub</th>
-      <th>Item</th>
-      <th>Given</th>
-      <th>Used</th>
+      <th>Allo/Distribution</th>
+      <th>Expenditure</th>
       <th>Balance</th>
     </tr>
   `;
@@ -51,7 +55,6 @@ function render(){
   if(level==="main"){
     ["A","B","C","D","E"].forEach(letter=>{
       let g=0,u=0;
-
       for(let k in given){
         if(k.startsWith(letter)){
           g+=given[k];
@@ -102,8 +105,19 @@ function render(){
         <td>${current[0]}</td>
         <td>${current}</td>
         <td>${key}</td>
-        <td class="clickable" onclick="edit('${key}','given')">${formatRs(g)}</td>
-        <td class="clickable" onclick="edit('${key}','used')">${formatRs(u)}</td>
+
+        <td class="clickable"
+            onclick="edit('${key}','given')"
+            oncontextmenu="viewHistory(event,'${key}','given')">
+            ${formatRs(g)}
+        </td>
+
+        <td class="clickable"
+            onclick="edit('${key}','used')"
+            oncontextmenu="viewHistory(event,'${key}','used')">
+            ${formatRs(u)}
+        </td>
+
         <td>${formatRs(g-u)}</td>
       </tr>`;
     }
@@ -125,9 +139,11 @@ function goBack(){
   render();
 }
 
+/* EDIT */
 function edit(key,type){
   currentKey=key;
   currentType=type;
+  document.getElementById("modalTitle").innerText = key;
   document.getElementById("modal").style.display="flex";
 }
 
@@ -136,25 +152,47 @@ function closeModal(){
 }
 
 function saveModal(){
-  let value=Number(document.getElementById("modalInput").value)||0;
+  let val = Number(document.getElementById("modalInput").value)||0;
+  let plus = document.getElementById("plusToggle").checked;
 
   let files=getFiles();
   let index=files.findIndex(f=>f.id===currentId);
+  let file=files[index];
 
-  if(currentType==="given"){
-    files[index].given[currentKey]=value;
-  }else{
-    files[index].used[currentKey]=value;
-  }
+  let old = file[currentType][currentKey] || 0;
+  let newVal = plus ? old + val : val;
 
+  file[currentType][currentKey] = newVal;
+
+  /* HISTORY SAVE */
+  if(!file.history) file.history = {};
+  if(!file.history[currentKey]) file.history[currentKey] = [];
+
+  file.history[currentKey].push({
+    date: getDate(),
+    type: currentType,
+    status: plus ? "Added" : "Changed",
+    amount: val
+  });
+
+  files[index]=file;
   saveFiles(files);
+
   closeModal();
   render();
 }
 
+/* RIGHT CLICK HISTORY */
+function viewHistory(e,key,type){
+  e.preventDefault();
+  localStorage.setItem("historyKey", key);
+  window.location="item-history.html";
+}
+
+/* EXPORT */
 function exportExcel(){
   let rows=[];
-  file=getCurrentFile();
+  let file=getCurrentFile();
 
   ["A","B","C","D","E"].forEach(letter=>{
     for(let i=1;i<=5;i++){
@@ -174,7 +212,7 @@ function exportExcel(){
   });
 
   let ws=XLSX.utils.aoa_to_sheet([
-    ["Category","Sub","Item","Given","Used","Balance"],
+    ["DS","Government Institute","Category","Allo/Distribution","Expenditure","Balance"],
     ...rows
   ]);
 
