@@ -8,13 +8,23 @@
 
 <div class="container">
   <div class="card">
-
     <h2>History</h2>
 
     <div id="files"></div>
 
     <button onclick="window.location='dashboard.html'">⬅ Back</button>
+  </div>
+</div>
 
+<!-- RENAME MODAL -->
+<div id="renameModal" class="modal">
+  <div class="modal-content">
+    <h3>Rename File</h3>
+    <input id="renameInput" placeholder="Enter new name">
+    <div class="modal-buttons">
+      <button onclick="confirmRename()">Save</button>
+      <button onclick="closeRename()">Cancel</button>
+    </div>
   </div>
 </div>
 
