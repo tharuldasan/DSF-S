@@ -172,7 +172,14 @@ function viewHistory(e,key,type){
 /* EXPORT EXCEL */
 function exportExcel(){
 
+  // 🔥 PROTECTION (IMPORTANT)
+  if(typeof XLSX === "undefined"){
+    alert("Excel library not loaded!");
+    return;
+  }
+
   let file = getCurrentFile();
+
   if(!file){
     alert("No file selected!");
     return;
@@ -225,13 +232,11 @@ function exportExcel(){
 
   let ws = XLSX.utils.aoa_to_sheet(data);
 
-  /* WIDTHS */
   ws['!cols'] = [
     {wch:6},{wch:20},{wch:26},
     ...Array(15).fill({wch:14.5})
   ];
 
-  /* MERGES */
   ws['!merges'] = [
     {s:{r:0,c:0},e:{r:1,c:0}},
     {s:{r:0,c:1},e:{r:1,c:1}},
@@ -243,48 +248,19 @@ function exportExcel(){
     {s:{r:0,c:15},e:{r:0,c:17}}
   ];
 
-  /* STYLING */
-  for(let R=0; R<data.length; R++){
-    for(let C=0; C<18; C++){
+  // SIMPLE STYLE (SAFE)
+  Object.keys(ws).forEach(cell=>{
+    if(cell[0] === '!') return;
 
-      let cellRef = XLSX.utils.encode_cell({r:R,c:C});
-      if(!ws[cellRef]) continue;
-
-      ws[cellRef].s = {
-        border:{
-          top:{style:"thin"},
-          bottom:{style:"thin"},
-          left:{style:"thin"},
-          right:{style:"thin"}
-        },
-        alignment:{
-          horizontal:(R===0 && C>=3) ? "center" :
-                     (C<3 ? "left" : "center"),
-          vertical:"center"
-        }
-      };
-
-      /* A–E HEADER */
-      if(R===0 && C>=3){
-        ws[cellRef].s.fill = { fgColor:{rgb:"BFBFBF"} };
+    ws[cell].s = {
+      border:{
+        top:{style:"thin"},
+        bottom:{style:"thin"},
+        left:{style:"thin"},
+        right:{style:"thin"}
       }
-
-      /* SUB HEADER */
-      if(R===1){
-        if((C-3)%3===0){
-          ws[cellRef].s.fill = { fgColor:{rgb:"A6A6A6"} };
-        }
-        if((C-3)%3===2){
-          ws[cellRef].s.fill = { fgColor:{rgb:"808080"} };
-        }
-      }
-
-      /* BALANCE COLUMN */
-      if(C>=3 && (C-3)%3===2 && R>1){
-        ws[cellRef].s.fill = { fgColor:{rgb:"BFBFBF"} };
-      }
-    }
-  }
+    };
+  });
 
   let wb = XLSX.utils.book_new();
   XLSX.utils.book_append_sheet(wb, ws, "Report");
