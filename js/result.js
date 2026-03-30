@@ -183,11 +183,13 @@ function exportExcel(){
   let file = getCurrentFile();
   let data = [];
 
+  // HEADER ROW 1
   let header1 = [
     "No","Government Institute","Category",
     "A","","","B","","","C","","","D","","","E","",""
   ];
 
+  // HEADER ROW 2
   let header2 = [
     "","","",
     "Allo/Distribution","Expenditure","Balance",
@@ -236,8 +238,14 @@ function exportExcel(){
     ...Array(15).fill({wch:14.5})
   ];
 
-  /* MERGE HEADERS */
+  /* MERGES */
   ws['!merges'] = [
+    // vertical merge
+    {s:{r:0,c:0}, e:{r:1,c:0}},
+    {s:{r:0,c:1}, e:{r:1,c:1}},
+    {s:{r:0,c:2}, e:{r:1,c:2}},
+
+    // horizontal A-E
     {s:{r:0,c:3}, e:{r:0,c:5}},
     {s:{r:0,c:6}, e:{r:0,c:8}},
     {s:{r:0,c:9}, e:{r:0,c:11}},
@@ -259,20 +267,29 @@ function exportExcel(){
           left:{style:"thin"},
           right:{style:"thin"}
         },
-        alignment:{ horizontal: C===0 ? "left" : "center" }
+        alignment:{
+          horizontal: (C>=3 && R===0) ? "center" :
+                      (C<3 ? "left" : "center")
+        }
       };
 
-      /* HEADER COLORS */
+      /* A-E HEADER COLOR */
       if(R===0 && C>=3){
         cell.s.fill = { fgColor:{rgb:"BFBFBF"} };
       }
 
+      /* SUB HEADER */
       if(R===1){
-        cell.s.fill = { fgColor:{rgb:"808080"} };
+        if((C-3)%3===0){ // Allo
+          cell.s.fill = { fgColor:{rgb:"A6A6A6"} };
+        }
+        if((C-3)%3===2){ // Balance
+          cell.s.fill = { fgColor:{rgb:"808080"} };
+        }
       }
 
-      /* BALANCE COLUMN COLOR */
-      if((C-3)%3===2 && C>=3){
+      /* BALANCE COLUMN FULL COLOR */
+      if(C>=3 && (C-3)%3===2 && R>1){
         cell.s.fill = { fgColor:{rgb:"BFBFBF"} };
       }
     }
