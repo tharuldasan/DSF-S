@@ -4,6 +4,7 @@ function getUserKey(){
 
 let currentId = localStorage.getItem("currentFile");
 
+/* FILE FUNCTIONS */
 function getFiles(){
   return JSON.parse(localStorage.getItem(getUserKey()) || "[]");
 }
@@ -16,14 +17,13 @@ function getCurrentFile(){
   return getFiles().find(f => f.id === currentId);
 }
 
-let level = "main";
-let current = "";
+/* GLOBAL */
 let currentKey = "";
 let currentType = "";
 
 /* FORMAT */
 function formatRs(num){
-  return "Rs. " + num.toLocaleString(undefined,{minimumFractionDigits:2});
+  return "Rs. " + Number(num).toLocaleString(undefined,{minimumFractionDigits:2});
 }
 
 /* DATE */
@@ -32,11 +32,13 @@ function getDate(){
   return `${(d.getMonth()+1).toString().padStart(2,'0')}/${d.getDate().toString().padStart(2,'0')}`;
 }
 
-/* RENDER */
+/* RENDER TABLE */
 function render(){
   let file = getCurrentFile();
-  let given = file.given;
-  let used = file.used;
+  if(!file) return;
+
+  let given = file.given || {};
+  let used = file.used || {};
 
   let div = document.getElementById("totals");
 
@@ -55,7 +57,7 @@ function render(){
     </tr>
 
     <tr>
-      ${["A","B","C","D","E"].map(() => `
+      ${["A","B","C","D","E"].map(()=>`
         <th>Allo/Distribution</th>
         <th>Expenditure</th>
         <th>Balance</th>
@@ -69,12 +71,12 @@ function render(){
     for(let i=1;i<=5;i++){
       for(let j=1;j<=5;j++){
 
-        let keyBase = `${letter}${i}.${j}`;
+        let base = `${letter}${i}.${j}`;
 
         html += `<tr>
           <td>${count}</td>
           <td>${letter}${i}</td>
-          <td>${keyBase}</td>
+          <td>${base}</td>
         `;
 
         ["A","B","C","D","E"].forEach(col=>{
@@ -110,52 +112,41 @@ function render(){
   div.innerHTML = html;
 }
 
-function goLevel(val){
-  current=val;
-  level=val.length===1?"A":"A1";
-  render();
-}
-
-function goBack(){
-  if(level==="A1"){current=current[0];level="A";}
-  else if(level==="A"){current="";level="main";}
-  render();
-}
-
 /* EDIT */
 function edit(key,type){
-  currentKey=key;
-  currentType=type;
+  currentKey = key;
+  currentType = type;
+
   document.getElementById("modalTitle").innerText = key;
-  document.getElementById("modal").style.display="flex";
+  document.getElementById("modalInput").value = "";
+  document.getElementById("modal").style.display = "flex";
 }
 
 function closeModal(){
-  document.getElementById("modal").style.display="none";
+  document.getElementById("modal").style.display = "none";
 }
 
-// ONLY CHANGE THIS PART INSIDE saveModal()
-
+/* SAVE VALUE */
 function saveModal(){
-  let val = Number(document.getElementById("modalInput").value)||0;
+  let val = Number(document.getElementById("modalInput").value) || 0;
   let plus = document.getElementById("plusToggle").checked;
 
-  let files=getFiles();
-  let index=files.findIndex(f=>f.id===currentId);
-  let file=files[index];
+  let files = getFiles();
+  let index = files.findIndex(f => f.id === currentId);
+  let file = files[index];
+
+  if(!file.given) file.given = {};
+  if(!file.used) file.used = {};
 
   let old = file[currentType][currentKey] || 0;
   let newVal = plus ? old + val : val;
 
   file[currentType][currentKey] = newVal;
 
-  /* 🔥 FIX: SEPARATE HISTORY */
+  /* HISTORY */
   if(!file.history) file.history = {};
-  if(!file.history[currentKey]) {
-    file.history[currentKey] = {
-      given: [],
-      used: []
-    };
+  if(!file.history[currentKey]){
+    file.history[currentKey] = { given: [], used: [] };
   }
 
   file.history[currentKey][currentType].push({
@@ -164,7 +155,7 @@ function saveModal(){
     amount: val
   });
 
-  files[index]=file;
+  files[index] = file;
   saveFiles(files);
 
   closeModal();
@@ -175,22 +166,26 @@ function saveModal(){
 function viewHistory(e,key,type){
   e.preventDefault();
   localStorage.setItem("historyKey", key);
-  window.location="item-history.html";
+  window.location = "item-history.html";
 }
 
-/* EXPORT */
+/* EXPORT EXCEL */
 function exportExcel(){
 
   let file = getCurrentFile();
+
+  if(!file){
+    alert("No file selected!");
+    return;
+  }
+
   let data = [];
 
-  // HEADER ROW 1
   let header1 = [
     "No","Government Institute","Category",
     "A","","","B","","","C","","","D","","","E","",""
   ];
 
-  // HEADER ROW 2
   let header2 = [
     "","","",
     "Allo/Distribution","Expenditure","Balance",
@@ -205,7 +200,6 @@ function exportExcel(){
 
   let count = 1;
 
-  // DATA
   for(let letter of ["A","B","C","D","E"]){
     for(let i=1;i<=5;i++){
       for(let j=1;j<=5;j++){
@@ -219,10 +213,10 @@ function exportExcel(){
         ["A","B","C","D","E"].forEach(col=>{
           let key = `${col}${i}.${j}`;
 
-          let g = file.given[key] || 0;
-          let u = file.used[key] || 0;
+          let g = (file.given && file.given[key]) || 0;
+          let u = (file.used && file.used[key]) || 0;
 
-          row.push(g, u, g-u);
+          row.push(g,u,g-u);
         });
 
         data.push(row);
@@ -233,96 +227,45 @@ function exportExcel(){
 
   let ws = XLSX.utils.aoa_to_sheet(data);
 
-  /* COLUMN WIDTHS */
   ws['!cols'] = [
-    {wch:6},
-    {wch:20},
-    {wch:26},
+    {wch:6},{wch:20},{wch:26},
     ...Array(15).fill({wch:14.5})
   ];
 
-  /* MERGES */
   ws['!merges'] = [
-    // vertical merge
-    {s:{r:0,c:0}, e:{r:1,c:0}},
-    {s:{r:0,c:1}, e:{r:1,c:1}},
-    {s:{r:0,c:2}, e:{r:1,c:2}},
-
-    // A-E horizontal merge
-    {s:{r:0,c:3}, e:{r:0,c:5}},
-    {s:{r:0,c:6}, e:{r:0,c:8}},
-    {s:{r:0,c:9}, e:{r:0,c:11}},
-    {s:{r:0,c:12}, e:{r:0,c:14}},
-    {s:{r:0,c:15}, e:{r:0,c:17}}
+    {s:{r:0,c:0},e:{r:1,c:0}},
+    {s:{r:0,c:1},e:{r:1,c:1}},
+    {s:{r:0,c:2},e:{r:1,c:2}},
+    {s:{r:0,c:3},e:{r:0,c:5}},
+    {s:{r:0,c:6},e:{r:0,c:8}},
+    {s:{r:0,c:9},e:{r:0,c:11}},
+    {s:{r:0,c:12},e:{r:0,c:14}},
+    {s:{r:0,c:15},e:{r:0,c:17}}
   ];
 
-  /* STYLING */
-  for(let R=0; R<data.length; R++){
-    for(let C=0; C<18; C++){
-
-      let cell = ws[XLSX.utils.encode_cell({r:R,c:C})];
-      if(!cell) continue;
-
-      cell.s = {
-        border:{
-          top:{style:"thin"},
-          bottom:{style:"thin"},
-          left:{style:"thin"},
-          right:{style:"thin"}
-        },
-        alignment:{
-          horizontal:
-            (R===0 && C>=3) ? "center" :
-            (C<3 ? "left" : "center")
-        }
-      };
-
-      /* A–E HEADER */
-      if(R===0 && C>=3){
-        cell.s.fill = { fgColor:{rgb:"BFBFBF"} };
-      }
-
-      /* SUB HEADERS */
-      if(R===1){
-        if((C-3)%3===0){ // Allo
-          cell.s.fill = { fgColor:{rgb:"A6A6A6"} };
-        }
-        if((C-3)%3===2){ // Balance
-          cell.s.fill = { fgColor:{rgb:"808080"} };
-        }
-      }
-
-      /* BALANCE COLUMN FULL COLOR */
-      if(C>=3 && (C-3)%3===2 && R>1){
-        cell.s.fill = { fgColor:{rgb:"BFBFBF"} };
-      }
-    }
-  }
-
-  /* CREATE WORKBOOK */
   let wb = XLSX.utils.book_new();
   XLSX.utils.book_append_sheet(wb, ws, "Report");
 
-  /* DOWNLOAD FIX (IMPORTANT) */
-  let wbout = XLSX.write(wb, { bookType:'xlsx', type:'binary' });
+  let wbout = XLSX.write(wb, {bookType:'xlsx', type:'binary'});
 
-  function s2ab(s) {
+  function s2ab(s){
     let buf = new ArrayBuffer(s.length);
     let view = new Uint8Array(buf);
-    for (let i=0; i<s.length; i++) view[i] = s.charCodeAt(i) & 0xFF;
+    for(let i=0;i<s.length;i++) view[i]=s.charCodeAt(i)&0xFF;
     return buf;
   }
 
   let blob = new Blob([s2ab(wbout)], {type:"application/octet-stream"});
-
   let link = document.createElement("a");
   link.href = URL.createObjectURL(blob);
   link.download = file.name + ".xlsx";
   link.click();
 }
 
+/* NAVIGATION */
 function goDashboard(){
-  window.location="dashboard.html";
+  window.location = "dashboard.html";
 }
 
+/* INIT */
 render();
