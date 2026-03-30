@@ -180,6 +180,7 @@ function viewHistory(e,key,type){
 
 /* EXPORT */
 function exportExcel(){
+
   let file = getCurrentFile();
   let data = [];
 
@@ -204,6 +205,7 @@ function exportExcel(){
 
   let count = 1;
 
+  // DATA
   for(let letter of ["A","B","C","D","E"]){
     for(let i=1;i<=5;i++){
       for(let j=1;j<=5;j++){
@@ -216,10 +218,11 @@ function exportExcel(){
 
         ["A","B","C","D","E"].forEach(col=>{
           let key = `${col}${i}.${j}`;
-          let g = file.given[key]||0;
-          let u = file.used[key]||0;
 
-          row.push(g,u,g-u);
+          let g = file.given[key] || 0;
+          let u = file.used[key] || 0;
+
+          row.push(g, u, g-u);
         });
 
         data.push(row);
@@ -245,7 +248,7 @@ function exportExcel(){
     {s:{r:0,c:1}, e:{r:1,c:1}},
     {s:{r:0,c:2}, e:{r:1,c:2}},
 
-    // horizontal A-E
+    // A-E horizontal merge
     {s:{r:0,c:3}, e:{r:0,c:5}},
     {s:{r:0,c:6}, e:{r:0,c:8}},
     {s:{r:0,c:9}, e:{r:0,c:11}},
@@ -268,17 +271,18 @@ function exportExcel(){
           right:{style:"thin"}
         },
         alignment:{
-          horizontal: (C>=3 && R===0) ? "center" :
-                      (C<3 ? "left" : "center")
+          horizontal:
+            (R===0 && C>=3) ? "center" :
+            (C<3 ? "left" : "center")
         }
       };
 
-      /* A-E HEADER COLOR */
+      /* A–E HEADER */
       if(R===0 && C>=3){
         cell.s.fill = { fgColor:{rgb:"BFBFBF"} };
       }
 
-      /* SUB HEADER */
+      /* SUB HEADERS */
       if(R===1){
         if((C-3)%3===0){ // Allo
           cell.s.fill = { fgColor:{rgb:"A6A6A6"} };
@@ -295,11 +299,28 @@ function exportExcel(){
     }
   }
 
+  /* CREATE WORKBOOK */
   let wb = XLSX.utils.book_new();
   XLSX.utils.book_append_sheet(wb, ws, "Report");
 
-  XLSX.writeFile(wb, file.name + ".xlsx");
+  /* DOWNLOAD FIX (IMPORTANT) */
+  let wbout = XLSX.write(wb, { bookType:'xlsx', type:'binary' });
+
+  function s2ab(s) {
+    let buf = new ArrayBuffer(s.length);
+    let view = new Uint8Array(buf);
+    for (let i=0; i<s.length; i++) view[i] = s.charCodeAt(i) & 0xFF;
+    return buf;
+  }
+
+  let blob = new Blob([s2ab(wbout)], {type:"application/octet-stream"});
+
+  let link = document.createElement("a");
+  link.href = URL.createObjectURL(blob);
+  link.download = file.name + ".xlsx";
+  link.click();
 }
+
 function goDashboard(){
   window.location="dashboard.html";
 }
