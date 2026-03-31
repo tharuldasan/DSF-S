@@ -12,10 +12,8 @@
 <div class="container">
   <div class="card">
 
-    <!-- FILE NAME -->
     <h2 id="fileTitle"></h2>
 
-    <!-- ADD MODE -->
     <div class="add-mode-row">
       <span>Add Mode</span>
 
@@ -25,10 +23,8 @@
       </label>
     </div>
 
-    <!-- TABLE -->
     <div id="totals"></div>
 
-    <!-- BUTTONS -->
     <div class="action-buttons">
       <button onclick="goBack()">⬅ Back</button>
       <button onclick="exportExcel()">Export Excel</button>
@@ -62,7 +58,12 @@ function loadTitle(){
   document.getElementById("fileTitle").innerText =
     file ? file.name : "File";
 }
-loadTitle();
+
+/* 🔥 LOAD EVERYTHING */
+window.onload = function(){
+  loadTitle();
+  render();
+};
 </script>
 
 </body>
