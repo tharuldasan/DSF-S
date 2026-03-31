@@ -82,6 +82,7 @@ function render(){
   html += "</table>";
   document.getElementById("totals").innerHTML = html;
 }
+
 /* EDIT */
 function edit(key,type){
   currentKey = key;
