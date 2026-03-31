@@ -38,18 +38,9 @@ function render(){
       <th rowspan="2">No</th>
       <th rowspan="2">Government Institute</th>
       <th rowspan="2">Category</th>
-      <th colspan="3">A</th>
-      <th colspan="3">B</th>
-      <th colspan="3">C</th>
-      <th colspan="3">D</th>
-      <th colspan="3">E</th>
-    </tr>
-    <tr>
-      ${["A","B","C","D","E"].map(()=>`
-        <th>Allo/Distribution</th>
-        <th>Expenditure</th>
-        <th>Balance</th>
-      `).join("")}
+      <th>Allo/Distribution</th>
+      <th>Expenditure</th>
+      <th>Balance</th>
     </tr>
   `;
 
@@ -59,18 +50,15 @@ function render(){
     for(let i=1;i<=5;i++){
       for(let j=1;j<=5;j++){
 
+        let key = `${letter}${i}.${j}`;
+        let g = given[key] || 0;
+        let u = used[key] || 0;
+
         html += `<tr>
           <td>${count}</td>
           <td>${letter}${i}</td>
-          <td>${letter}${i}.${j}</td>
-        `;
+          <td>${key}</td>
 
-        ["A","B","C","D","E"].forEach(col=>{
-          let key = `${col}${i}.${j}`;
-          let g = given[key] || 0;
-          let u = used[key] || 0;
-
-          html += `
           <td class="clickable"
             onclick="edit('${key}','given')"
             oncontextmenu="viewHistory(event,'${key}','given')">
@@ -84,10 +72,8 @@ function render(){
           </td>
 
           <td class="balance-cell">${formatRs(g-u)}</td>
-          `;
-        });
+        </tr>`;
 
-        html += "</tr>";
         count++;
       }
     }
@@ -96,7 +82,6 @@ function render(){
   html += "</table>";
   document.getElementById("totals").innerHTML = html;
 }
-
 /* EDIT */
 function edit(key,type){
   currentKey = key;
