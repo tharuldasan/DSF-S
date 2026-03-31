@@ -3,17 +3,16 @@
 <head>
   <title>Accounting</title>
   <link rel="stylesheet" href="css/style.css">
-  <!-- Your JS first -->
-<script src="js/result.js"></script>
 
-<!-- Excel library AFTER -->
-<script src="https://cdn.jsdelivr.net/npm/xlsx-js-style@1.2.0/dist/xlsx.full.min.js"></script>
+  <!-- Excel Library -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
 </head>
 <body>
 
 <div class="container">
   <div class="card">
 
+    <!-- FILE NAME -->
     <h2 id="fileTitle"></h2>
 
     <!-- ADD MODE -->
@@ -26,8 +25,10 @@
       </label>
     </div>
 
+    <!-- TABLE -->
     <div id="totals"></div>
 
+    <!-- BUTTONS -->
     <div class="action-buttons">
       <button onclick="goBack()">⬅ Back</button>
       <button onclick="exportExcel()">Export Excel</button>
@@ -37,7 +38,7 @@
   </div>
 </div>
 
-<!-- EDIT MODAL -->
+<!-- MODAL -->
 <div id="modal" class="modal">
   <div class="modal-content">
     <h3 id="modalTitle"></h3>
