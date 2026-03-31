@@ -213,10 +213,10 @@ function exportExcel(){
 
         ["A","B","C","D","E"].forEach(col=>{
           let key = `${col}${i}.${j}`;
-          let g = file.given[key]||0;
-          let u = file.used[key]||0;
+          let g = file.given[key] || 0;
+          let u = file.used[key] || 0;
 
-          row.push(g,u,g-u);
+          row.push(g, u, g-u);
         });
 
         data.push(row);
@@ -227,7 +227,7 @@ function exportExcel(){
 
   let ws = XLSX.utils.aoa_to_sheet(data);
 
-  /* COLUMN WIDTHS */
+  /* WIDTH */
   ws['!cols'] = [
     {wch:6},
     {wch:20},
@@ -235,12 +235,11 @@ function exportExcel(){
     ...Array(15).fill({wch:14.5})
   ];
 
-  /* MERGES */
+  /* MERGE */
   ws['!merges'] = [
     {s:{r:0,c:0},e:{r:1,c:0}},
     {s:{r:0,c:1},e:{r:1,c:1}},
     {s:{r:0,c:2},e:{r:1,c:2}},
-
     {s:{r:0,c:3},e:{r:0,c:5}},
     {s:{r:0,c:6},e:{r:0,c:8}},
     {s:{r:0,c:9},e:{r:0,c:11}},
@@ -272,19 +271,24 @@ function exportExcel(){
         }
       };
 
-      /* A–E HEADER (GRAY) */
+      /* HEADERS */
       if(R===0 && C>=3){
         cell.s.fill = { fgColor:{rgb:"BFBFBF"} };
       }
 
-      /* SUB HEADER (DARK GRAY) */
       if(R===1 && C>=3){
         cell.s.fill = { fgColor:{rgb:"808080"} };
       }
 
-      /* BALANCE COLUMN (LIGHT GRAY) */
+      /* BALANCE */
       if((C-3)%3===2 && C>=3){
         cell.s.fill = { fgColor:{rgb:"D9D9D9"} };
+      }
+
+      /* NUMBER FORMAT 🔥 */
+      if(R >= 2 && C >= 3){
+        cell.z = "#,##0.00";
+        cell.s.alignment.horizontal = "right";
       }
     }
   }
