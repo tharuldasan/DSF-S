@@ -257,17 +257,25 @@ function exportExcel(){
         alignment:{
           horizontal: (C>=3 ? "center" : "left"),
           vertical:"center"
+        },
+        font:{
+          bold: (R<=1) // headers bold
         }
       };
 
+      /* A–E HEADER */
       if(R===0 && C>=3){
         cell.s.fill = { fgColor:{rgb:"BFBFBF"} };
+        cell.s.alignment.horizontal = "center";
       }
 
+      /* SUB HEADER */
       if(R===1 && C>=3){
         cell.s.fill = { fgColor:{rgb:"808080"} };
+        cell.s.alignment.horizontal = "center";
       }
 
+      /* BALANCE COLUMN */
       if((C-3)%3===2 && C>=3){
         cell.s.fill = { fgColor:{rgb:"BFBFBF"} };
       }
@@ -279,7 +287,6 @@ function exportExcel(){
 
   XLSX.writeFile(wb, file.name + ".xlsx");
 }
-
   function s2ab(s){
     let buf = new ArrayBuffer(s.length);
     let view = new Uint8Array(buf);
