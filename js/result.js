@@ -171,20 +171,7 @@ function viewHistory(e,key,type){
 
 /* EXPORT EXCEL */
 function exportExcel(){
-
-  // 🔥 PROTECTION (IMPORTANT)
-  if(typeof XLSX === "undefined"){
-    alert("Excel library not loaded!");
-    return;
-  }
-
   let file = getCurrentFile();
-
-  if(!file){
-    alert("No file selected!");
-    return;
-  }
-
   let data = [];
 
   let header1 = [
@@ -218,8 +205,8 @@ function exportExcel(){
 
         ["A","B","C","D","E"].forEach(col=>{
           let key = `${col}${i}.${j}`;
-          let g = (file.given && file.given[key]) || 0;
-          let u = (file.used && file.used[key]) || 0;
+          let g = file.given[key]||0;
+          let u = file.used[key]||0;
 
           row.push(g,u,g-u);
         });
@@ -232,35 +219,60 @@ function exportExcel(){
 
   let ws = XLSX.utils.aoa_to_sheet(data);
 
+  /* COLUMN WIDTHS */
   ws['!cols'] = [
-    {wch:6},{wch:20},{wch:26},
+    {wch:6},
+    {wch:20},
+    {wch:26},
     ...Array(15).fill({wch:14.5})
   ];
 
+  /* MERGES */
   ws['!merges'] = [
-    {s:{r:0,c:0},e:{r:1,c:0}},
-    {s:{r:0,c:1},e:{r:1,c:1}},
-    {s:{r:0,c:2},e:{r:1,c:2}},
-    {s:{r:0,c:3},e:{r:0,c:5}},
-    {s:{r:0,c:6},e:{r:0,c:8}},
-    {s:{r:0,c:9},e:{r:0,c:11}},
-    {s:{r:0,c:12},e:{r:0,c:14}},
-    {s:{r:0,c:15},e:{r:0,c:17}}
+    {s:{r:0,c:0}, e:{r:1,c:0}},
+    {s:{r:0,c:1}, e:{r:1,c:1}},
+    {s:{r:0,c:2}, e:{r:1,c:2}},
+
+    {s:{r:0,c:3}, e:{r:0,c:5}},
+    {s:{r:0,c:6}, e:{r:0,c:8}},
+    {s:{r:0,c:9}, e:{r:0,c:11}},
+    {s:{r:0,c:12}, e:{r:0,c:14}},
+    {s:{r:0,c:15}, e:{r:0,c:17}}
   ];
 
-  // SIMPLE STYLE (SAFE)
-  Object.keys(ws).forEach(cell=>{
-    if(cell[0] === '!') return;
+  /* STYLE */
+  for(let R=0; R<data.length; R++){
+    for(let C=0; C<18; C++){
 
-    ws[cell].s = {
-      border:{
-        top:{style:"thin"},
-        bottom:{style:"thin"},
-        left:{style:"thin"},
-        right:{style:"thin"}
+      let cell = ws[XLSX.utils.encode_cell({r:R,c:C})];
+      if(!cell) continue;
+
+      cell.s = {
+        border:{
+          top:{style:"thin"},
+          bottom:{style:"thin"},
+          left:{style:"thin"},
+          right:{style:"thin"}
+        },
+        alignment:{
+          horizontal: (C>=3 ? "center" : "left"),
+          vertical:"center"
+        }
+      };
+
+      if(R===0 && C>=3){
+        cell.s.fill = { fgColor:{rgb:"BFBFBF"} };
       }
-    };
-  });
+
+      if(R===1 && C>=3){
+        cell.s.fill = { fgColor:{rgb:"808080"} };
+      }
+
+      if((C-3)%3===2 && C>=3){
+        cell.s.fill = { fgColor:{rgb:"BFBFBF"} };
+      }
+    }
+  }
 
   let wb = XLSX.utils.book_new();
   XLSX.utils.book_append_sheet(wb, ws, "Report");
