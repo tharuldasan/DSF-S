@@ -1,46 +1,36 @@
-function getUserKey(){
-  return "files_" + localStorage.getItem("currentUser");
-}
-
-let currentId = localStorage.getItem("currentFile");
-
-/* FILE FUNCTIONS */
-function getFiles(){
-  return JSON.parse(localStorage.getItem(getUserKey()) || "[]");
-}
-
-function saveFiles(files){
-  localStorage.setItem(getUserKey(), JSON.stringify(files));
-}
-
-function getCurrentFile(){
-  return getFiles().find(f => f.id === currentId);
-}
-
-/* GLOBAL */
 let currentKey = "";
 let currentType = "";
 
-/* FORMAT */
-function formatRs(num){
-  return "Rs. " + Number(num).toLocaleString(undefined,{minimumFractionDigits:2});
+/* GET CURRENT FILE */
+function getCurrentFile(){
+  let user = localStorage.getItem("currentUser");
+  let files = JSON.parse(localStorage.getItem("files_" + user)||"[]");
+  let id = localStorage.getItem("currentFile");
+
+  return files.find(f => f.id === id);
 }
 
-/* DATE */
-function getDate(){
-  let d = new Date();
-  return `${(d.getMonth()+1).toString().padStart(2,'0')}/${d.getDate().toString().padStart(2,'0')}`;
+/* SAVE FILE */
+function saveFile(file){
+  let user = localStorage.getItem("currentUser");
+  let files = JSON.parse(localStorage.getItem("files_" + user)||"[]");
+
+  let index = files.findIndex(f => f.id === file.id);
+  files[index] = file;
+
+  localStorage.setItem("files_" + user, JSON.stringify(files));
+}
+
+/* FORMAT */
+function formatRs(val){
+  return "Rs. " + Number(val).toLocaleString(undefined,{minimumFractionDigits:2});
 }
 
 /* RENDER TABLE */
 function render(){
   let file = getCurrentFile();
-  if(!file) return;
-
   let given = file.given || {};
   let used = file.used || {};
-
-  let div = document.getElementById("totals");
 
   let html = `
   <table>
@@ -48,14 +38,12 @@ function render(){
       <th rowspan="2">No</th>
       <th rowspan="2">Government Institute</th>
       <th rowspan="2">Category</th>
-
       <th colspan="3">A</th>
       <th colspan="3">B</th>
       <th colspan="3">C</th>
       <th colspan="3">D</th>
       <th colspan="3">E</th>
     </tr>
-
     <tr>
       ${["A","B","C","D","E"].map(()=>`
         <th>Allo/Distribution</th>
@@ -71,17 +59,14 @@ function render(){
     for(let i=1;i<=5;i++){
       for(let j=1;j<=5;j++){
 
-        let base = `${letter}${i}.${j}`;
-
         html += `<tr>
           <td>${count}</td>
           <td>${letter}${i}</td>
-          <td>${base}</td>
+          <td>${letter}${i}.${j}</td>
         `;
 
         ["A","B","C","D","E"].forEach(col=>{
           let key = `${col}${i}.${j}`;
-
           let g = given[key] || 0;
           let u = used[key] || 0;
 
@@ -109,7 +94,7 @@ function render(){
   }
 
   html += "</table>";
-  div.innerHTML = html;
+  document.getElementById("totals").innerHTML = html;
 }
 
 /* EDIT */
@@ -117,59 +102,76 @@ function edit(key,type){
   currentKey = key;
   currentType = type;
 
-  document.getElementById("modalTitle").innerText = key;
+  document.getElementById("modalTitle").innerText = key + " - " + type;
   document.getElementById("modalInput").value = "";
   document.getElementById("modal").style.display = "flex";
 }
 
-function closeModal(){
-  document.getElementById("modal").style.display = "none";
-}
-
-/* SAVE VALUE */
+/* SAVE MODAL */
 function saveModal(){
-  let val = Number(document.getElementById("modalInput").value) || 0;
-  let plus = document.getElementById("plusToggle").checked;
+  let val = Number(document.getElementById("modalInput").value);
+  if(!val) return closeModal();
 
-  let files = getFiles();
-  let index = files.findIndex(f => f.id === currentId);
-  let file = files[index];
+  let file = getCurrentFile();
+  let addMode = document.getElementById("plusToggle").checked;
 
-  if(!file.given) file.given = {};
-  if(!file.used) file.used = {};
-
-  let old = file[currentType][currentKey] || 0;
-  let newVal = plus ? old + val : val;
-
-  file[currentType][currentKey] = newVal;
-
-  /* HISTORY */
+  if(!file[currentType]) file[currentType] = {};
   if(!file.history) file.history = {};
-  if(!file.history[currentKey]){
-    file.history[currentKey] = { given: [], used: [] };
+  if(!file.history[currentKey]) file.history[currentKey] = [];
+
+  if(addMode){
+    file[currentType][currentKey] =
+      (file[currentType][currentKey] || 0) + val;
+  }else{
+    file[currentType][currentKey] = val;
   }
 
-  file.history[currentKey][currentType].push({
-    date: getDate(),
-    status: plus ? "Added" : "Changed",
-    amount: val
+  file.history[currentKey].push({
+    type: currentType,
+    amount: val,
+    mode: addMode ? "Added" : "Set",
+    date: new Date().toLocaleDateString()
   });
 
-  files[index] = file;
-  saveFiles(files);
-
+  saveFile(file);
   closeModal();
   render();
 }
 
-/* RIGHT CLICK HISTORY */
-function viewHistory(e,key,type){
-  e.preventDefault();
-  localStorage.setItem("historyKey", key);
-  window.location = "item-history.html";
+/* CLOSE MODAL */
+function closeModal(){
+  document.getElementById("modal").style.display = "none";
 }
 
-/* EXPORT EXCEL */
+/* HISTORY (RIGHT CLICK) */
+function viewHistory(e,key,type){
+  e.preventDefault();
+
+  let file = getCurrentFile();
+  let history = (file.history && file.history[key]) || [];
+
+  let html = "<table><tr><th>Date</th><th>Type</th><th>Amount</th></tr>";
+
+  history.forEach(h=>{
+    if(h.type === type){
+      html += `<tr>
+        <td>${h.date}</td>
+        <td>${h.mode}</td>
+        <td>${formatRs(h.amount)}</td>
+      </tr>`;
+    }
+  });
+
+  html += "</table><br><button onclick='render()'>⬅ Back</button>";
+
+  document.getElementById("totals").innerHTML = html;
+}
+
+/* NAVIGATION */
+function goBack(){ history.back(); }
+function goDashboard(){ window.location.href="dashboard.html"; }
+
+/* EXPORT EXCEL (YOUR FINAL VERSION) */
 function exportExcel(){
   let file = getCurrentFile();
   let data = [];
@@ -219,92 +221,23 @@ function exportExcel(){
 
   let ws = XLSX.utils.aoa_to_sheet(data);
 
-  /* COLUMN WIDTHS */
   ws['!cols'] = [
-    {wch:6},
-    {wch:20},
-    {wch:26},
+    {wch:6},{wch:20},{wch:26},
     ...Array(15).fill({wch:14.5})
   ];
 
-  /* MERGES */
   ws['!merges'] = [
-    {s:{r:0,c:0}, e:{r:1,c:0}},
-    {s:{r:0,c:1}, e:{r:1,c:1}},
-    {s:{r:0,c:2}, e:{r:1,c:2}},
-
-    {s:{r:0,c:3}, e:{r:0,c:5}},
-    {s:{r:0,c:6}, e:{r:0,c:8}},
-    {s:{r:0,c:9}, e:{r:0,c:11}},
-    {s:{r:0,c:12}, e:{r:0,c:14}},
-    {s:{r:0,c:15}, e:{r:0,c:17}}
+    {s:{r:0,c:0},e:{r:1,c:0}},
+    {s:{r:0,c:1},e:{r:1,c:1}},
+    {s:{r:0,c:2},e:{r:1,c:2}},
+    {s:{r:0,c:3},e:{r:0,c:5}},
+    {s:{r:0,c:6},e:{r:0,c:8}},
+    {s:{r:0,c:9},e:{r:0,c:11}},
+    {s:{r:0,c:12},e:{r:0,c:14}},
+    {s:{r:0,c:15},e:{r:0,c:17}}
   ];
-
-  /* STYLE */
-  for(let R=0; R<data.length; R++){
-    for(let C=0; C<18; C++){
-
-      let cell = ws[XLSX.utils.encode_cell({r:R,c:C})];
-      if(!cell) continue;
-
-      cell.s = {
-        border:{
-          top:{style:"thin"},
-          bottom:{style:"thin"},
-          left:{style:"thin"},
-          right:{style:"thin"}
-        },
-        alignment:{
-          horizontal: (C>=3 ? "center" : "left"),
-          vertical:"center"
-        },
-        font:{
-          bold: (R<=1) // headers bold
-        }
-      };
-
-      /* A–E HEADER */
-      if(R===0 && C>=3){
-        cell.s.fill = { fgColor:{rgb:"BFBFBF"} };
-        cell.s.alignment.horizontal = "center";
-      }
-
-      /* SUB HEADER */
-      if(R===1 && C>=3){
-        cell.s.fill = { fgColor:{rgb:"808080"} };
-        cell.s.alignment.horizontal = "center";
-      }
-
-      /* BALANCE COLUMN */
-      if((C-3)%3===2 && C>=3){
-        cell.s.fill = { fgColor:{rgb:"BFBFBF"} };
-      }
-    }
-  }
 
   let wb = XLSX.utils.book_new();
   XLSX.utils.book_append_sheet(wb, ws, "Report");
-
   XLSX.writeFile(wb, file.name + ".xlsx");
 }
-  function s2ab(s){
-    let buf = new ArrayBuffer(s.length);
-    let view = new Uint8Array(buf);
-    for(let i=0;i<s.length;i++) view[i]=s.charCodeAt(i)&0xFF;
-    return buf;
-  }
-
-  let blob = new Blob([s2ab(wbout)], {type:"application/octet-stream"});
-  let link = document.createElement("a");
-  link.href = URL.createObjectURL(blob);
-  link.download = file.name + ".xlsx";
-  link.click();
-}
-
-/* NAVIGATION */
-function goDashboard(){
-  window.location = "dashboard.html";
-}
-
-/* INIT */
-render();
