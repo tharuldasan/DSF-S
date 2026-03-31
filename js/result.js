@@ -110,23 +110,29 @@ function edit(key,type){
 /* SAVE MODAL */
 function saveModal(){
   let val = Number(document.getElementById("modalInput").value);
-  if(!val) return closeModal();
+  if(isNaN(val)) return closeModal();
 
   let file = getCurrentFile();
   let addMode = document.getElementById("plusToggle").checked;
 
-  if(!file[currentType]) file[currentType] = {};
+  // SAFETY (IMPORTANT)
+  if(!file.given) file.given = {};
+  if(!file.used) file.used = {};
   if(!file.history) file.history = {};
   if(!file.history[currentKey]) file.history[currentKey] = [];
 
+  // CLEAN KEY
+  let key = currentKey.trim();
+
+  // UPDATE ONLY THIS KEY (NO SPREAD BUG)
   if(addMode){
-    file[currentType][currentKey] =
-      (file[currentType][currentKey] || 0) + val;
+    file[currentType][key] = (file[currentType][key] || 0) + val;
   }else{
-    file[currentType][currentKey] = val;
+    file[currentType][key] = val;
   }
 
-  file.history[currentKey].push({
+  // SAVE HISTORY
+  file.history[key].push({
     type: currentType,
     amount: val,
     mode: addMode ? "Added" : "Set",
