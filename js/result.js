@@ -88,8 +88,8 @@ async function render(){
 
     html += `<tr>
       <td>${i}</td>
-      <td>${i}</td>
-      <td>${i}</td>
+      <td>${file.rows?.[i-1]?.head || ""}</td>
+      <td>${file.rows?.[i-1]?.vote || ""}</td>
     `;
 
     DS.forEach(col=>{
