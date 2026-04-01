@@ -58,7 +58,10 @@ async function addRow(){
   const { data: sessionData } = await supabaseClient.auth.getSession();
   let userEmail = sessionData.session.user.email;
 
+  let id = "row_" + Date.now(); // 🔥 FIX: generate id
+
   let { error } = await supabaseClient.from("rows").insert({
+    id: id,
     user_email: userEmail,
     head: head,
     vote: vote
@@ -67,6 +70,8 @@ async function addRow(){
   if(error){
     console.log(error);
     alert("Insert failed");
+  }else{
+    loadRows();
   }
 }
 
