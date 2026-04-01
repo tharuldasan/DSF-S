@@ -8,6 +8,7 @@ const DS = [
   "Matugama","Walallawita","Ingiriya"
 ];
 
+/* FILE */
 function getCurrentFile(){
   let user = localStorage.getItem("currentUser");
   let files = JSON.parse(localStorage.getItem("files_" + user)||"[]");
@@ -25,11 +26,12 @@ function saveFile(file){
   localStorage.setItem("files_" + user, JSON.stringify(files));
 }
 
+/* FORMAT */
 function formatRs(val){
   return "Rs. " + Number(val).toLocaleString(undefined,{minimumFractionDigits:2});
 }
 
-/* 🔥 RENDER */
+/* RENDER */
 function render(){
   let file = getCurrentFile();
   if(!file) return;
@@ -49,7 +51,7 @@ function render(){
       <th></th><th></th><th></th>
       ${DS.map(()=>`
         <th>Allo</th>
-        <th>Used</th>
+        <th>Expenditure</th>
         <th>Balance</th>
       `).join("")}
     </tr>
@@ -132,12 +134,11 @@ function closeSearch(){
 function doSearch(){
   let head = document.getElementById("searchHead").value;
   let vote = document.getElementById("searchVote").value;
-  let ds = document.getElementById("searchDS").value;
 
   let found = false;
 
-  document.querySelectorAll("#totals td").forEach(td=>{
-    td.style.background = ""; // reset
+  document.querySelectorAll("#totals tr").forEach(row=>{
+    row.style.background = "";
   });
 
   let rows = document.querySelectorAll("#totals table tr");
@@ -177,7 +178,104 @@ function closePopup(){
 function goBack(){ history.back(); }
 function goDashboard(){ window.location.href="dashboard.html"; }
 
-/* EXCEL (simple) */
+/* 🔥 FULL EXCEL EXPORT (UPDATED STRUCTURE) */
 function exportExcel(){
-  alert("Excel export can be re-added later");
+  let file = getCurrentFile();
+  let data = [];
+
+  let header1 = [
+    "No","Head","Vote",
+    ...DS.flatMap(d => [d,"",""])
+  ];
+
+  let header2 = [
+    "","","",
+    ...DS.flatMap(() => ["Allo","Expenditure","Balance"])
+  ];
+
+  data.push(header1);
+  data.push(header2);
+
+  for(let i=1;i<=100;i++){
+
+    let row = [
+      i,
+      "Head " + i,
+      "Vote " + i
+    ];
+
+    DS.forEach(col=>{
+      let key = col + "_" + i;
+
+      let g = file.given[key] || 0;
+      let u = file.used[key] || 0;
+
+      row.push(g, u, g-u);
+    });
+
+    data.push(row);
+  }
+
+  let ws = XLSX.utils.aoa_to_sheet(data);
+
+  /* WIDTH */
+  ws['!cols'] = [
+    {wch:6},{wch:20},{wch:20},
+    ...Array(DS.length*3).fill({wch:14})
+  ];
+
+  /* MERGE HEADERS */
+  let merges = [];
+
+  for(let i=0;i<DS.length;i++){
+    let start = 3 + i*3;
+    merges.push({s:{r:0,c:start}, e:{r:0,c:start+2}});
+  }
+
+  ws['!merges'] = merges;
+
+  /* STYLE */
+  for(let R=0; R<data.length; R++){
+    for(let C=0; C<data[0].length; C++){
+
+      let cellRef = XLSX.utils.encode_cell({r:R,c:C});
+      let cell = ws[cellRef];
+      if(!cell) continue;
+
+      cell.s = {
+        border:{
+          top:{style:"thin"},
+          bottom:{style:"thin"},
+          left:{style:"thin"},
+          right:{style:"thin"}
+        },
+        alignment:{
+          horizontal: (C>=3 ? "center" : "left"),
+          vertical:"center"
+        }
+      };
+
+      if(R===0 && C>=3){
+        cell.s.fill = { fgColor:{rgb:"BFBFBF"} };
+      }
+
+      if(R===1 && C>=3){
+        cell.s.fill = { fgColor:{rgb:"808080"} };
+      }
+
+      if((C-3)%3===2 && C>=3){
+        cell.s.fill = { fgColor:{rgb:"D9D9D9"} };
+      }
+
+      if(R>=2 && C>=3){
+        cell.z = "#,##0.00";
+        cell.s.alignment.horizontal = "right";
+      }
+    }
+  }
+
+  let wb = XLSX.utils.book_new();
+  XLSX.utils.book_append_sheet(wb, ws, "Report");
+
+  XLSX.writeFile(wb, file.name + ".xlsx");
 }
