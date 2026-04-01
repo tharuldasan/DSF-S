@@ -32,7 +32,10 @@ function closeCreateModal(){
 async function createFileConfirm(){
 
   let name = document.getElementById("fileNameInput").value.trim();
-  if(!name) return;
+  if(!name){
+    alert("Enter file name");
+    return;
+  }
 
   let id = "file_" + Date.now();
 
@@ -51,26 +54,39 @@ async function createFileConfirm(){
 
   let file = { id, name, given, used };
 
-  let user = localStorage.getItem("user");
+  // 🔥 GET LOGGED USER EMAIL FROM SUPABASE
+  const { data: sessionData } = await supabaseClient.auth.getSession();
 
+  if(!sessionData.session){
+    alert("User not logged in");
+    return;
+  }
+
+  let userEmail = sessionData.session.user.email;
+
+  // 🔥 INSERT INTO DATABASE
   let { error } = await supabaseClient
     .from("files")
     .insert({
       id: id,
-      user_email: user,
+      user_email: userEmail,
       name: name,
       data: file
     });
 
   if(error){
-    alert("Error saving file");
     console.log(error);
+    alert("Error saving file");
     return;
   }
 
+  // SAVE CURRENT FILE ID
   localStorage.setItem("currentFile", id);
 
+  // CLOSE MODAL
   closeCreateModal();
+
+  // GO TO RESULT PAGE
   window.location = "result.html";
 }
 
