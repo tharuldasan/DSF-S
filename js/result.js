@@ -80,30 +80,30 @@ function formatRs(val){
 
 /* RENDER */
 async function render(){
-  let rows = await loadRows();
+
+  let rows = await loadRows(); // ✅ ONLY ONCE
   let file = await getCurrentFile();
   if(!file) return;
 
   let given = file.given || {};
   let used = file.used || {};
 
- let html = `
-<table>
-<tr>
-  <th rowspan="2">No</th>
-  <th rowspan="2">Head</th>
-  <th rowspan="2">Vote</th>
-  ${DS.map(d=>`<th colspan="3">${d}</th>`).join("")}
-</tr>
-<tr>
-  ${DS.map(d=>`
-  <th>${d === "Total Allocation" ? "Received" : "Allo/Distribution"}</th>
-  <th>${d === "Total Allocation" ? "Issued" : "Expenditure"}</th>
-  <th>Balance</th>
-`).join("")}
-</tr>
-`;
-  let rows = await loadRows(); // 🔥 NEW
+  let html = `
+  <table>
+  <tr>
+    <th rowspan="2">No</th>
+    <th rowspan="2">Head</th>
+    <th rowspan="2">Vote</th>
+    ${DS.map(d=>`<th colspan="3">${d}</th>`).join("")}
+  </tr>
+  <tr>
+    ${DS.map(d=>`
+      <th>${d === "Total Allocation" ? "Received" : "Allo/Distribution"}</th>
+      <th>${d === "Total Allocation" ? "Issued" : "Expenditure"}</th>
+      <th>Balance</th>
+    `).join("")}
+  </tr>
+  `;
 
   for(let i=0;i<rows.length;i++){
 
@@ -114,15 +114,15 @@ async function render(){
     `;
 
     DS.forEach(col=>{
-      let key = col + "_" + i;
+      let key = col + "_" + (i+1); // ✅ FIXED INDEX
 
       let g = given[key] || 0;
       let u = used[key] || 0;
 
       html += `
-      <td class="clickable" onclick="edit('${key}','given')">${formatRs(g)}</td>
-      <td class="clickable" onclick="edit('${key}','used')">${formatRs(u)}</td>
-      <td class="balance-cell">${formatRs(g-u)}</td>
+        <td class="clickable" onclick="edit('${key}','given')">${formatRs(g)}</td>
+        <td class="clickable" onclick="edit('${key}','used')">${formatRs(u)}</td>
+        <td class="balance-cell">${formatRs(g-u)}</td>
       `;
     });
 
@@ -130,11 +130,11 @@ async function render(){
   }
 
   html += "</table>";
-  
+
   document.getElementById("totals").innerHTML = html;
+
   applyHighlight();
 }
-
 /* EDIT */
 function edit(key,type){
   currentKey = key;
