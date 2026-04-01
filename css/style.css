@@ -246,3 +246,36 @@ th:nth-child(2), td:nth-child(2){
 th:nth-child(3), td:nth-child(3){
   width:200px;
 }
+
+.custom-select{
+  border:1px solid #ccc;
+  padding:10px;
+  border-radius:10px;
+  cursor:pointer;
+  position:relative;
+  margin-top:10px;
+}
+
+.dropdown-list{
+  display:none;
+  position:absolute;
+  background:white;
+  width:100%;
+  border:1px solid #ccc;
+  max-height:150px;
+  overflow:auto;
+  z-index:10;
+}
+
+.dropdown-list div{
+  padding:8px;
+  cursor:pointer;
+}
+
+.dropdown-list div:hover{
+  background:#e5e7eb;
+}
+
+.show{
+  display:block;
+}
