@@ -33,18 +33,21 @@ function loadRows(){
 }
 
 /* ADD ROW */
-function addRow(){
+async function addRow(){
 
   let head = prompt("Enter Head");
   let vote = prompt("Enter Vote");
 
   if(!head || !vote) return;
 
-  let rows = JSON.parse(localStorage.getItem("rows") || "[]");
+  const { data: sessionData } = await supabaseClient.auth.getSession();
+  let userEmail = sessionData.session.user.email;
 
-  rows.push({ head, vote });
-
-  localStorage.setItem("rows", JSON.stringify(rows));
+  await supabaseClient.from("rows").insert({
+    user_email: userEmail,
+    head: head,
+    vote: vote
+  });
 
   loadRows();
 }
