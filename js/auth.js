@@ -1,44 +1,18 @@
-function getUsers(){
-  return JSON.parse(localStorage.getItem("users") || "[]");
-}
+const SUPABASE_URL = "YOUR_PROJECT_URL";
+const SUPABASE_KEY = "YOUR_ANON_KEY";
 
-function saveUsers(users){
-  localStorage.setItem("users", JSON.stringify(users));
-}
+const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
-function login(){
+/* LOGIN */
+async function login(){
+
   const email = document.getElementById("email").value.trim();
-  const pass  = document.getElementById("password").value.trim();
+  const password = document.getElementById("password").value.trim();
 
-  if(!email || !pass){
+  if(!email || !password){
     alert("Enter email and password");
     return;
   }
-
-  let users = getUsers();
-  let existingUser = users.find(u => u.email === email);
-
-  if(existingUser){
-    if(existingUser.password === pass){
-      localStorage.setItem("currentUser", email);
-      window.location = "dashboard.html";
-    }else{
-      alert("Email already used with a different password");
-    }
-  }else{
-    users.push({email, password: pass});
-    saveUsers(users);
-
-    localStorage.setItem("currentUser", email);
-    alert("Account created!");
-    window.location = "dashboard.html";
-  }
-}
-
-async function login(){
-
-  let email = document.getElementById("email").value;
-  let password = document.getElementById("password").value;
 
   let { data, error } = await supabase.auth.signInWithPassword({
     email,
@@ -48,7 +22,30 @@ async function login(){
   if(error){
     alert(error.message);
   }else{
-    localStorage.setItem("user", email);
-    window.location.href = "dashboard.html";
+    localStorage.setItem("user", email); // keep for now
+    window.location = "dashboard.html";
+  }
+}
+
+/* SIGNUP */
+async function signup(){
+
+  const email = document.getElementById("email").value.trim();
+  const password = document.getElementById("password").value.trim();
+
+  if(!email || !password){
+    alert("Enter email and password");
+    return;
+  }
+
+  let { data, error } = await supabase.auth.signUp({
+    email,
+    password
+  });
+
+  if(error){
+    alert(error.message);
+  }else{
+    alert("Account created! Now login.");
   }
 }
