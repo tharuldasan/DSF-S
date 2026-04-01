@@ -77,11 +77,11 @@ async function render(){
   ${DS.map(d=>`<th colspan="3">${d}</th>`).join("")}
 </tr>
 <tr>
-  ${DS.map(()=>`
-    <th>Allo/Distribution</th>
-    <th>Expenditure</th>
-    <th>Balance</th>
-  `).join("")}
+  ${DS.map(d=>`
+  <th>${d === "Total Allocation" ? "Received" : "Allo/Distribution"}</th>
+  <th>${d === "Total Allocation" ? "Issued" : "Expenditure"}</th>
+  <th>Balance</th>
+`).join("")}
 </tr>
 `;
   for(let i=1;i<=100;i++){
