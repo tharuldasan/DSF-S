@@ -241,18 +241,18 @@ async function exportExcel(){
   data.push(header2);
 
   /* DATA */
-  let rows = JSON.parse(localStorage.getItem("rows") || "[]");
+  let rows = await loadRows(); // ✅ FROM SUPABASE
 
-  for(let i=1;i<=rows.length;i++){
+  for(let i=0;i<rows.length;i++){
     
-    let row = [
-    i,
-    rows[i-1]?.head || "",
-    rows[i-1]?.vote || ""
-    ];
+  let row = [
+    i+1,
+    rows[i]?.head || "",
+    rows[i]?.vote || ""
+  ];
 
     DS.forEach(col=>{
-      let key = col + "_" + i;
+      let key = col + "_" + (i+1);
 
       let g = file.given?.[key] || 0;
       let u = file.used?.[key] || 0;
