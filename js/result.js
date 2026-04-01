@@ -47,7 +47,7 @@ function formatRs(val){
 }
 
 /* RENDER */
-function render(){
+async function render(){
   let file = getCurrentFile();
   if(!file) return;
 
