@@ -286,3 +286,15 @@ th:nth-child(3), td:nth-child(3){
   background:#facc15 !important;
   transition: background 5s ease;
 }
+
+/* FORCE ALL TABLE COLUMNS SAME SIZE */
+table{
+  table-layout: fixed;
+}
+
+th, td{
+  width:90px;
+  overflow:hidden;
+  text-overflow:ellipsis;
+}
+
