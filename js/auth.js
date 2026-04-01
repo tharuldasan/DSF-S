@@ -40,15 +40,19 @@ async function login(){
 /* SIGNUP */
 async function signup(){
 
+  if(loading) return;
+  loading = true;
+
   const email = document.getElementById("email").value.trim();
   const password = document.getElementById("password").value.trim();
 
   if(!email || !password){
     alert("Enter email and password");
+    loading = false;
     return;
   }
 
-  let { data, error } = await supabaseClient.auth.signUp({
+  let { error } = await supabaseClient.auth.signUp({
     email,
     password
   });
@@ -58,7 +62,10 @@ async function signup(){
   }else{
     alert("Account created! Now login.");
   }
+
+  loading = false;
 }
+
 window.onload = async function(){
 
   const { data } = await supabaseClient.auth.getSession();
