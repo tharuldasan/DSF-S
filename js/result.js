@@ -124,11 +124,13 @@ function edit(key,type){
   document.getElementById("modal").style.display = "flex";
 }
 
-function saveModal(){
+async function saveModal(){
+
   let val = Number(document.getElementById("modalInput").value);
   if(isNaN(val)) return closeModal();
 
-  let file = getCurrentFile();
+  let file = await getCurrentFile(); // ✅ FIXED
+
   let addMode = document.getElementById("plusToggle").checked;
 
   if(!file.given) file.given = {};
@@ -141,7 +143,8 @@ function saveModal(){
     file[currentType][currentKey] = val;
   }
 
-  saveFile(file);
+  await saveFile(file); // ✅ MUST await
+
   closeModal();
   render();
 }
