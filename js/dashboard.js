@@ -29,7 +29,8 @@ function closeCreateModal(){
 }
 
 /* CREATE FILE */
-function createFileConfirm(){
+async function createFileConfirm(){
+
   let name = document.getElementById("fileNameInput").value.trim();
   if(!name) return;
 
@@ -50,12 +51,23 @@ function createFileConfirm(){
 
   let file = { id, name, given, used };
 
-  let key = getUserKey();
-  let files = JSON.parse(localStorage.getItem(key) || "[]");
+  let user = localStorage.getItem("user");
 
-  files.push(file);
+  let { error } = await supabaseClient
+    .from("files")
+    .insert({
+      id: id,
+      user_email: user,
+      name: name,
+      data: file
+    });
 
-  localStorage.setItem(key, JSON.stringify(files));
+  if(error){
+    alert("Error saving file");
+    console.log(error);
+    return;
+  }
+
   localStorage.setItem("currentFile", id);
 
   closeCreateModal();
