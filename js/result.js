@@ -17,6 +17,19 @@ const DS = [
   "Matugama","Walallawita","Ingiriya"
 ];
 
+async function loadRows(){
+
+  const { data: sessionData } = await supabaseClient.auth.getSession();
+  let userEmail = sessionData.session.user.email;
+
+  let { data } = await supabaseClient
+    .from("rows")
+    .select("*")
+    .eq("user_email", userEmail);
+
+  return data || [];
+}
+
 /* FILE */
 async function getCurrentFile(){
 
