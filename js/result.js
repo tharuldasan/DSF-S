@@ -10,6 +10,7 @@ let lastSearch = null;
 let highlightTimer = null;
 
 const DS = [
+  "Total Allocation", // ✅ NEW FIRST
   "Ds","Kalutara","Panadura","Bandaragama","Agalawatta",
   "Beruwala","Bulathsinhala","Dodangoda","Horana",
   "Madurawala","Millaniya","Palindanuwara",
