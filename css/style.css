@@ -309,9 +309,10 @@ th, td{
   text-overflow:ellipsis;
 }
 
-/* MAKE ONLY DS COLUMNS BIGGER */
-td:nth-child(n+4), th:nth-child(n+4){
-  padding:20px 16px;   /* increase height + width */
-  font-size:15px;      /* slightly bigger text */
-  min-width:110px;     /* wider cells */
+/* DS columns exact width (15.00 ≈ 150px) */
+td:nth-child(n+4),
+th:nth-child(n+4){
+  width:150px;
+  min-width:150px;
+  max-width:150px;
 }
