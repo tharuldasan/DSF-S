@@ -11,11 +11,24 @@ const DS = [
 ];
 
 /* FILE */
-function getCurrentFile(){
-  let user = localStorage.getItem("currentUser");
-  let files = JSON.parse(localStorage.getItem("files_" + user)||"[]");
+async function getCurrentFile(){
+
+  let user = localStorage.getItem("user");
   let id = localStorage.getItem("currentFile");
-  return files.find(f => f.id === id);
+
+  let { data, error } = await supabaseClient
+    .from("files")
+    .select("*")
+    .eq("user_email", user)
+    .eq("id", id)
+    .single();
+
+  if(error){
+    console.log(error);
+    return null;
+  }
+
+  return data.data;
 }
 
 function saveFile(file){
