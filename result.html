@@ -4,7 +4,7 @@
   <title>Accounting</title>
   <link rel="stylesheet" href="css/style.css">
 
-  <!-- Excel Library --><script src="https://cdn.jsdelivr.net/npm/xlsx-js-style@1.2.0/dist/xlsx.bundle.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/xlsx-js-style@1.2.0/dist/xlsx.bundle.js"></script>
 </head>
 <body>
 
@@ -13,6 +13,7 @@
 
     <h2 id="fileTitle"></h2>
 
+    <!-- ADD MODE + SEARCH -->
     <div class="add-mode-row">
       <span>Add Mode</span>
 
@@ -20,6 +21,8 @@
         <input type="checkbox" id="plusToggle" checked>
         <span class="slider"></span>
       </label>
+
+      <button onclick="openSearch()" style="margin-left:20px;">Search</button>
     </div>
 
     <div id="totals"></div>
@@ -33,7 +36,7 @@
   </div>
 </div>
 
-<!-- MODAL -->
+<!-- EDIT MODAL -->
 <div id="modal" class="modal">
   <div class="modal-content">
     <h3 id="modalTitle"></h3>
@@ -42,6 +45,48 @@
       <button onclick="saveModal()">Save</button>
       <button onclick="closeModal()">Cancel</button>
     </div>
+  </div>
+</div>
+
+<!-- SEARCH MODAL -->
+<div id="searchModal" class="modal">
+  <div class="modal-content">
+
+    <h3>Search</h3>
+
+    <input id="searchHead" placeholder="Head">
+    <input id="searchVote" placeholder="Vote">
+
+    <select id="searchDS">
+      <option>Ds</option>
+      <option>Kalutara</option>
+      <option>Panadura</option>
+      <option>Bandaragama</option>
+      <option>Agalawatta</option>
+      <option>Beruwala</option>
+      <option>Bulathsinhala</option>
+      <option>Dodangoda</option>
+      <option>Horana</option>
+      <option>Madurawala</option>
+      <option>Millaniya</option>
+      <option>Palindanuwara</option>
+      <option>Matugama</option>
+      <option>Walallawita</option>
+      <option>Ingiriya</option>
+    </select>
+
+    <br><br>
+    <button onclick="doSearch()">Search</button>
+    <button onclick="closeSearch()">Cancel</button>
+
+  </div>
+</div>
+
+<!-- CUSTOM POPUP -->
+<div id="popup" class="modal">
+  <div class="modal-content">
+    <p id="popupText"></p>
+    <button onclick="closePopup()">OK</button>
   </div>
 </div>
 
@@ -58,7 +103,6 @@ function loadTitle(){
     file ? file.name : "File";
 }
 
-/* 🔥 LOAD EVERYTHING */
 window.onload = function(){
   loadTitle();
   render();
