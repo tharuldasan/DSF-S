@@ -55,12 +55,13 @@ function createFileConfirm(){
 
 async function logout(){
 
-  await supabaseClient.auth.signOut(); // 🔥 important
+  await supabaseClient.auth.signOut();
 
-  localStorage.removeItem("user");
+  localStorage.setItem("loggedOut", "true");
 
   window.location.href = "index.html";
 }
+
 /* GO HISTORY */
 function goHistory(){
   window.location = "history.html";
