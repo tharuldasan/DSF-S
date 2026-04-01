@@ -242,9 +242,11 @@ th {
 
 th:nth-child(2), td:nth-child(2){
   width:200px;
+  min-width:200px;
 }
 th:nth-child(3), td:nth-child(3){
   width:200px;
+  min-width:200px;
 }
 
 .custom-select{
