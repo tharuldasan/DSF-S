@@ -38,48 +38,62 @@ function render(){
       <th rowspan="2">No</th>
       <th rowspan="2">Government Institute</th>
       <th rowspan="2">Category</th>
-      <th>Allo/Distribution</th>
-      <th>Expenditure</th>
-      <th>Balance</th>
+      <th colspan="3">A</th>
+      <th colspan="3">B</th>
+      <th colspan="3">C</th>
+      <th colspan="3">D</th>
+      <th colspan="3">E</th>
+    </tr>
+    <tr>
+      ${["A","B","C","D","E"].map(()=>`
+        <th>Allo/Distribution</th>
+        <th>Expenditure</th>
+        <th>Balance</th>
+      `).join("")}
     </tr>
   `;
 
   let count = 1;
 
-  for(let letter of ["A","B","C","D","E"]){
-    for(let i=1;i<=5;i++){
-      for(let j=1;j<=5;j++){
+  for(let i=1;i<=5;i++){
+    for(let j=1;j<=5;j++){
 
-        let key = `${letter}${i}.${j}`;
+      html += `<tr>
+        <td>${count}</td>
+        <td>A${i}</td>
+        <td>A${i}.${j}</td>
+      `;
+
+      ["A","B","C","D","E"].forEach(col=>{
+
+        let key = `${col}${i}.${j}`;
         let g = given[key] || 0;
         let u = used[key] || 0;
 
-        html += `<tr>
-          <td>${count}</td>
-          <td>${letter}${i}</td>
-          <td>${key}</td>
+        html += `
+        <td class="clickable"
+          onclick="edit('${key}','given')"
+          oncontextmenu="viewHistory(event,'${key}','given')">
+          ${formatRs(g)}
+        </td>
 
-          <td class="clickable"
-            onclick="edit('${key}','given')"
-            oncontextmenu="viewHistory(event,'${key}','given')">
-            ${formatRs(g)}
-          </td>
+        <td class="clickable"
+          onclick="edit('${key}','used')"
+          oncontextmenu="viewHistory(event,'${key}','used')">
+          ${formatRs(u)}
+        </td>
 
-          <td class="clickable"
-            onclick="edit('${key}','used')"
-            oncontextmenu="viewHistory(event,'${key}','used')">
-            ${formatRs(u)}
-          </td>
+        <td class="balance-cell">${formatRs(g-u)}</td>
+        `;
+      });
 
-          <td class="balance-cell">${formatRs(g-u)}</td>
-        </tr>`;
-
-        count++;
-      }
+      html += "</tr>";
+      count++;
     }
   }
 
   html += "</table>";
+
   document.getElementById("totals").innerHTML = html;
 }
 
