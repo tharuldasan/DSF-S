@@ -130,14 +130,11 @@ function closeSearch(){
 }
 
 function doSearch(){
-  let head = document.getElementById("searchHead").value;
-  let vote = document.getElementById("searchVote").value;
+  let head = document.getElementById("searchHead").value.trim();
+  let vote = document.getElementById("searchVote").value.trim();
+  let ds = document.getElementById("searchDS").innerText;
 
   let found = false;
-
-  document.querySelectorAll("#totals tr").forEach(row=>{
-    row.style.background = "";
-  });
 
   let rows = document.querySelectorAll("#totals table tr");
 
@@ -145,11 +142,23 @@ function doSearch(){
     let cells = row.children;
 
     if(cells.length > 3){
-      if(
-        cells[1].innerText === head &&
-        cells[2].innerText === vote
-      ){
+
+      let headVal = cells[1].innerText.trim();
+      let voteVal = cells[2].innerText.trim();
+
+      if(headVal == head && voteVal == vote){
+
         row.style.background = "#fde68a";
+
+        // highlight DS column
+        let index = DS.indexOf(ds);
+        if(index !== -1){
+          let start = 3 + index*3;
+          for(let k=0;k<3;k++){
+            cells[start+k].style.background = "#facc15";
+          }
+        }
+
         found = true;
       }
     }
@@ -161,7 +170,6 @@ function doSearch(){
     showPopup("Couldn't find");
   }
 }
-
 /* POPUP */
 function showPopup(msg){
   document.getElementById("popupText").innerText = msg;
