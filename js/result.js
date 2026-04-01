@@ -277,3 +277,51 @@ function selectDS(val){
   document.getElementById("searchDS").innerText = val;
   // ❌ DO NOT CLOSE HERE (removed)
 }
+
+function applyHighlight(){
+
+  if(!lastSearch) return;
+
+  let { head, vote, ds } = lastSearch;
+
+  let found = false;
+
+  let rows = document.querySelectorAll("#totals table tr");
+
+  rows.forEach(row=>{
+    let cells = row.children;
+
+    if(cells.length > 3){
+
+      let headVal = cells[1].innerText.trim();
+      let voteVal = cells[2].innerText.trim();
+
+      if(headVal == head && voteVal == vote){
+
+        let index = DS.indexOf(ds);
+
+        if(index !== -1){
+          let start = 3 + index*3;
+
+          for(let k=0;k<3;k++){
+            let cell = cells[start+k];
+
+            cell.classList.add("highlight-cell");
+
+            cell.scrollIntoView({
+              behavior: "smooth",
+              block: "center",
+              inline: "center"
+            });
+          }
+        }
+
+        found = true;
+      }
+    }
+  });
+
+  if(!found){
+    showPopup("Couldn't find");
+  }
+}
