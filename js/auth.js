@@ -60,3 +60,11 @@ async function signup(){
     alert("Account created! Now login.");
   }
 }
+window.onload = async function(){
+
+  const { data } = await supabaseClient.auth.getSession();
+
+  if(data.session){
+    window.location.href = "dashboard.html";
+  }
+};
