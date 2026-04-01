@@ -78,3 +78,36 @@ async function createFileConfirm(){
 function goHistory(){
   window.location = "history.html";
 }
+
+async function loadFiles(){
+
+  let user = localStorage.getItem("user");
+
+  let { data, error } = await supabaseClient
+    .from("files")
+    .select("*")
+    .eq("user_email", user);
+
+  if(error){
+    console.log(error);
+    return;
+  }
+
+  let container = document.getElementById("filesList");
+  container.innerHTML = "";
+
+  data.forEach(file => {
+
+    let div = document.createElement("div");
+    div.className = "file-box";
+
+    div.innerHTML = `
+      <h3>${file.name}</h3>
+      <button onclick="openFile('${file.id}')">Open</button>
+      <button onclick="renameFile('${file.id}')">Rename</button>
+      <button onclick="deleteFile('${file.id}')">Delete</button>
+    `;
+
+    container.appendChild(div);
+  });
+}
