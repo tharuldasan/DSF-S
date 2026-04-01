@@ -280,6 +280,9 @@ function selectDS(val){
 }
 
 function applyHighlight(){
+  document.querySelectorAll(".highlight-cell").forEach(c=>{
+  c.classList.remove("highlight-cell");
+});
 
   if(!lastSearch) return;
 
