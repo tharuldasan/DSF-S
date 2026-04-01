@@ -298,3 +298,13 @@ th, td{
   text-overflow:ellipsis;
 }
 
+/* FORCE ALL TABLE COLUMNS SAME SIZE */
+table{
+  table-layout: fixed;
+}
+
+th, td{
+  width:90px;
+  overflow:hidden;
+  text-overflow:ellipsis;
+}
