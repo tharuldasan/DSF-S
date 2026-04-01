@@ -6,35 +6,35 @@ const { createClient } = supabase;
 const supabaseClient = createClient(SUPABASE_URL, SUPABASE_KEY);
 
 /* LOGIN */
+let loading = false;
+
 async function login(){
+
+  if(loading) return;
+  loading = true;
 
   const email = document.getElementById("email").value.trim();
   const password = document.getElementById("password").value.trim();
 
   if(!email || !password){
     alert("Enter email and password");
+    loading = false;
     return;
   }
 
-  let { data, error } = await supabaseClient.auth.signInWithPassword({
+  let { error } = await supabaseClient.auth.signInWithPassword({
     email,
     password
   });
 
   if(error){
     alert(error.message);
-    return;
-  }
-
-  // 🔥 GET SESSION (important)
-  const { data: sessionData } = await supabaseClient.auth.getSession();
-
-  if(sessionData.session){
+  }else{
     localStorage.setItem("user", email);
     window.location.href = "dashboard.html";
-  }else{
-    alert("Login failed, try again");
   }
+
+  loading = false;
 }
 
 /* SIGNUP */
