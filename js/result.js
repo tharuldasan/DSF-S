@@ -39,24 +39,22 @@ function render(){
   let given = file.given || {};
   let used = file.used || {};
 
-  let html = `
-  <table>
-    <tr>
-      <th>No</th>
-      <th>Head</th>
-      <th>Vote</th>
-      ${DS.map(d=>`<th colspan="3">${d}</th>`).join("")}
-    </tr>
-    <tr>
-      <th></th><th></th><th></th>
-      ${DS.map(()=>`
-        <th>Allo</th>
-        <th>Expenditure</th>
-        <th>Balance</th>
-      `).join("")}
-    </tr>
-  `;
-
+ let html = `
+<table>
+<tr>
+  <th rowspan="2">No</th>
+  <th rowspan="2">Head</th>
+  <th rowspan="2">Vote</th>
+  ${DS.map(d=>`<th colspan="3">${d}</th>`).join("")}
+</tr>
+<tr>
+  ${DS.map(()=>`
+    <th>Allo/Distribution</th>
+    <th>Expenditure</th>
+    <th>Balance</th>
+  `).join("")}
+</tr>
+`;
   for(let i=1;i<=100;i++){
 
     html += `<tr>
