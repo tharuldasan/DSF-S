@@ -83,6 +83,7 @@ function render(){
   html += "</table>";
 
   document.getElementById("totals").innerHTML = html;
+  applyHighlight();
 }
 
 /* EDIT */
