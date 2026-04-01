@@ -61,8 +61,8 @@ function render(){
 
     html += `<tr>
       <td>${i}</td>
-      <td>Head ${i}</td>
-      <td>Vote ${i}</td>
+      <td>${i}</td>
+      <td>${i}</td>
     `;
 
     DS.forEach(col=>{
