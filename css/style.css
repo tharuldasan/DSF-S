@@ -281,3 +281,8 @@ th:nth-child(3), td:nth-child(3){
 .show{
   display:block;
 }
+
+.highlight-cell{
+  background:#facc15 !important;
+  transition: background 5s ease;
+}
