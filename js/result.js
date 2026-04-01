@@ -148,14 +148,28 @@ function doSearch(){
 
       if(headVal == head && voteVal == vote){
 
-        row.style.background = "#fde68a";
-
-        // highlight DS column
         let index = DS.indexOf(ds);
+
         if(index !== -1){
           let start = 3 + index*3;
+
+          // 🔥 highlight ONLY 3 cells
           for(let k=0;k<3;k++){
-            cells[start+k].style.background = "#facc15";
+            let cell = cells[start+k];
+
+            cell.classList.add("highlight-cell");
+
+            // 🔥 scroll to center
+            cell.scrollIntoView({
+              behavior: "smooth",
+              block: "center",
+              inline: "center"
+            });
+
+            // 🔥 remove highlight after 5 sec
+            setTimeout(()=>{
+              cell.classList.remove("highlight-cell");
+            }, 5000);
           }
         }
 
@@ -170,6 +184,7 @@ function doSearch(){
     showPopup("Couldn't find");
   }
 }
+
 /* POPUP */
 function showPopup(msg){
   document.getElementById("popupText").innerText = msg;
