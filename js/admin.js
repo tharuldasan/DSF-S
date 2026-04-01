@@ -14,22 +14,31 @@ function checkPass(){
 }
 
 /* LOAD ROWS */
-function loadRows(){
-  let rows = JSON.parse(localStorage.getItem("rows") || "[]");
+async function loadRows(){
+
+  const { data: sessionData } = await supabaseClient.auth.getSession();
+  let userEmail = sessionData.session.user.email;
+
+  let { data } = await supabaseClient
+    .from("rows")
+    .select("*")
+    .eq("user_email", userEmail);
 
   let container = document.getElementById("rowsList");
   container.innerHTML = "";
 
-  rows.forEach((r,index)=>{
+  data.forEach((r,index)=>{
     let div = document.createElement("div");
 
     div.innerHTML = `
-      ${index+1}. Head: ${r.head} | Vote: ${r.vote}
-      <button onclick="deleteRow(${index})">Delete</button>
+      Head: ${r.head} | Vote: ${r.vote}
+      <button onclick="deleteRow('${r.id}')">Delete</button>
     `;
 
     container.appendChild(div);
   });
+
+  return data;
 }
 
 /* ADD ROW */
@@ -53,13 +62,12 @@ async function addRow(){
 }
 
 /* DELETE */
-function deleteRow(index){
+async function deleteRow(id){
 
-  let rows = JSON.parse(localStorage.getItem("rows") || "[]");
-
-  rows.splice(index,1);
-
-  localStorage.setItem("rows", JSON.stringify(rows));
+  await supabaseClient
+    .from("rows")
+    .delete()
+    .eq("id", id);
 
   loadRows();
 }
