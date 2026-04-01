@@ -55,48 +55,53 @@ function render(){
 
   let count = 1;
 
-  for(let i=1;i<=5;i++){
-    for(let j=1;j<=5;j++){
+  // 🔥 FULL LOOP (A → E)
+  for(let letter of ["A","B","C","D","E"]){
+    for(let i=1;i<=5;i++){
+      for(let j=1;j<=5;j++){
 
-      html += `<tr>
-        <td>${count}</td>
-        <td>A${i}</td>
-        <td>A${i}.${j}</td>
-      `;
-
-      ["A","B","C","D","E"].forEach(col=>{
-
-        let key = `${col}${i}.${j}`;
-        let g = given[key] || 0;
-        let u = used[key] || 0;
-
-        html += `
-        <td class="clickable"
-          onclick="edit('${key}','given')"
-          oncontextmenu="viewHistory(event,'${key}','given')">
-          ${formatRs(g)}
-        </td>
-
-        <td class="clickable"
-          onclick="edit('${key}','used')"
-          oncontextmenu="viewHistory(event,'${key}','used')">
-          ${formatRs(u)}
-        </td>
-
-        <td class="balance-cell">${formatRs(g-u)}</td>
+        html += `<tr>
+          <td>${count}</td>
+          <td>${letter}${i}</td>
+          <td>${letter}${i}.${j}</td>
         `;
-      });
 
-      html += "</tr>";
-      count++;
+        // 🔥 A–E columns
+        ["A","B","C","D","E"].forEach(col=>{
+          let key = `${col}${i}.${j}`;
+          let g = given[key] || 0;
+          let u = used[key] || 0;
+
+          html += `
+          <td class="clickable"
+            onclick="edit('${key}','given')"
+            oncontextmenu="viewHistory(event,'${key}','given')">
+            ${formatRs(g)}
+          </td>
+
+          <td class="clickable"
+            onclick="edit('${key}','used')"
+            oncontextmenu="viewHistory(event,'${key}','used')">
+            ${formatRs(u)}
+          </td>
+
+          <td class="balance-cell">${formatRs(g-u)}</td>
+          `;
+        });
+
+        html += "</tr>";
+        count++;
+      }
     }
   }
 
   html += "</table>";
 
   document.getElementById("totals").innerHTML = html;
-}
 
+  // 🔥 SHOW BUTTONS AGAIN (important)
+  document.querySelector(".action-buttons").style.display = "block";
+}
 /* EDIT */
 function edit(key,type){
   currentKey = key;
