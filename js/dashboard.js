@@ -90,6 +90,10 @@ async function createFileConfirm(){
   window.location = "result.html";
 }
 
+function goAdmin(){
+  window.location = "administrator.html";
+}
+
 /* GO HISTORY */
 function goHistory(){
   window.location = "history.html";
