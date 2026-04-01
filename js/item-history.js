@@ -4,7 +4,6 @@ const SUPABASE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZ
 const { createClient } = supabase;
 const supabaseClient = createClient(SUPABASE_URL, SUPABASE_KEY);
 
-/* LOAD HISTORY */
 async function loadHistory(){
 
   let key = localStorage.getItem("historyKey");
@@ -13,34 +12,28 @@ async function loadHistory(){
   const { data: sessionData } = await supabaseClient.auth.getSession();
   let userEmail = sessionData.session.user.email;
 
-  let { data, error } = await supabaseClient
+  let { data } = await supabaseClient
     .from("files")
     .select("*")
     .eq("user_email", userEmail)
     .eq("id", fileId)
     .single();
 
-  if(error){
-    console.log(error);
-    return;
-  }
-
   let file = data.data;
 
-  let history = (file.history && file.history[key]) || {
+  let history = file.history?.[key] || {
     given: [],
     used: []
   };
 
-  let output = "";
+  let html = "";
 
-  output += buildTable("Allo / Distribution", history.given);
-  output += buildTable("Expenditure", history.used);
+  html += buildTable("Allo / Distribution", history.given);
+  html += buildTable("Expenditure", history.used);
 
-  document.getElementById("historyTable").innerHTML = output;
+  document.getElementById("historyTable").innerHTML = html;
 }
 
-/* BUILD TABLE */
 function buildTable(title, data){
 
   let html = `<h3>${title}</h3>`;
@@ -55,10 +48,10 @@ function buildTable(title, data){
   `;
 
   data.forEach(h=>{
-    html+=`
+    html += `
     <tr>
       <td>${h.date}</td>
-      <td>${h.mode || h.status}</td>
+      <td>${h.mode}</td>
       <td>Rs. ${Number(h.amount).toLocaleString(undefined,{minimumFractionDigits:2})}</td>
     </tr>`;
   });
@@ -68,7 +61,4 @@ function buildTable(title, data){
   return html;
 }
 
-/* LOAD ON PAGE OPEN */
-window.onload = function(){
-  loadHistory();
-};
+window.onload = loadHistory;
