@@ -34,3 +34,21 @@ function login(){
     window.location = "dashboard.html";
   }
 }
+
+async function login(){
+
+  let email = document.getElementById("email").value;
+  let password = document.getElementById("password").value;
+
+  let { data, error } = await supabase.auth.signInWithPassword({
+    email,
+    password
+  });
+
+  if(error){
+    alert(error.message);
+  }else{
+    localStorage.setItem("user", email);
+    window.location.href = "dashboard.html";
+  }
+}
