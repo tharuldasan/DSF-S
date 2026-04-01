@@ -120,10 +120,20 @@ async function render(){
       let u = used[key] || 0;
 
       html += `
-        <td class="clickable" onclick="edit('${key}','given')">${formatRs(g)}</td>
-        <td class="clickable" onclick="edit('${key}','used')">${formatRs(u)}</td>
-        <td class="balance-cell">${formatRs(g-u)}</td>
-      `;
+        <td class="clickable"
+           onclick="edit('${key}','given')"
+           oncontextmenu="viewHistory(event,'${key}')">
+           ${formatRs(g)}
+        </td>
+
+        <td class="clickable"
+           onclick="edit('${key}','used')"
+           oncontextmenu="viewHistory(event,'${key}')">
+           ${formatRs(u)}
+        </td>
+
+  <td class="balance-cell">${formatRs(g-u)}</td>
+`;
     });
 
     html += "</tr>";
@@ -479,4 +489,12 @@ async function saveModal(){
 
   closeModal();
   render();
+}
+
+function viewHistory(e, key){
+  e.preventDefault(); // stop browser menu
+
+  localStorage.setItem("historyKey", key);
+
+  window.location = "item-history.html";
 }
