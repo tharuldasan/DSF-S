@@ -1,5 +1,6 @@
 let currentKey = "";
 let currentType = "";
+let lastSearch = null;
 
 const DS = [
   "Ds","Kalutara","Panadura","Bandaragama","Agalawatta",
@@ -134,55 +135,11 @@ function doSearch(){
   let vote = document.getElementById("searchVote").value.trim();
   let ds = document.getElementById("searchDS").innerText;
 
-  let found = false;
+  lastSearch = { head, vote, ds }; // ✅ save search
 
-  let rows = document.querySelectorAll("#totals table tr");
-
-  rows.forEach(row=>{
-    let cells = row.children;
-
-    if(cells.length > 3){
-
-      let headVal = cells[1].innerText.trim();
-      let voteVal = cells[2].innerText.trim();
-
-      if(headVal == head && voteVal == vote){
-
-        let index = DS.indexOf(ds);
-
-        if(index !== -1){
-          let start = 3 + index*3;
-
-          // 🔥 highlight ONLY 3 cells
-          for(let k=0;k<3;k++){
-            let cell = cells[start+k];
-
-            cell.classList.add("highlight-cell");
-
-            // 🔥 scroll to center
-            cell.scrollIntoView({
-              behavior: "smooth",
-              block: "center",
-              inline: "center"
-            });
-
-            // 🔥 remove highlight after 5 sec
-            setTimeout(()=>{
-              cell.classList.remove("highlight-cell");
-            }, 45000);
-          }
-        }
-
-        found = true;
-      }
-    }
-  });
+  applyHighlight();
 
   closeSearch();
-
-  if(!found){
-    showPopup("Couldn't find");
-  }
 }
 
 /* POPUP */
