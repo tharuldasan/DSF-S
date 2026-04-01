@@ -1,6 +1,7 @@
 let currentKey = "";
 let currentType = "";
 let lastSearch = null;
+let highlightTimer = null;
 
 const DS = [
   "Ds","Kalutara","Panadura","Bandaragama","Agalawatta",
@@ -288,6 +289,16 @@ function applyHighlight(){
 
   let { head, vote, ds } = lastSearch;
 
+  // 🔥 clear previous highlights
+  document.querySelectorAll(".highlight-cell").forEach(c=>{
+    c.classList.remove("highlight-cell");
+  });
+
+  // 🔥 clear previous timer
+  if(highlightTimer){
+    clearTimeout(highlightTimer);
+  }
+
   let found = false;
 
   let rows = document.querySelectorAll("#totals table tr");
@@ -312,6 +323,7 @@ function applyHighlight(){
 
             cell.classList.add("highlight-cell");
 
+            // scroll to center
             cell.scrollIntoView({
               behavior: "smooth",
               block: "center",
@@ -328,4 +340,12 @@ function applyHighlight(){
   if(!found){
     showPopup("Couldn't find");
   }
+
+  // 🔥 AUTO CLEAR AFTER 1 MINUTE
+  highlightTimer = setTimeout(()=>{
+    document.querySelectorAll(".highlight-cell").forEach(c=>{
+      c.classList.remove("highlight-cell");
+    });
+    lastSearch = null;
+  }, 60000); // 60000 ms = 1 minute
 }
