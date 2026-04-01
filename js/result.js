@@ -161,7 +161,15 @@ function viewHistory(e,key,type){
   let file = getCurrentFile();
   let history = (file.history && file.history[key]) || [];
 
-  let html = "<table><tr><th>Date</th><th>Type</th><th>Amount</th></tr>";
+  let html = `
+    <h3>${key} - ${type} History</h3>
+    <table>
+      <tr>
+        <th>Date</th>
+        <th>Type</th>
+        <th>Amount</th>
+      </tr>
+  `;
 
   history.forEach(h=>{
     if(h.type === type){
@@ -173,7 +181,14 @@ function viewHistory(e,key,type){
     }
   });
 
-  html += "</table><br><button onclick='render()'>⬅ Back</button>";
+  html += `
+    </table>
+    <br>
+    <button onclick="render()">⬅ Back</button>
+  `;
+
+  // 🔥 HIDE MAIN BUTTONS
+  document.querySelector(".action-buttons").style.display = "none";
 
   document.getElementById("totals").innerHTML = html;
 }
