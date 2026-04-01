@@ -62,6 +62,7 @@ function formatRs(val){
 
 /* RENDER */
 async function render(){
+  let rows = JSON.parse(localStorage.getItem("rows") || "[]");
   let file = await getCurrentFile();
   if(!file) return;
 
@@ -84,7 +85,7 @@ async function render(){
 `).join("")}
 </tr>
 `;
-  for(let i=1;i<=100;i++){
+  for(let i=1;i<=rows.length;i++){
 
     html += `<tr>
       <td>${i}</td>
@@ -220,9 +221,15 @@ async function exportExcel(){
   data.push(header2);
 
   /* DATA */
-  for(let i=1;i<=100;i++){
+  let rows = JSON.parse(localStorage.getItem("rows") || "[]");
 
-    let row = [i, i, i];
+  for(let i=1;i<=rows.length;i++){
+    
+    let row = [
+    i,
+    rows[i-1]?.head || "",
+    rows[i-1]?.vote || ""
+    ];
 
     DS.forEach(col=>{
       let key = col + "_" + i;
