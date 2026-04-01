@@ -436,3 +436,47 @@ function applyHighlight(){
     lastSearch = null;
   }, 60000); // 60000 ms = 1 minute
 }
+
+async function saveModal(){
+
+  let val = Number(document.getElementById("modalInput").value);
+  if(isNaN(val)) return closeModal();
+
+  let file = await getCurrentFile();
+
+  let addMode = document.getElementById("plusToggle").checked;
+
+  if(!file.given) file.given = {};
+  if(!file.used) file.used = {};
+  if(!file.history) file.history = {};
+
+  let key = currentKey;
+
+  // 🔥 INIT STRUCTURE
+  if(!file.history[key]){
+    file.history[key] = {
+      given: [],
+      used: []
+    };
+  }
+
+  // 🔥 SAVE VALUE
+  if(addMode){
+    file[currentType][key] =
+      (file[currentType][key] || 0) + val;
+  }else{
+    file[currentType][key] = val;
+  }
+
+  // 🔥 SAVE HISTORY
+  file.history[key][currentType].push({
+    amount: val,
+    mode: addMode ? "Added" : "Set",
+    date: new Date().toLocaleDateString()
+  });
+
+  await saveFile(file);
+
+  closeModal();
+  render();
+}
