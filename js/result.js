@@ -108,7 +108,7 @@ async function render(){
   for(let i=0;i<rows.length;i++){
 
     html += `<tr>
-      <td></td>
+      <td>${i+1}</td>
       <td>${rows[i].head}</td>
       <td>${rows[i].vote}</td>
     `;
