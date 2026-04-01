@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Administrator</title>
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+<div class="container">
+  <div class="card">
+
+    <h2>Administrator</h2>
+
+    <!-- PASSWORD -->
+    <div id="loginBox">
+      <input id="adminPass" type="password" placeholder="Enter Password">
+      <button onclick="checkPass()">Enter</button>
+    </div>
+
+    <!-- ADMIN PANEL -->
+    <div id="adminPanel" style="display:none;">
+
+      <button onclick="addRow()">+ Add Row</button>
+
+      <div id="rowsList"></div>
+
+    </div>
+
+  </div>
+</div>
+
+<script src="js/admin.js"></script>
+
+</body>
+</html>
