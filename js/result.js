@@ -85,12 +85,14 @@ async function render(){
 `).join("")}
 </tr>
 `;
-  for(let i=1;i<=rows.length;i++){
+  let rows = await loadRows(); // 🔥 NEW
+
+  for(let i=0;i<rows.length;i++){
 
     html += `<tr>
-      <td>${i}</td>
-      <td>${file.rows?.[i-1]?.head || ""}</td>
-      <td>${file.rows?.[i-1]?.vote || ""}</td>
+      <td></td>   // no number
+      <td>${rows[i]?.head || ""}</td>
+      <td>${rows[i]?.vote || ""}</td>
     `;
 
     DS.forEach(col=>{
