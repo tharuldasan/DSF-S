@@ -39,12 +39,13 @@ async function getCurrentFile(){
 
 async function saveFile(file){
 
-  let user = localStorage.getItem("user");
+  const { data: sessionData } = await supabaseClient.auth.getSession();
+  let userEmail = sessionData.session.user.email;
 
   let { error } = await supabaseClient
     .from("files")
     .update({ data: file })
-    .eq("user_email", user)
+    .eq("user_email", userEmail)
     .eq("id", file.id);
 
   if(error){
@@ -52,6 +53,7 @@ async function saveFile(file){
     alert("Save failed");
   }
 }
+
 /* FORMAT */
 function formatRs(val){
   return "Rs. " + Number(val).toLocaleString(undefined,{minimumFractionDigits:2});
