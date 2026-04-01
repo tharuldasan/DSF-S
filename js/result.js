@@ -60,17 +60,18 @@ function render(){
 
   let count = 1;
 
-  // ✅ FIXED LOOP (NO BREAK)
+  // 🔥 PERFECT STRUCTURE
   for(let i=1;i<=5;i++){
     for(let j=1;j<=5;j++){
 
       html += `<tr>
         <td>${count}</td>
-        <td>A${i}</td>
-        <td>A${i}.${j}</td>
+        <td>Row ${i}</td>
+        <td>Item ${i}.${j}</td>
       `;
 
       ["A","B","C","D","E"].forEach(col=>{
+
         let key = col + i + "." + j;
 
         let g = given[key] || 0;
@@ -105,7 +106,6 @@ function render(){
 
   document.getElementById("totals").innerHTML = html;
 
-  // restore buttons
   let btns = document.querySelector(".action-buttons");
   if(btns) btns.style.display = "block";
 }
