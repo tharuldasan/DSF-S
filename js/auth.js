@@ -71,6 +71,11 @@ window.onload = async function(){
   const { data } = await supabaseClient.auth.getSession();
 
   if(data.session){
-    window.location.href = "dashboard.html";
+    // only auto login if NOT logging out
+    if(!localStorage.getItem("loggedOut")){
+      window.location.href = "dashboard.html";
+    }
   }
+
+  localStorage.removeItem("loggedOut");
 };
