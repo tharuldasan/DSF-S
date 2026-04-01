@@ -22,10 +22,15 @@ async function loadRows(){
   const { data: sessionData } = await supabaseClient.auth.getSession();
   let userEmail = sessionData.session.user.email;
 
-  let { data } = await supabaseClient
+  let { data, error } = await supabaseClient
     .from("rows")
     .select("*")
     .eq("user_email", userEmail);
+
+  if(error){
+    console.log(error);
+    return [];
+  }
 
   return data || [];
 }
@@ -75,7 +80,7 @@ function formatRs(val){
 
 /* RENDER */
 async function render(){
-  let rows = JSON.parse(localStorage.getItem("rows") || "[]");
+  let rows = await loadRows();
   let file = await getCurrentFile();
   if(!file) return;
 
@@ -103,9 +108,9 @@ async function render(){
   for(let i=0;i<rows.length;i++){
 
     html += `<tr>
-      <td></td>   // no number
-      <td>${rows[i]?.head || ""}</td>
-      <td>${rows[i]?.vote || ""}</td>
+      <td></td>
+      <td>${rows[i].head}</td>
+      <td>${rows[i].vote}</td>
     `;
 
     DS.forEach(col=>{
@@ -125,7 +130,7 @@ async function render(){
   }
 
   html += "</table>";
-
+  
   document.getElementById("totals").innerHTML = html;
   applyHighlight();
 }
