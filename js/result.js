@@ -48,7 +48,7 @@ function formatRs(val){
 
 /* RENDER */
 async function render(){
-  let file = getCurrentFile();
+  let file = await getCurrentFile();
   if(!file) return;
 
   let given = file.given || {};
