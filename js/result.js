@@ -285,3 +285,12 @@ function exportExcel(){
 
   XLSX.writeFile(wb, file.name + ".xlsx");
 }
+
+function toggleDropdown(){
+  document.getElementById("dropdownList").classList.toggle("show");
+}
+
+function selectDS(val){
+  document.getElementById("searchDS").innerText = val;
+  document.getElementById("dropdownList").classList.remove("show");
+}
