@@ -9,10 +9,13 @@ function getUserKey(){
 }
 
 /* LOGOUT */
-function logout(){
-  localStorage.removeItem("currentUser");
-  localStorage.removeItem("currentFile");
-  window.location = "index.html";
+async function logout(){
+
+  await supabaseClient.auth.signOut();
+
+  localStorage.setItem("loggedOut", "true");
+
+  window.location.href = "index.html";
 }
 
 /* OPEN CREATE MODAL */
@@ -57,15 +60,6 @@ function createFileConfirm(){
 
   closeCreateModal();
   window.location = "result.html";
-}
-
-async function logout(){
-
-  await supabaseClient.auth.signOut();
-
-  localStorage.setItem("loggedOut", "true");
-
-  window.location.href = "index.html";
 }
 
 /* GO HISTORY */
