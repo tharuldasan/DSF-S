@@ -53,6 +53,14 @@ function createFileConfirm(){
   window.location = "result.html";
 }
 
+async function logout(){
+
+  await supabaseClient.auth.signOut(); // 🔥 important
+
+  localStorage.removeItem("user");
+
+  window.location.href = "index.html";
+}
 /* GO HISTORY */
 function goHistory(){
   window.location = "history.html";
