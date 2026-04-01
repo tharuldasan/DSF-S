@@ -307,10 +307,16 @@ function exportExcel(){
   XLSX.writeFile(wb, file.name + ".xlsx");
 }
 function toggleDropdown(){
-  document.getElementById("dropdownList").classList.toggle("show");
+  let list = document.getElementById("dropdownList");
+
+  if(list.classList.contains("show")){
+    list.classList.remove("show"); // close
+  }else{
+    list.classList.add("show"); // open
+  }
 }
 
 function selectDS(val){
   document.getElementById("searchDS").innerText = val;
-  document.getElementById("dropdownList").classList.remove("show");
+  // ❌ DO NOT CLOSE HERE (removed)
 }
