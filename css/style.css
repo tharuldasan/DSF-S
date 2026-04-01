@@ -312,7 +312,11 @@ th, td{
 /* DS columns exact width (15.00 ≈ 150px) */
 td:nth-child(n+4),
 th:nth-child(n+4){
-  width:150px;
-  min-width:150px;
-  max-width:150px;
+  width:450px;
+  min-width:450px;
+  max-width:450px;
+}
+
+table{
+  table-layout: fixed;
 }
