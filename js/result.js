@@ -189,10 +189,10 @@ function exportExcel(){
   let file = getCurrentFile();
   let data = [];
 
-  let header1 = [
-    "No","Head","Vote",
-    ...DS.flatMap(d => [d,"",""])
-  ];
+  let header2 = [
+  "","","",
+  ...DS.flatMap(() => ["Allo/Distribution","Expenditure","Balance"])
+];
 
   let header2 = [
     "","","",
@@ -239,6 +239,11 @@ function exportExcel(){
   }
 
   ws['!merges'] = merges;
+  ws['!merges'].push(
+  {s:{r:0,c:0},e:{r:1,c:0}},
+  {s:{r:0,c:1},e:{r:1,c:1}},
+  {s:{r:0,c:2},e:{r:1,c:2}}
+);
 
   /* STYLE */
   for(let R=0; R<data.length; R++){
