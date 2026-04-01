@@ -58,13 +58,16 @@ async function addRow(){
   const { data: sessionData } = await supabaseClient.auth.getSession();
   let userEmail = sessionData.session.user.email;
 
-  await supabaseClient.from("rows").insert({
+  let { error } = await supabaseClient.from("rows").insert({
     user_email: userEmail,
     head: head,
     vote: vote
   });
 
-  loadRows();
+  if(error){
+    console.log(error);
+    alert("Insert failed");
+  }
 }
 
 /* DELETE */
