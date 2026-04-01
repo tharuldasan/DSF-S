@@ -169,7 +169,7 @@ function doSearch(){
             // 🔥 remove highlight after 5 sec
             setTimeout(()=>{
               cell.classList.remove("highlight-cell");
-            }, 5000);
+            }, 45000);
           }
         }
 
