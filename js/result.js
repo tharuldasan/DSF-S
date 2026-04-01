@@ -31,16 +31,21 @@ async function getCurrentFile(){
   return data.data;
 }
 
-function saveFile(file){
-  let user = localStorage.getItem("currentUser");
-  let files = JSON.parse(localStorage.getItem("files_" + user)||"[]");
+async function saveFile(file){
 
-  let index = files.findIndex(f => f.id === file.id);
-  files[index] = file;
+  let user = localStorage.getItem("user");
 
-  localStorage.setItem("files_" + user, JSON.stringify(files));
+  let { error } = await supabaseClient
+    .from("files")
+    .update({ data: file })
+    .eq("user_email", user)
+    .eq("id", file.id);
+
+  if(error){
+    console.log(error);
+    alert("Save failed");
+  }
 }
-
 /* FORMAT */
 function formatRs(val){
   return "Rs. " + Number(val).toLocaleString(undefined,{minimumFractionDigits:2});
