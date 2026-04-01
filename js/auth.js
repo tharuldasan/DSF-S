@@ -24,9 +24,17 @@ async function login(){
 
   if(error){
     alert(error.message);
-  }else{
+    return;
+  }
+
+  // 🔥 GET SESSION (important)
+  const { data: sessionData } = await supabaseClient.auth.getSession();
+
+  if(sessionData.session){
     localStorage.setItem("user", email);
-    window.location = "dashboard.html";
+    window.location.href = "dashboard.html";
+  }else{
+    alert("Login failed, try again");
   }
 }
 
