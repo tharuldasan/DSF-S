@@ -189,14 +189,14 @@ function exportExcel(){
   let file = getCurrentFile();
   let data = [];
 
-  let header2 = [
-  "","","",
-  ...DS.flatMap(() => ["Allo/Distribution","Expenditure","Balance"])
-];
+  let header1 = [
+    "No","Head","Vote",
+    ...DS.flatMap(d => [d,"",""])
+  ];
 
   let header2 = [
     "","","",
-    ...DS.flatMap(() => ["Allo","Expenditure","Balance"])
+    ...DS.flatMap(() => ["Allo/Distribution","Expenditure","Balance"])
   ];
 
   data.push(header1);
@@ -206,8 +206,8 @@ function exportExcel(){
 
     let row = [
       i,
-      "Head " + i,
-      "Vote " + i
+      i,
+      i
     ];
 
     DS.forEach(col=>{
@@ -230,7 +230,7 @@ function exportExcel(){
     ...Array(DS.length*3).fill({wch:14})
   ];
 
-  /* MERGE HEADERS */
+  /* MERGES */
   let merges = [];
 
   for(let i=0;i<DS.length;i++){
@@ -238,12 +238,13 @@ function exportExcel(){
     merges.push({s:{r:0,c:start}, e:{r:0,c:start+2}});
   }
 
+  merges.push(
+    {s:{r:0,c:0},e:{r:1,c:0}},
+    {s:{r:0,c:1},e:{r:1,c:1}},
+    {s:{r:0,c:2},e:{r:1,c:2}}
+  );
+
   ws['!merges'] = merges;
-  ws['!merges'].push(
-  {s:{r:0,c:0},e:{r:1,c:0}},
-  {s:{r:0,c:1},e:{r:1,c:1}},
-  {s:{r:0,c:2},e:{r:1,c:2}}
-);
 
   /* STYLE */
   for(let R=0; R<data.length; R++){
@@ -290,7 +291,6 @@ function exportExcel(){
 
   XLSX.writeFile(wb, file.name + ".xlsx");
 }
-
 function toggleDropdown(){
   document.getElementById("dropdownList").classList.toggle("show");
 }
