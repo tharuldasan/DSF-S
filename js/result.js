@@ -189,38 +189,48 @@ function goBack(){ history.back(); }
 function goDashboard(){ window.location.href="dashboard.html"; }
 
 /* 🔥 FULL EXCEL EXPORT (UPDATED STRUCTURE) */
-function exportExcel(){
-  let file = getCurrentFile();
+async function exportExcel(){
+
+  let file = await getCurrentFile(); // ✅ FIXED
+
+  if(!file){
+    alert("No file found");
+    return;
+  }
+
   let data = [];
 
+  /* HEADER 1 */
   let header1 = [
     "No","Head","Vote",
     ...DS.flatMap(d => [d,"",""])
   ];
 
+  /* HEADER 2 (FIXED FOR TOTAL ALLOCATION) */
   let header2 = [
     "","","",
-    ...DS.flatMap(() => ["Allo/Distribution","Expenditure","Balance"])
+    ...DS.flatMap(d => [
+      d === "Total Allocation" ? "Received" : "Allo/Distribution",
+      d === "Total Allocation" ? "Issued" : "Expenditure",
+      "Balance"
+    ])
   ];
 
   data.push(header1);
   data.push(header2);
 
+  /* DATA */
   for(let i=1;i<=100;i++){
 
-    let row = [
-      i,
-      i,
-      i
-    ];
+    let row = [i, i, i];
 
     DS.forEach(col=>{
       let key = col + "_" + i;
 
-      let g = file.given[key] || 0;
-      let u = file.used[key] || 0;
+      let g = file.given?.[key] || 0;
+      let u = file.used?.[key] || 0;
 
-      row.push(g, u, g-u);
+      row.push(g, u, g - u);
     });
 
     data.push(row);
@@ -295,6 +305,7 @@ function exportExcel(){
 
   XLSX.writeFile(wb, file.name + ".xlsx");
 }
+
 function toggleDropdown(){
   let list = document.getElementById("dropdownList");
 
