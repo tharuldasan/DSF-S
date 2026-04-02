@@ -28,8 +28,7 @@ async function loadRows(){
   let { data } = await supabaseClient
     .from("rows")
     .select("*")
-    .eq("user_email", userEmail);
-
+    
   let container = document.getElementById("rowsList");
   container.innerHTML = "";
 
