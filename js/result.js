@@ -23,54 +23,61 @@ function getVoteCode(vote){
   return parts[parts.length - 1]; // last part
 }
 
-function calculateSummary(rows, given){
+function calculateFullSummary(rows, given, used){
 
-  let result = {
-    "1001": {},
-    "1002": {},
-    "1003": {},
-    "recurrent": {},
-    "capital": {},
-    "total": {}
-  };
+  let types = ["1001","1002","1003","recurrent","capital","total"];
 
-  rows.forEach((r, index)=>{
+  let summary = {};
+
+  types.forEach(t=>{
+    summary[t] = {};
+    DS.forEach(col=>{
+      summary[t][col] = {
+        g:0, // allo
+        u:0  // used
+      };
+    });
+  });
+
+  rows.forEach((r,i)=>{
 
     let code = getVoteCode(r.vote);
+    let type = null;
+
+    if(code==="1001") type="1001";
+    else if(code==="1002") type="1002";
+    else if(code==="1003") type="1003";
+    else if(code>=1000 && code<2000 && !["1001","1002","1003"].includes(code)) type="recurrent";
+    else if(code>=2000 && code<3000) type="capital";
+
+    if(!type) return;
 
     DS.forEach(col=>{
-      let key = col + "_" + (index+1);
-      let val = given[key] || 0;
+      let key = col+"_"+(i+1);
 
-      function add(type){
-        result[type][col] = (result[type][col] || 0) + val;
+      let g = given[key] || 0;
+      let u = used[key] || 0;
+
+      if(col==="Total Allocation"){
+        let sum=0;
+        DS.forEach(c=>{
+          if(c!=="Total Allocation"){
+            sum += given[c+"_"+(i+1)] || 0;
+          }
+        });
+        u = sum;
       }
 
-      if(code === "1001") add("1001");
-      else if(code === "1002") add("1002");
-      else if(code === "1003") add("1003");
+      summary[type][col].g += g;
+      summary[type][col].u += u;
 
-      else if(Number(code) >= 1000 && Number(code) < 2000 &&
-              !["1001","1002","1003"].includes(code)){
-        add("recurrent");
-      }
-
-      else if(Number(code) >= 2000 && Number(code) < 3000){
-        add("capital");
-      }
+      summary["total"][col].g += g;
+      summary["total"][col].u += u;
     });
 
   });
 
-  // total = 1001 + 1002 + 1003
-  ["1001","1002","1003"].forEach(type=>{
-    DS.forEach(col=>{
-      result["total"][col] =
-        (result["total"][col] || 0) + (result[type][col] || 0);
-    });
-  });
-
-  return result;
+  return summary;
 }
 
 function calculateFinalTotal(rows, given){
