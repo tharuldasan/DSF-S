@@ -207,6 +207,12 @@ async function render(){
   `;
 });
 
+    let summary = calculateSummary(rows, given);
+
+    for(let k=0;k<3;k++){
+  html += `<tr><td colspan="${3 + DS.length*3}"></td></tr>`;
+}
+
     html += "</tr>";
   }
 
