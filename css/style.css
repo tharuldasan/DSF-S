@@ -241,8 +241,8 @@ th {
 }
 
 th:nth-child(2), td:nth-child(2){
-  width:70px;
-  min-width:70px;
+  width:100px;
+  min-width:100px;
 }
 th:nth-child(3), td:nth-child(3){
   width:200px;
@@ -316,6 +316,16 @@ th:nth-child(n+4){
   min-width:450px;
   max-width:450px;
 }
+
+.dark-row td{
+  background:#9ca3af;
+  font-weight:600;
+}
+
+.dark-cell{
+  background:#9ca3af !important;
+}
+
 
 table{
   table-layout: fixed;
