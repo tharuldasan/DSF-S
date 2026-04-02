@@ -73,6 +73,42 @@ function calculateSummary(rows, given){
   return result;
 }
 
+function calculateFinalTotal(rows, given){
+
+  let totalReceived = 0;
+  let totalBalance = 0;
+
+  rows.forEach((r, i)=>{
+
+    let code = getVoteCode(r.vote);
+
+    if(["1001","1002","1003"].includes(code)){
+
+      let rowSum = 0;
+
+      DS.forEach(col=>{
+        if(col !== "Total Allocation"){
+          let key = col + "_" + (i+1);
+          rowSum += given[key] || 0;
+        }
+      });
+
+      totalReceived += rowSum;
+
+      // balance = received - issued
+      // issued = rowSum → so balance = 0 normally
+      // but we calculate manually anyway
+      totalBalance += (rowSum - rowSum);
+    }
+
+  });
+
+  return {
+    received: totalReceived,
+    balance: totalBalance
+  };
+}
+
 async function loadRows(){
 
   const { data: sessionData } = await supabaseClient.auth.getSession();
