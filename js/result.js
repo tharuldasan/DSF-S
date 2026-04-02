@@ -421,13 +421,12 @@ async function exportExcel(){
   let rows = await loadRows();
   let data = [];
 
-  /* HEADER 1 */
+  /* HEADER */
   let header1 = [
     "No","Head","Vote",
     ...DS.flatMap(d => [d,"",""])
   ];
 
-  /* HEADER 2 */
   let header2 = [
     "","","",
     ...DS.flatMap(d => [
@@ -456,96 +455,54 @@ async function exportExcel(){
       let g = file.given?.[key] || 0;
       let u = file.used?.[key] || 0;
 
-      /* TOTAL ALLOCATION AUTO */
       if(col === "Total Allocation"){
-        let totalGiven = 0;
-
+        let sum=0;
         DS.forEach(c=>{
-          if(c !== "Total Allocation"){
-            let k = c + "_" + (i+1);
-            totalGiven += file.given?.[k] || 0;
+          if(c!=="Total Allocation"){
+            sum += file.given?.[c+"_"+(i+1)] || 0;
           }
         });
-
-        u = totalGiven;
+        u = sum;
       }
 
-      if(col === "Total Allocation"){
-        row.push(g, u, g - u);
-      }else{
-        row.push(g, "", "");
-      }
-
+      row.push(g, u, g-u);
     });
 
     data.push(row);
   }
 
-  /* 🔥 SUMMARY CALC */
+  /* SUMMARY */
   let summary = calculateFullSummary(rows, file.given || {}, file.used || {});
 
-  /* SPACE */
   data.push([]); data.push([]); data.push([]);
 
-  /* 1001,1002,1003,total */
-["1001","1002","1003","total","recurrent","capital"].forEach(type=>{
+  ["1001","1002","1003","total","recurrent","capital"].forEach(type=>{
 
-  let row = ["", type, ""];
+    let row = ["", type, ""];
 
-  DS.forEach(col=>{
+    DS.forEach(col=>{
+      let g = summary[type][col].g;
+      let u = summary[type][col].u;
+      let b = g - u;
 
-    let g = summary[type][col].g;
-    let u = summary[type][col].u;
-    let b = g - u;
+      row.push(g, u, b);
+    });
 
-    row.push(g, u, b);
+    data.push(row);
   });
-
-  data.push(row);
-});
-  
-  /* SPACE */
-  data.push([]);
-
-  /* RECURRENT */
-  let rRow = ["","recurrent",""];
-  DS.forEach(col=>{
-    let val = summary["recurrent"][col] || 0;
-    if(col === "Total Allocation"){
-      rRow.push(val, "", val);
-    }else{
-      rRow.push(val, "", "");
-    }
-  });
-  data.push(rRow);
-
-  /* SPACE */
-  data.push([]);
-
-  /* CAPITAL */
-  let cRow = ["","capital",""];
-  DS.forEach(col=>{
-    let val = summary["capital"][col] || 0;
-    if(col === "Total Allocation"){
-      cRow.push(val, "", val);
-    }else{
-      cRow.push(val, "", "");
-    }
-  });
-  data.push(cRow);
 
   /* CREATE SHEET */
   let ws = XLSX.utils.aoa_to_sheet(data);
 
   /* WIDTH */
   ws['!cols'] = [
-    {wch:6},      // No
-    {wch:10},     // Head ✅ FIXED
-    {wch:20},     // Vote
+    {wch:6},
+    {wch:10},
+    {wch:20},
     ...Array(DS.length*3).fill({wch:15})
   ];
 
-  /* MERGE HEADERS */
+  /* MERGES */
   let merges = [];
 
   for(let i=0;i<DS.length;i++){
@@ -565,8 +522,8 @@ async function exportExcel(){
   for(let R=0; R<data.length; R++){
     for(let C=0; C<data[0].length; C++){
 
-      let cellRef = XLSX.utils.encode_cell({r:R,c:C});
-      let cell = ws[cellRef];
+      let ref = XLSX.utils.encode_cell({r:R,c:C});
+      let cell = ws[ref];
       if(!cell) continue;
 
       cell.s = {
@@ -601,9 +558,9 @@ async function exportExcel(){
         cell.z = "#,##0.00";
       }
 
-      /* 🔥 DARK ROWS */
-      let rowName = data[R][1];
-      if(rowName === "total" || rowName === "capital"){
+      /* DARK ROWS */
+      let name = data[R]?.[1];
+      if(name === "total" || name === "capital"){
         cell.s.fill = { fgColor:{rgb:"A6A6A6"} };
         cell.s.font = { bold:true };
       }
