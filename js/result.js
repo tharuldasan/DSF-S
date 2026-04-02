@@ -188,93 +188,28 @@ function formatRs(val){
   return "Rs. " + Number(val).toLocaleString(undefined,{minimumFractionDigits:2});
 }
 
-function buildSummaryRow(title, data, rows, given){
+function buildFullSummaryRow(title, data){
 
-  let isDark = (title === "total" || title === "capital");
+  let dark = (title==="total" || title==="capital");
 
-  let row = `<tr class="${isDark ? 'dark-row' : ''}">
+  let row = `<tr class="${dark?'dark-row':''}">
     <td></td>
     <td>${title}</td>
     <td></td>
   `;
 
-  /* 🔥 TOTAL ROW (SPECIAL) */
-  if(title === "total"){
+  DS.forEach(col=>{
 
-    let totalReceived = 0;
-    let totalBalance = 0;
+    let g = data[col].g;
+    let u = data[col].u;
+    let b = g - u;
 
-    rows.forEach((r, i)=>{
-
-      let code = getVoteCode(r.vote);
-
-      if(["1001","1002","1003"].includes(code)){
-
-        let rowSum = 0;
-
-        DS.forEach(col=>{
-          if(col !== "Total Allocation"){
-            let key = col + "_" + (i+1);
-            rowSum += given[key] || 0;
-          }
-        });
-
-        totalReceived += rowSum;
-
-        let rowBalance = 0;
-
-        DS.forEach(col=>{
-          if(col !== "Total Allocation"){
-            let key = col + "_" + (i+1);
-            let g = given[key] || 0;
-            rowBalance += g;
-          }
-        });
-
-        totalBalance += rowBalance;
-      }
-
-    });
-
-    /* ✅ ONLY TOTAL ALLOCATION FILLED */
-    DS.forEach(col=>{
-      if(col === "Total Allocation"){
-        row += `
-          <td class="dark-cell">${formatRs(totalReceived)}</td>
-          <td></td>
-          <td class="dark-cell">${formatRs(totalBalance)}</td>
-        `;
-      }else{
-        row += `<td></td><td></td><td></td>`;
-      }
-    });
-
-  }
-
-  /* 🔥 NORMAL ROWS */
-  else{
-
-    DS.forEach(col=>{
-
-      let val = data[col] || 0;
-
-      if(col === "Total Allocation"){
-        row += `
-          <td class="${isDark ? 'dark-cell' : ''}">${formatRs(val)}</td>
-          <td></td>
-          <td class="balance-cell ${isDark ? 'dark-cell' : ''}">${formatRs(val)}</td>
-        `;
-      }else{
-        row += `
-          <td class="${isDark ? 'dark-cell' : ''}">${formatRs(val)}</td>
-          <td></td>
-          <td></td>
-        `;
-      }
-
-    });
-
-  }
+    row += `
+      <td>${formatRs(g)}</td>
+      <td>${formatRs(u)}</td>
+      <td class="balance-cell">${formatRs(b)}</td>
+    `;
+  });
 
   row += "</tr>";
   return row;
@@ -307,7 +242,7 @@ async function render(){
   </tr>
   `;
 
-  let summary = calculateSummary(rows, given);
+  let summary = calculateFullSummary(rows, given, used);
   
   for(let i=0;i<rows.length;i++){
 
@@ -359,18 +294,18 @@ async function render(){
     html += "</tr>";
   }
 
-  // 🔥 SPACE (3 rows)
-for(let k=0;k<3;k++){
+  // SPACE
+for(let i=0;i<3;i++){
   html += `<tr><td colspan="${3 + DS.length*3}"></td></tr>`;
 }
 
-// 🔥 MAIN GROUPS
-html += buildSummaryRow("1001", summary["1001"], rows, given);
-html += buildSummaryRow("1002", summary["1002"], rows, given);
-html += buildSummaryRow("1003", summary["1003"], rows, given);
-html += buildSummaryRow("total", summary["total"], rows, given);
-html += buildSummaryRow("recurrent", summary["recurrent"], rows, given);
-html += buildSummaryRow("capital", summary["capital"], rows, given);
+// FULL SUMMARY ROWS
+html += buildFullSummaryRow("1001", summary["1001"]);
+html += buildFullSummaryRow("1002", summary["1002"]);
+html += buildFullSummaryRow("1003", summary["1003"]);
+html += buildFullSummaryRow("total", summary["total"]);
+html += buildFullSummaryRow("recurrent", summary["recurrent"]);
+html += buildFullSummaryRow("capital", summary["capital"]);
   
   html += "</table>";
 
@@ -544,68 +479,28 @@ async function exportExcel(){
   }
 
   /* 🔥 SUMMARY CALC */
-  let summary = calculateSummary(rows, file.given || {});
+  let summary = calculateFullSummary(rows, file.given || {}, file.used || {});
 
   /* SPACE */
   data.push([]); data.push([]); data.push([]);
 
   /* 1001,1002,1003,total */
-  ["1001","1002","1003","total"].forEach(type=>{
+["1001","1002","1003","total","recurrent","capital"].forEach(type=>{
 
   let row = ["", type, ""];
 
   DS.forEach(col=>{
 
-    let val = summary[type]?.[col] || 0;
+    let g = summary[type][col].g;
+    let u = summary[type][col].u;
+    let b = g - u;
 
-    if(col === "Total Allocation"){
-
-      if(type === "total"){
-
-        let totalReceived = 0;
-        let totalBalance = 0;
-
-        rows.forEach((r, i)=>{
-
-  let code = getVoteCode(r.vote);
-
-  if(["1001","1002","1003"].includes(code)){
-
-    let rowSum = 0;
-    let rowBalance = 0;
-
-    DS.forEach(col=>{
-      if(col !== "Total Allocation"){
-        let key = col + "_" + (i+1);
-
-        let g = file.given?.[key] || 0;
-        let u = 0;
-
-        rowSum += g;
-        rowBalance += (g - u);
-      }
-    });
-
-    totalReceived += rowSum;
-    totalBalance += rowBalance;
-  }
-
-});
-
-        row.push(totalReceived, "", totalBalance);
-
-      }else{
-        row.push(val, "", val);
-      }
-
-    }else{
-      row.push(val, "", "");
-    }
-
+    row.push(g, u, b);
   });
 
   data.push(row);
 });
+  
   /* SPACE */
   data.push([]);
 
