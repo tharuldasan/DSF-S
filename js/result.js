@@ -135,7 +135,9 @@ function formatRs(val){
 
 function buildSummaryRow(title, data){
 
-  let row = `<tr>
+  let isDark = (title === "total" || title === "capital");
+
+  let row = `<tr class="${isDark ? 'dark-row' : ''}">
     <td></td>
     <td>${title}</td>
     <td></td>
@@ -147,13 +149,13 @@ function buildSummaryRow(title, data){
 
     if(col === "Total Allocation"){
       row += `
-        <td class="balance-cell">${formatRs(val)}</td>
-        <td class="balance-cell"></td>
-        <td class="balance-cell"></td>
+        <td class="${isDark ? 'dark-cell' : ''}">${formatRs(val)}</td>
+        <td class="${isDark ? 'dark-cell' : ''}"></td>
+        <td class="balance-cell ${isDark ? 'dark-cell' : ''}">${formatRs(val)}</td>
       `;
     }else{
       row += `
-        <td>${formatRs(val)}</td>
+        <td class="${isDark ? 'dark-cell' : ''}">${formatRs(val)}</td>
         <td></td>
         <td></td>
       `;
