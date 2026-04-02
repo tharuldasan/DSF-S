@@ -23,6 +23,56 @@ function getVoteCode(vote){
   return parts[parts.length - 1]; // last part
 }
 
+function calculateSummary(rows, given){
+
+  let result = {
+    "1001": {},
+    "1002": {},
+    "1003": {},
+    "recurrent": {},
+    "capital": {},
+    "total": {}
+  };
+
+  rows.forEach((r, index)=>{
+
+    let code = getVoteCode(r.vote);
+
+    DS.forEach(col=>{
+      let key = col + "_" + (index+1);
+      let val = given[key] || 0;
+
+      function add(type){
+        result[type][col] = (result[type][col] || 0) + val;
+      }
+
+      if(code === "1001") add("1001");
+      else if(code === "1002") add("1002");
+      else if(code === "1003") add("1003");
+
+      else if(Number(code) >= 1000 && Number(code) < 2000 &&
+              !["1001","1002","1003"].includes(code)){
+        add("recurrent");
+      }
+
+      else if(Number(code) >= 2000 && Number(code) < 3000){
+        add("capital");
+      }
+    });
+
+  });
+
+  // total = 1001 + 1002 + 1003
+  ["1001","1002","1003"].forEach(type=>{
+    DS.forEach(col=>{
+      result["total"][col] =
+        (result["total"][col] || 0) + (result[type][col] || 0);
+    });
+  });
+
+  return result;
+}
+
 async function loadRows(){
 
   const { data: sessionData } = await supabaseClient.auth.getSession();
