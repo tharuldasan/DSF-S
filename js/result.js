@@ -98,7 +98,19 @@ function calculateFinalTotal(rows, given){
       // balance = received - issued
       // issued = rowSum → so balance = 0 normally
       // but we calculate manually anyway
-      totalBalance += (rowSum - rowSum);
+      let rowBalance = 0;
+
+// calculate real balance from DS
+DS.forEach(col=>{
+  if(col !== "Total Allocation"){
+    let key = col + "_" + (i+1);
+    let g = given[key] || 0;
+    let u = 0; // DS has no used stored here
+    rowBalance += (g - u);
+  }
+});
+
+totalBalance += rowBalance;
     }
 
   });
@@ -341,10 +353,12 @@ for(let k=0;k<3;k++){
 }
 
 // 🔥 MAIN GROUPS
-html += buildSummaryRow("1001", summary["1001"]);
-html += buildSummaryRow("1002", summary["1002"]);
-html += buildSummaryRow("1003", summary["1003"]);
-html += buildSummaryRow("total", summary["total"]);
+html += buildSummaryRow("1001", summary["1001"], rows, given);
+html += buildSummaryRow("1002", summary["1002"], rows, given);
+html += buildSummaryRow("1003", summary["1003"], rows, given);
+html += buildSummaryRow("total", summary["total"], rows, given);
+html += buildSummaryRow("recurrent", summary["recurrent"], rows, given);
+html += buildSummaryRow("capital", summary["capital"], rows, given);
 
 // 🔥 SPACE
 html += `<tr><td colspan="${3 + DS.length*3}"></td></tr>`;
@@ -551,11 +565,32 @@ async function exportExcel(){
         let totalReceived = 0;
         let totalBalance = 0;
 
-        ["1001","1002","1003"].forEach(t=>{
-          let v = summary[t]?.["Total Allocation"] || 0;
-          totalReceived += v;
-          totalBalance += v;
-        });
+        rows.forEach((r, i)=>{
+
+  let code = getVoteCode(r.vote);
+
+  if(["1001","1002","1003"].includes(code)){
+
+    let rowSum = 0;
+    let rowBalance = 0;
+
+    DS.forEach(col=>{
+      if(col !== "Total Allocation"){
+        let key = col + "_" + (i+1);
+
+        let g = file.given?.[key] || 0;
+        let u = 0;
+
+        rowSum += g;
+        rowBalance += (g - u);
+      }
+    });
+
+    totalReceived += rowSum;
+    totalBalance += rowBalance;
+  }
+
+});
 
         row.push(totalReceived, "", totalBalance);
 
