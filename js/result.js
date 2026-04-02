@@ -25,8 +25,7 @@ async function loadRows(){
   let { data, error } = await supabaseClient
     .from("rows")
     .select("*")
-    .eq("user_email", userEmail);
-
+    
   if(error){
     console.log(error);
     return [];
