@@ -296,13 +296,29 @@ async function exportExcel(){
   ];
 
     DS.forEach(col=>{
-      let key = col + "_" + (i+1);
 
-      let g = file.given?.[key] || 0;
-      let u = file.used?.[key] || 0;
+  let key = col + "_" + (i+1);
 
-      row.push(g, u, g - u);
+  let g = file.given?.[key] || 0;
+  let u = file.used?.[key] || 0;
+
+  /* 🔥 AUTO CALC FOR TOTAL ALLOCATION */
+  if(col === "Total Allocation"){
+
+    let totalGiven = 0;
+
+    DS.forEach(c=>{
+      if(c !== "Total Allocation"){
+        let k = c + "_" + (i+1);
+        totalGiven += file.given?.[k] || 0;
+      }
     });
+
+    u = totalGiven; // ✅ FIX
+  }
+
+  row.push(g, u, g - u);
+});
 
     data.push(row);
   }
