@@ -191,7 +191,7 @@ function buildSummaryRow(title, data, rows, given){
     <td></td>
   `;
 
-  /* 🔥 SPECIAL TOTAL ROW */
+  /* 🔥 TOTAL ROW (SPECIAL) */
   if(title === "total"){
 
     let totalReceived = 0;
@@ -214,38 +214,37 @@ function buildSummaryRow(title, data, rows, given){
 
         totalReceived += rowSum;
 
-        // balance = received - issued
-        // issued = rowSum → balance = 0
         let rowBalance = 0;
 
-DS.forEach(col=>{
-  if(col !== "Total Allocation"){
-    let key = col + "_" + (i+1);
-    let g = given[key] || 0;
-    rowBalance += g;
-  }
-});
+        DS.forEach(col=>{
+          if(col !== "Total Allocation"){
+            let key = col + "_" + (i+1);
+            let g = given[key] || 0;
+            rowBalance += g;
+          }
+        });
 
-totalBalance += rowBalance;
+        totalBalance += rowBalance;
+      }
 
-    /* ONLY TOTAL ALLOCATION COLUMN FILLED */
+    });
+
+    /* ✅ ONLY TOTAL ALLOCATION FILLED */
     DS.forEach(col=>{
-  if(col === "Total Allocation"){
-
-    row += `
-      <td class="dark-cell">${formatRs(totalReceived)}</td>
-      <td></td>
-      <td class="dark-cell">${formatRs(totalBalance)}</td>
-    `;
-
-  }else{
-    row += `<td></td><td></td><td></td>`;
-  }
-});
+      if(col === "Total Allocation"){
+        row += `
+          <td class="dark-cell">${formatRs(totalReceived)}</td>
+          <td></td>
+          <td class="dark-cell">${formatRs(totalBalance)}</td>
+        `;
+      }else{
+        row += `<td></td><td></td><td></td>`;
+      }
+    });
 
   }
 
-  /* 🔥 NORMAL SUMMARY ROWS */
+  /* 🔥 NORMAL ROWS */
   else{
 
     DS.forEach(col=>{
@@ -253,21 +252,17 @@ totalBalance += rowBalance;
       let val = data[col] || 0;
 
       if(col === "Total Allocation"){
-
         row += `
           <td class="${isDark ? 'dark-cell' : ''}">${formatRs(val)}</td>
           <td></td>
           <td class="balance-cell ${isDark ? 'dark-cell' : ''}">${formatRs(val)}</td>
         `;
-
       }else{
-
         row += `
           <td class="${isDark ? 'dark-cell' : ''}">${formatRs(val)}</td>
           <td></td>
           <td></td>
         `;
-
       }
 
     });
