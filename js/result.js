@@ -17,6 +17,12 @@ const DS = [
   "Matugama","Walallawita","Ingiriya"
 ];
 
+function getVoteCode(vote){
+  if(!vote) return "";
+  let parts = vote.split("-");
+  return parts[parts.length - 1]; // last part
+}
+
 async function loadRows(){
 
   const { data: sessionData } = await supabaseClient.auth.getSession();
