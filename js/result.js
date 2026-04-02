@@ -475,21 +475,39 @@ async function exportExcel(){
   /* 1001,1002,1003,total */
   ["1001","1002","1003","total"].forEach(type=>{
 
-    let row = ["", type, ""];
+  let row = ["", type, ""];
 
-    DS.forEach(col=>{
-      let val = summary[type][col] || 0;
+  DS.forEach(col=>{
 
-      if(col === "Total Allocation"){
-        row.push(val, "", val);
+    let val = summary[type]?.[col] || 0;
+
+    if(col === "Total Allocation"){
+
+      if(type === "total"){
+
+        let totalReceived = 0;
+        let totalBalance = 0;
+
+        ["1001","1002","1003"].forEach(t=>{
+          let v = summary[t]?.["Total Allocation"] || 0;
+          totalReceived += v;
+          totalBalance += v;
+        });
+
+        row.push(totalReceived, "", totalBalance);
+
       }else{
-        row.push(val, "", "");
+        row.push(val, "", val);
       }
-    });
 
-    data.push(row);
+    }else{
+      row.push(val, "", "");
+    }
+
   });
 
+  data.push(row);
+});
   /* SPACE */
   data.push([]);
 
