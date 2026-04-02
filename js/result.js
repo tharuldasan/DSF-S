@@ -25,17 +25,14 @@ function getVoteCode(vote){
 
 function calculateFullSummary(rows, given, used){
 
-  let types = ["1001","1002","1003","recurrent","capital","total"];
+  let summary = {
+    "1001":{}, "1002":{}, "1003":{},
+    "recurrent":{}, "capital":{}, "total":{}
+  };
 
-  let summary = {};
-
-  types.forEach(t=>{
-    summary[t] = {};
+  Object.keys(summary).forEach(t=>{
     DS.forEach(col=>{
-      summary[t][col] = {
-        g:0, // allo
-        u:0  // used
-      };
+      summary[t][col] = { g:0, u:0 };
     });
   });
 
@@ -53,6 +50,7 @@ function calculateFullSummary(rows, given, used){
     if(!type) return;
 
     DS.forEach(col=>{
+
       let key = col+"_"+(i+1);
 
       let g = given[key] || 0;
@@ -70,11 +68,16 @@ function calculateFullSummary(rows, given, used){
 
       summary[type][col].g += g;
       summary[type][col].u += u;
-
-      summary["total"][col].g += g;
-      summary["total"][col].u += u;
     });
 
+  });
+
+  /* 🔥 FIXED TOTAL = ONLY 1001+1002+1003 */
+  ["1001","1002","1003"].forEach(t=>{
+    DS.forEach(col=>{
+      summary["total"][col].g += summary[t][col].g;
+      summary["total"][col].u += summary[t][col].u;
+    });
   });
 
   return summary;
