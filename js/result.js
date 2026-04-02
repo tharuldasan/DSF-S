@@ -371,13 +371,13 @@ function goDashboard(){ window.location.href="dashboard.html"; }
 /* 🔥 FULL EXCEL EXPORT (UPDATED STRUCTURE) */
 async function exportExcel(){
 
-  let file = await getCurrentFile(); // ✅ FIXED
-
+  let file = await getCurrentFile();
   if(!file){
     alert("No file found");
     return;
   }
 
+  let rows = await loadRows();
   let data = [];
 
   /* HEADER 1 */
@@ -386,7 +386,7 @@ async function exportExcel(){
     ...DS.flatMap(d => [d,"",""])
   ];
 
-  /* HEADER 2 (FIXED FOR TOTAL ALLOCATION) */
+  /* HEADER 2 */
   let header2 = [
     "","","",
     ...DS.flatMap(d => [
@@ -399,54 +399,113 @@ async function exportExcel(){
   data.push(header1);
   data.push(header2);
 
-  /* DATA */
-  let rows = await loadRows(); // ✅ FROM SUPABASE
-
+  /* MAIN DATA */
   for(let i=0;i<rows.length;i++){
-    
-  let row = [
-    i+1,
-    rows[i]?.head || "",
-    rows[i]?.vote || ""
-  ];
+
+    let row = [
+      i+1,
+      rows[i]?.head || "",
+      rows[i]?.vote || ""
+    ];
 
     DS.forEach(col=>{
 
-  let key = col + "_" + (i+1);
+      let key = col + "_" + (i+1);
 
-  let g = file.given?.[key] || 0;
-  let u = file.used?.[key] || 0;
+      let g = file.given?.[key] || 0;
+      let u = file.used?.[key] || 0;
 
-  /* 🔥 AUTO CALC FOR TOTAL ALLOCATION */
-  if(col === "Total Allocation"){
+      /* TOTAL ALLOCATION AUTO */
+      if(col === "Total Allocation"){
+        let totalGiven = 0;
 
-    let totalGiven = 0;
+        DS.forEach(c=>{
+          if(c !== "Total Allocation"){
+            let k = c + "_" + (i+1);
+            totalGiven += file.given?.[k] || 0;
+          }
+        });
 
-    DS.forEach(c=>{
-      if(c !== "Total Allocation"){
-        let k = c + "_" + (i+1);
-        totalGiven += file.given?.[k] || 0;
+        u = totalGiven;
       }
+
+      if(col === "Total Allocation"){
+        row.push(g, u, g - u);
+      }else{
+        row.push(g, "", "");
+      }
+
     });
-
-    u = totalGiven; // ✅ FIX
-  }
-
-  row.push(g, u, g - u);
-});
 
     data.push(row);
   }
 
+  /* 🔥 SUMMARY CALC */
+  let summary = calculateSummary(rows, file.given);
+
+  /* SPACE */
+  data.push([]); data.push([]); data.push([]);
+
+  /* 1001,1002,1003,total */
+  ["1001","1002","1003","total"].forEach(type=>{
+
+    let row = ["", type, ""];
+
+    DS.forEach(col=>{
+      let val = summary[type][col] || 0;
+
+      if(col === "Total Allocation"){
+        row.push(val, "", val);
+      }else{
+        row.push(val, "", "");
+      }
+    });
+
+    data.push(row);
+  });
+
+  /* SPACE */
+  data.push([]);
+
+  /* RECURRENT */
+  let rRow = ["","recurrent",""];
+  DS.forEach(col=>{
+    let val = summary["recurrent"][col] || 0;
+    if(col === "Total Allocation"){
+      rRow.push(val, "", val);
+    }else{
+      rRow.push(val, "", "");
+    }
+  });
+  data.push(rRow);
+
+  /* SPACE */
+  data.push([]);
+
+  /* CAPITAL */
+  let cRow = ["","capital",""];
+  DS.forEach(col=>{
+    let val = summary["capital"][col] || 0;
+    if(col === "Total Allocation"){
+      cRow.push(val, "", val);
+    }else{
+      cRow.push(val, "", "");
+    }
+  });
+  data.push(cRow);
+
+  /* CREATE SHEET */
   let ws = XLSX.utils.aoa_to_sheet(data);
 
   /* WIDTH */
   ws['!cols'] = [
-    {wch:6},{wch:20},{wch:20},
-    ...Array(DS.length*3).fill({wch:14})
+    {wch:6},      // No
+    {wch:10},     // Head ✅ FIXED
+    {wch:20},     // Vote
+    ...Array(DS.length*3).fill({wch:15})
   ];
 
-  /* MERGES */
+  /* MERGE HEADERS */
   let merges = [];
 
   for(let i=0;i<DS.length;i++){
@@ -478,11 +537,12 @@ async function exportExcel(){
           right:{style:"thin"}
         },
         alignment:{
-          horizontal: (C>=3 ? "center" : "left"),
+          horizontal: (C>=3 ? "right" : "left"),
           vertical:"center"
         }
       };
 
+      /* HEADER COLORS */
       if(R===0 && C>=3){
         cell.s.fill = { fgColor:{rgb:"BFBFBF"} };
       }
@@ -491,13 +551,21 @@ async function exportExcel(){
         cell.s.fill = { fgColor:{rgb:"808080"} };
       }
 
+      /* BALANCE COLUMN */
       if((C-3)%3===2 && C>=3){
         cell.s.fill = { fgColor:{rgb:"D9D9D9"} };
       }
 
+      /* NUMBER FORMAT */
       if(R>=2 && C>=3){
         cell.z = "#,##0.00";
-        cell.s.alignment.horizontal = "right";
+      }
+
+      /* 🔥 DARK ROWS */
+      let rowName = data[R][1];
+      if(rowName === "total" || rowName === "capital"){
+        cell.s.fill = { fgColor:{rgb:"A6A6A6"} };
+        cell.s.font = { bold:true };
       }
     }
   }
