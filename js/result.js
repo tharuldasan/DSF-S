@@ -148,18 +148,44 @@ function buildSummaryRow(title, data){
     let val = data[col] || 0;
 
     if(col === "Total Allocation"){
-      row += `
-        <td class="${isDark ? 'dark-cell' : ''}">${formatRs(val)}</td>
-        <td class="${isDark ? 'dark-cell' : ''}"></td>
-        <td class="balance-cell ${isDark ? 'dark-cell' : ''}">${formatRs(val)}</td>
-      `;
-    }else{
-      row += `
-        <td class="${isDark ? 'dark-cell' : ''}">${formatRs(val)}</td>
-        <td></td>
-        <td></td>
-      `;
-    }
+
+  if(title === "total"){
+
+    let totalReceived = 0;
+    let totalBalance = 0;
+
+    ["1001","1002","1003"].forEach(type=>{
+      totalReceived += (data[type]?.["Total Allocation"] || 0);
+
+      // balance = received - issued → but issued = received → balance = 0
+      // so we calculate from given vs issued:
+      totalBalance += (data[type]?.["Total Allocation"] || 0);
+    });
+
+    row += `
+      <td class="dark-cell">${formatRs(totalReceived)}</td>
+      <td class="dark-cell"></td>
+      <td class="dark-cell">${formatRs(totalBalance)}</td>
+    `;
+
+  }else{
+
+    let val = data[col] || 0;
+
+    row += `
+      <td class="${isDark ? 'dark-cell' : ''}">${formatRs(val)}</td>
+      <td></td>
+      <td class="balance-cell ${isDark ? 'dark-cell' : ''}">${formatRs(val)}</td>
+    `;
+  }
+
+}else{
+  row += `
+    <td>${formatRs(data[col] || 0)}</td>
+    <td></td>
+    <td></td>
+  `;
+}
 
   });
 
@@ -441,7 +467,7 @@ async function exportExcel(){
   }
 
   /* 🔥 SUMMARY CALC */
-  let summary = calculateSummary(rows, file.given);
+  let summary = calculateSummary(rows, file.given || {});
 
   /* SPACE */
   data.push([]); data.push([]); data.push([]);
