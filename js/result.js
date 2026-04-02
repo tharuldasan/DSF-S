@@ -133,6 +133,38 @@ function formatRs(val){
   return "Rs. " + Number(val).toLocaleString(undefined,{minimumFractionDigits:2});
 }
 
+function buildSummaryRow(title, data){
+
+  let row = `<tr>
+    <td></td>
+    <td>${title}</td>
+    <td></td>
+  `;
+
+  DS.forEach(col=>{
+
+    let val = data[col] || 0;
+
+    if(col === "Total Allocation"){
+      row += `
+        <td class="balance-cell">${formatRs(val)}</td>
+        <td class="balance-cell"></td>
+        <td class="balance-cell"></td>
+      `;
+    }else{
+      row += `
+        <td>${formatRs(val)}</td>
+        <td></td>
+        <td></td>
+      `;
+    }
+
+  });
+
+  row += "</tr>";
+  return row;
+}
+
 /* RENDER */
 async function render(){
 
@@ -207,15 +239,34 @@ async function render(){
   `;
 });
 
-    let summary = calculateSummary(rows, given);
-
-    for(let k=0;k<3;k++){
+       // 🔥 SPACE (3 rows)
+for(let k=0;k<3;k++){
   html += `<tr><td colspan="${3 + DS.length*3}"></td></tr>`;
 }
+
+// 🔥 MAIN GROUPS
+html += buildSummaryRow("1001", summary["1001"]);
+html += buildSummaryRow("1002", summary["1002"]);
+html += buildSummaryRow("1003", summary["1003"]);
+html += buildSummaryRow("total", summary["total"]);
+
+// 🔥 SPACE
+html += `<tr><td colspan="${3 + DS.length*3}"></td></tr>`;
+
+// 🔥 RECURRENT
+html += buildSummaryRow("recurrent", summary["recurrent"]);
+
+// 🔥 SPACE
+html += `<tr><td colspan="${3 + DS.length*3}"></td></tr>`;
+
+// 🔥 CAPITAL
+html += buildSummaryRow("capital", summary["capital"]);
 
     html += "</tr>";
   }
 
+   let summary = calculateSummary(rows, given);
+  
   html += "</table>";
 
   document.getElementById("totals").innerHTML = html;
