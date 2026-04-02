@@ -192,6 +192,8 @@ async function render(){
   </tr>
   `;
 
+  let summary = calculateSummary(rows, given);
+  
   for(let i=0;i<rows.length;i++){
 
     html += `<tr>
@@ -239,7 +241,10 @@ async function render(){
   `;
 });
 
-       // 🔥 SPACE (3 rows)
+    html += "</tr>";
+  }
+
+  // 🔥 SPACE (3 rows)
 for(let k=0;k<3;k++){
   html += `<tr><td colspan="${3 + DS.length*3}"></td></tr>`;
 }
@@ -261,11 +266,6 @@ html += `<tr><td colspan="${3 + DS.length*3}"></td></tr>`;
 
 // 🔥 CAPITAL
 html += buildSummaryRow("capital", summary["capital"]);
-
-    html += "</tr>";
-  }
-
-   let summary = calculateSummary(rows, given);
   
   html += "</table>";
 
@@ -589,50 +589,6 @@ function applyHighlight(){
     });
     lastSearch = null;
   }, 60000); // 60000 ms = 1 minute
-}
-
-async function saveModal(){
-
-  let val = Number(document.getElementById("modalInput").value);
-  if(isNaN(val)) return closeModal();
-
-  let file = await getCurrentFile();
-
-  let addMode = document.getElementById("plusToggle").checked;
-
-  if(!file.given) file.given = {};
-  if(!file.used) file.used = {};
-  if(!file.history) file.history = {};
-
-  let key = currentKey;
-
-  // 🔥 INIT STRUCTURE
-  if(!file.history[key]){
-    file.history[key] = {
-      given: [],
-      used: []
-    };
-  }
-
-  // 🔥 SAVE VALUE
-  if(addMode){
-    file[currentType][key] =
-      (file[currentType][key] || 0) + val;
-  }else{
-    file[currentType][key] = val;
-  }
-
-  // 🔥 SAVE HISTORY
-  file.history[key][currentType].push({
-    amount: val,
-    mode: addMode ? "Added" : "Set",
-    date: new Date().toLocaleDateString()
-  });
-
-  await saveFile(file);
-
-  closeModal();
-  render();
 }
 
 function viewHistory(e, key){
