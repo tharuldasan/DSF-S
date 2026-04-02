@@ -142,7 +142,7 @@ async function render(){
     </td>
 
     <td class="clickable"
-      onclick="edit('${key}','used')"
+      ${col === "Total Allocation" ? "" : `onclick="edit('${key}','used')"` }
       oncontextmenu="viewHistory(event,'${key}')">
       ${formatRs(u)}
     </td>
