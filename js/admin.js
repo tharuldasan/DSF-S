@@ -61,7 +61,6 @@ async function addRow(){
 
   let { error } = await supabaseClient.from("rows").insert({
     id: id,
-    user_email: userEmail,
     head: head,
     vote: vote
   });
