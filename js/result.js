@@ -169,7 +169,7 @@ function formatRs(val){
   return "Rs. " + Number(val).toLocaleString(undefined,{minimumFractionDigits:2});
 }
 
-function buildSummaryRow(title, data){
+function buildSummaryRow(title, data, rows, given){
 
   let isDark = (title === "total" || title === "capital");
 
@@ -179,51 +179,78 @@ function buildSummaryRow(title, data){
     <td></td>
   `;
 
-  DS.forEach(col=>{
-
-    let val = data[col] || 0;
-
-    if(col === "Total Allocation"){
-
+  /* 🔥 SPECIAL TOTAL ROW */
   if(title === "total"){
 
     let totalReceived = 0;
     let totalBalance = 0;
 
-    ["1001","1002","1003"].forEach(type=>{
-      totalReceived += (data[type]?.["Total Allocation"] || 0);
+    rows.forEach((r, i)=>{
 
-      // balance = received - issued → but issued = received → balance = 0
-      // so we calculate from given vs issued:
-      totalBalance += (data[type]?.["Total Allocation"] || 0);
+      let code = getVoteCode(r.vote);
+
+      if(["1001","1002","1003"].includes(code)){
+
+        let rowSum = 0;
+
+        DS.forEach(col=>{
+          if(col !== "Total Allocation"){
+            let key = col + "_" + (i+1);
+            rowSum += given[key] || 0;
+          }
+        });
+
+        totalReceived += rowSum;
+
+        // balance = received - issued
+        // issued = rowSum → balance = 0
+        totalBalance += (rowSum - rowSum);
+      }
     });
 
-    row += `
-      <td class="dark-cell">${formatRs(totalReceived)}</td>
-      <td class="dark-cell"></td>
-      <td class="dark-cell">${formatRs(totalBalance)}</td>
-    `;
+    /* ONLY TOTAL ALLOCATION COLUMN FILLED */
+    DS.forEach(col=>{
+      if(col === "Total Allocation"){
+        row += `
+          <td class="dark-cell">${formatRs(totalReceived)}</td>
+          <td></td>
+          <td class="dark-cell">${formatRs(totalBalance)}</td>
+        `;
+      }else{
+        row += `<td></td><td></td><td></td>`;
+      }
+    });
 
-  }else{
-
-    let val = data[col] || 0;
-
-    row += `
-      <td class="${isDark ? 'dark-cell' : ''}">${formatRs(val)}</td>
-      <td></td>
-      <td class="balance-cell ${isDark ? 'dark-cell' : ''}">${formatRs(val)}</td>
-    `;
   }
 
-}else{
-  row += `
-    <td>${formatRs(data[col] || 0)}</td>
-    <td></td>
-    <td></td>
-  `;
-}
+  /* 🔥 NORMAL SUMMARY ROWS */
+  else{
 
-  });
+    DS.forEach(col=>{
+
+      let val = data[col] || 0;
+
+      if(col === "Total Allocation"){
+
+        row += `
+          <td class="${isDark ? 'dark-cell' : ''}">${formatRs(val)}</td>
+          <td></td>
+          <td class="balance-cell ${isDark ? 'dark-cell' : ''}">${formatRs(val)}</td>
+        `;
+
+      }else{
+
+        row += `
+          <td class="${isDark ? 'dark-cell' : ''}">${formatRs(val)}</td>
+          <td></td>
+          <td></td>
+        `;
+
+      }
+
+    });
+
+  }
 
   row += "</tr>";
   return row;
