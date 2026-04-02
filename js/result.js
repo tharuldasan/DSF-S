@@ -113,27 +113,43 @@ async function render(){
     `;
 
     DS.forEach(col=>{
-      let key = col + "_" + (i+1); // ✅ FIXED INDEX
 
-      let g = given[key] || 0;
-      let u = used[key] || 0;
+  let key = col + "_" + (i+1);
 
-      html += `
-        <td class="clickable"
-           onclick="edit('${key}','given')"
-           oncontextmenu="viewHistory(event,'${key}')">
-           ${formatRs(g)}
-        </td>
+  let g = given[key] || 0;
+  let u = used[key] || 0;
 
-        <td class="clickable"
-           onclick="edit('${key}','used')"
-           oncontextmenu="viewHistory(event,'${key}')">
-           ${formatRs(u)}
-        </td>
+  /* 🔥 AUTO CALC FOR TOTAL ALLOCATION */
+  if(col === "Total Allocation"){
 
-  <td class="balance-cell">${formatRs(g-u)}</td>
-`;
+    let totalGiven = 0;
+
+    DS.forEach(c=>{
+      if(c !== "Total Allocation"){
+        let k = c + "_" + (i+1);
+        totalGiven += given[k] || 0;
+      }
     });
+
+    u = totalGiven; // 🔥 SET ISSUED = SUM
+  }
+
+  html += `
+    <td class="clickable"
+      onclick="edit('${key}','given')"
+      oncontextmenu="viewHistory(event,'${key}')">
+      ${formatRs(g)}
+    </td>
+
+    <td class="clickable"
+      onclick="edit('${key}','used')"
+      oncontextmenu="viewHistory(event,'${key}')">
+      ${formatRs(u)}
+    </td>
+
+    <td class="balance-cell">${formatRs(g-u)}</td>
+  `;
+});
 
     html += "</tr>";
   }
