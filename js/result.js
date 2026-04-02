@@ -216,22 +216,32 @@ function buildSummaryRow(title, data, rows, given){
 
         // balance = received - issued
         // issued = rowSum → balance = 0
-        totalBalance += (rowSum - rowSum);
-      }
-    });
+        let rowBalance = 0;
+
+DS.forEach(col=>{
+  if(col !== "Total Allocation"){
+    let key = col + "_" + (i+1);
+    let g = given[key] || 0;
+    rowBalance += g;
+  }
+});
+
+totalBalance += rowBalance;
 
     /* ONLY TOTAL ALLOCATION COLUMN FILLED */
     DS.forEach(col=>{
-      if(col === "Total Allocation"){
-        row += `
-          <td class="dark-cell">${formatRs(totalReceived)}</td>
-          <td></td>
-          <td class="dark-cell">${formatRs(totalBalance)}</td>
-        `;
-      }else{
-        row += `<td></td><td></td><td></td>`;
-      }
-    });
+  if(col === "Total Allocation"){
+
+    row += `
+      <td class="dark-cell">${formatRs(totalReceived)}</td>
+      <td></td>
+      <td class="dark-cell">${formatRs(totalBalance)}</td>
+    `;
+
+  }else{
+    row += `<td></td><td></td><td></td>`;
+  }
+});
 
   }
 
@@ -359,18 +369,6 @@ html += buildSummaryRow("1003", summary["1003"], rows, given);
 html += buildSummaryRow("total", summary["total"], rows, given);
 html += buildSummaryRow("recurrent", summary["recurrent"], rows, given);
 html += buildSummaryRow("capital", summary["capital"], rows, given);
-
-// 🔥 SPACE
-html += `<tr><td colspan="${3 + DS.length*3}"></td></tr>`;
-
-// 🔥 RECURRENT
-html += buildSummaryRow("recurrent", summary["recurrent"]);
-
-// 🔥 SPACE
-html += `<tr><td colspan="${3 + DS.length*3}"></td></tr>`;
-
-// 🔥 CAPITAL
-html += buildSummaryRow("capital", summary["capital"]);
   
   html += "</table>";
 
