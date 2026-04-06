@@ -21,19 +21,14 @@ function getVoteCode(vote){
 
   if(!vote) return "";
 
-  // 🔥 remove brackets content (e.g. "(11)")
-  vote = vote.replace(/\(.*?\)/g, "");
+  // 🔥 find ALL 4-digit numbers in string
+  let matches = vote.match(/\d{4}/g);
 
-  // 🔥 split by "-"
-  let parts = vote.split("-");
+  // ❌ if none → ignore this row
+  if(!matches) return "";
 
-  // 🔥 get last part
-  let last = parts[parts.length - 1];
-
-  // 🔥 extract ONLY numbers
-  let match = last.match(/\d+/);
-
-  return match ? match[0] : "";
+  // ✅ take LAST 4-digit number
+  return matches[matches.length - 1];
 }
 
 function calculateFullSummary(rows, given, used){
