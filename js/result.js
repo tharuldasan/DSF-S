@@ -540,13 +540,13 @@ async function exportExcel(){
     
 /* STYLE */
 for(let R=0; R<data.length; R++){
-  for(let C=0; C<data[0].length; C++){
+  for(let C=0; C<(data[R]?.length || 0); C++){
 
     let ref = XLSX.utils.encode_cell({r:R,c:C});
     let cell = ws[ref];
     if(!cell) continue;
 
-    let isEmptyRow = data[R].length === 0;
+    let isEmptyRow = !data[R] || data[R].every(v => v === "" || v === undefined);
 
     let isHeader1 = data[R][0] === "No";
     let isHeader2 = (R > 0 && data[R-1]?.[0] === "No");
@@ -571,7 +571,7 @@ for(let R=0; R<data.length; R++){
       }
     };
 
-    if(isHeader1 && C>=3){
+    if(isHeader1){
       cell.s.fill = { fgColor:{rgb:"BFBFBF"} };
       cell.s.font = { bold:true };
     }
@@ -591,7 +591,8 @@ for(let R=0; R<data.length; R++){
 
     let name = data[R]?.[1];
     if(name === "total" || name === "capital"){
-      cell.s.fill = { fgColor:{rgb:"A6A6A6"} };
+      cell.s.fill = cell.s.fill || {};
+      cell.s.fill.fgColor = { rgb:"A6A6A6" };
       cell.s.font = { bold:true };
     }
   }
@@ -655,7 +656,7 @@ for(let R=0; R<data.length; R++){
 
     let group = pureDS.slice(i, i+3);
 
-    let name = group.map(d => d[0]).join(""); // DKP style
+    let name = group.map(d => d.substring(0,2)).join(""); // DKP style
 
     buildSheet(name, group);
   }
