@@ -537,6 +537,65 @@ async function exportExcel(){
   });
 
   let ws = XLSX.utils.aoa_to_sheet(data);
+    
+/* STYLE */
+for(let R=0; R<data.length; R++){
+  for(let C=0; C<data[0].length; C++){
+
+    let ref = XLSX.utils.encode_cell({r:R,c:C});
+    let cell = ws[ref];
+    if(!cell) continue;
+
+    let isEmptyRow = data[R].length === 0;
+
+    let isHeader1 = data[R][0] === "No";
+    let isHeader2 = (R > 0 && data[R-1]?.[0] === "No");
+
+    let isDataRow = !isEmptyRow && !isHeader1 && !isHeader2;
+
+    if(isEmptyRow){
+      cell.s = {};
+      continue;
+    }
+
+    cell.s = {
+      border:{
+        top:{style:"thin"},
+        bottom:{style:"thin"},
+        left:{style:"thin"},
+        right:{style:"thin"}
+      },
+      alignment:{
+        horizontal: (C>=3 ? "right" : "left"),
+        vertical:"center"
+      }
+    };
+
+    if(isHeader1 && C>=3){
+      cell.s.fill = { fgColor:{rgb:"BFBFBF"} };
+      cell.s.font = { bold:true };
+    }
+
+    if(isHeader2 && C>=3){
+      cell.s.fill = { fgColor:{rgb:"808080"} };
+      cell.s.font = { bold:true };
+    }
+
+    if((C-3)%3===2 && C>=3){
+      cell.s.fill = { fgColor:{rgb:"D9D9D9"} };
+    }
+
+    if(isDataRow && C>=3){
+      cell.z = "#,##0.00";
+    }
+
+    let name = data[R]?.[1];
+    if(name === "total" || name === "capital"){
+      cell.s.fill = { fgColor:{rgb:"A6A6A6"} };
+      cell.s.font = { bold:true };
+    }
+  }
+}
 
   /* WIDTH */
   ws['!cols'] = [
