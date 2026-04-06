@@ -565,10 +565,15 @@ for(let R=0; R<data.length; R++){
         left:{style:"thin"},
         right:{style:"thin"}
       },
-      alignment:{
-        horizontal: (C>=3 ? "right" : "left"),
-        vertical:"center"
-      }
+      let isHeader1 = data[R][0] === "No";
+let isHeader2 = (R > 0 && data[R-1]?.[0] === "No");
+
+cell.s.alignment = {
+  horizontal: (isHeader1 || isHeader2) 
+    ? "center"     // 🔥 headers centered
+    : (C>=3 ? "right" : "left"), // data same as before
+  vertical: "center"
+};
     };
 
     if(isHeader1){
