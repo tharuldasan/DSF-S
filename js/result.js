@@ -427,28 +427,16 @@ async function exportExcel(){
   }
 
   let rows = await loadRows();
-  let data = [];
+  let given = file.given || {};
+  let used = file.used || {};
 
-  /* HEADER */
-  let header1 = [
-    "No","Head","Vote",
-    ...DS.flatMap(d => [d,"",""])
-  ];
+  let wb = XLSX.utils.book_new();
 
-  let header2 = [
-    "","","",
-    ...DS.flatMap(d => [
-      d === "Total Allocation" ? "Received" : "Allo/Distribution",
-      d === "Total Allocation" ? "Issued" : "Expenditure",
-      "Balance"
-    ])
-  ];
+  /* =========================
+     🔥 HELPER FUNCTIONS
+  ========================= */
 
-  data.push(header1);
-  data.push(header2);
-
-  /* MAIN DATA */
-  for(let i=0;i<rows.length;i++){
+  function getRowData(i, cols){
 
     let row = [
       i+1,
@@ -456,18 +444,18 @@ async function exportExcel(){
       rows[i]?.vote || ""
     ];
 
-    DS.forEach(col=>{
+    cols.forEach(col=>{
 
       let key = col + "_" + (i+1);
 
-      let g = file.given?.[key] || 0;
-      let u = file.used?.[key] || 0;
+      let g = given[key] || 0;
+      let u = used[key] || 0;
 
       if(col === "Total Allocation"){
         let sum=0;
         DS.forEach(c=>{
           if(c!=="Total Allocation"){
-            sum += file.given?.[c+"_"+(i+1)] || 0;
+            sum += given[c+"_"+(i+1)] || 0;
           }
         });
         u = sum;
@@ -476,108 +464,121 @@ async function exportExcel(){
       row.push(g, u, g-u);
     });
 
-    data.push(row);
+    return row;
   }
 
-  /* SUMMARY */
-  let summary = calculateFullSummary(rows, file.given || {}, file.used || {});
+  function buildSheet(name, cols){
 
-  data.push([]); data.push([]); data.push([]);
+    let data = [];
 
-  ["1001","1002","1003","total","recurrent","capital"].forEach(type=>{
+    let header1 = [
+      "No","Head","Vote",
+      ...cols.flatMap(c => [c,"",""])
+    ];
 
-    let row = ["", type, ""];
+    let header2 = [
+      "","","",
+      ...cols.flatMap(c => [
+        c === "Total Allocation" ? "Received" : "Allo/Distribution",
+        c === "Total Allocation" ? "Issued" : "Expenditure",
+        "Balance"
+      ])
+    ];
 
-    DS.forEach(col=>{
-      let g = summary[type][col].g;
-      let u = summary[type][col].u;
-      let b = g - u;
+    data.push(header1);
+    data.push(header2);
 
-      row.push(g, u, b);
-    });
+    let chunkSize = 50;
 
-    data.push(row);
-  });
+    for(let start=0; start<rows.length; start+=chunkSize){
 
-  /* CREATE SHEET */
-  let ws = XLSX.utils.aoa_to_sheet(data);
+      let end = Math.min(start+chunkSize, rows.length);
 
-  /* WIDTH */
-  ws['!cols'] = [
-    {wch:6},
-    {wch:10},
-    {wch:20},
-    ...Array(DS.length*3).fill({wch:15})
-  ];
-
-  /* MERGES */
-  let merges = [];
-
-  for(let i=0;i<DS.length;i++){
-    let start = 3 + i*3;
-    merges.push({s:{r:0,c:start}, e:{r:0,c:start+2}});
-  }
-
-  merges.push(
-    {s:{r:0,c:0},e:{r:1,c:0}},
-    {s:{r:0,c:1},e:{r:1,c:1}},
-    {s:{r:0,c:2},e:{r:1,c:2}}
-  );
-
-  ws['!merges'] = merges;
-
-  /* STYLE */
-  for(let R=0; R<data.length; R++){
-    for(let C=0; C<data[0].length; C++){
-
-      let ref = XLSX.utils.encode_cell({r:R,c:C});
-      let cell = ws[ref];
-      if(!cell) continue;
-
-      cell.s = {
-        border:{
-          top:{style:"thin"},
-          bottom:{style:"thin"},
-          left:{style:"thin"},
-          right:{style:"thin"}
-        },
-        alignment:{
-          horizontal: (C>=3 ? "right" : "left"),
-          vertical:"center"
-        }
-      };
-
-      /* HEADER COLORS */
-      if(R===0 && C>=3){
-        cell.s.fill = { fgColor:{rgb:"BFBFBF"} };
+      for(let i=start;i<end;i++){
+        data.push(getRowData(i, cols));
       }
 
-      if(R===1 && C>=3){
-        cell.s.fill = { fgColor:{rgb:"808080"} };
-      }
-
-      /* BALANCE COLUMN */
-      if((C-3)%3===2 && C>=3){
-        cell.s.fill = { fgColor:{rgb:"D9D9D9"} };
-      }
-
-      /* NUMBER FORMAT */
-      if(R>=2 && C>=3){
-        cell.z = "#,##0.00";
-      }
-
-      /* DARK ROWS */
-      let name = data[R]?.[1];
-      if(name === "total" || name === "capital"){
-        cell.s.fill = { fgColor:{rgb:"A6A6A6"} };
-        cell.s.font = { bold:true };
+      // skip 5 rows
+      for(let s=0;s<5;s++){
+        data.push([]);
       }
     }
+
+    /* 🔥 SUMMARY */
+    let summary = calculateFullSummary(rows, given, used);
+
+    ["1001","1002","1003","total","recurrent","capital"].forEach(type=>{
+
+      let row = ["", type, ""];
+
+      cols.forEach(col=>{
+        let g = summary[type][col].g;
+        let u = summary[type][col].u;
+        let b = g - u;
+
+        row.push(g, u, b);
+      });
+
+      data.push(row);
+    });
+
+    let ws = XLSX.utils.aoa_to_sheet(data);
+
+    /* WIDTH */
+    ws['!cols'] = [
+      {wch:6},
+      {wch:10},
+      {wch:20},
+      ...Array(cols.length*3).fill({wch:15})
+    ];
+
+    /* MERGE */
+    let merges = [];
+
+    for(let i=0;i<cols.length;i++){
+      let start = 3 + i*3;
+      merges.push({s:{r:0,c:start}, e:{r:0,c:start+2}});
+    }
+
+    merges.push(
+      {s:{r:0,c:0},e:{r:1,c:0}},
+      {s:{r:0,c:1},e:{r:1,c:1}},
+      {s:{r:0,c:2},e:{r:1,c:2}}
+    );
+
+    ws['!merges'] = merges;
+
+    XLSX.utils.book_append_sheet(wb, ws, name);
   }
 
-  let wb = XLSX.utils.book_new();
-  XLSX.utils.book_append_sheet(wb, ws, "Report");
+  /* =========================
+     🔥 SHEET 1 — FULL TABLE
+  ========================= */
 
+  buildSheet("FT", DS);
+
+  /* =========================
+     🔥 SHEET 2 — TA ONLY
+  ========================= */
+
+  buildSheet("TA", ["Total Allocation"]);
+
+  /* =========================
+     🔥 GROUP DS (3 EACH)
+  ========================= */
+
+  let pureDS = DS.filter(d => d !== "Total Allocation");
+
+  for(let i=0;i<pureDS.length;i+=3){
+
+    let group = pureDS.slice(i, i+3);
+
+    let name = group.map(d => d[0]).join(""); // DKP style
+
+    buildSheet(name, group);
+  }
+
+  /* SAVE */
   XLSX.writeFile(wb, file.name + ".xlsx");
 }
 
