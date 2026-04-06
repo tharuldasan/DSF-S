@@ -469,7 +469,9 @@ async function exportExcel(){
 
   function buildSheet(name, cols){
 
-    let data = [];
+  let data = [];
+
+  function addHeaders(){
 
     let header1 = [
       "No","Head","Vote",
@@ -487,69 +489,90 @@ async function exportExcel(){
 
     data.push(header1);
     data.push(header2);
+  }
 
-    let chunkSize = 50;
+  /* 🔥 FIRST HEADER */
+  addHeaders();
 
-    for(let start=0; start<rows.length; start+=chunkSize){
+  let chunkSize = 50;
 
-      let end = Math.min(start+chunkSize, rows.length);
+  for(let start=0; start<rows.length; start+=chunkSize){
 
-      for(let i=start;i<end;i++){
-        data.push(getRowData(i, cols));
-      }
+    let end = Math.min(start+chunkSize, rows.length);
 
-      // skip 5 rows
+    for(let i=start;i<end;i++){
+      data.push(getRowData(i, cols));
+    }
+
+    /* 🔥 IF NOT LAST → ADD GAP + HEADERS AGAIN */
+    if(end < rows.length){
+
       for(let s=0;s<5;s++){
         data.push([]);
       }
+
+      addHeaders(); // 🔥 REPEAT HEADERS
     }
+  }
 
-    /* 🔥 SUMMARY */
-    let summary = calculateFullSummary(rows, given, used);
+  /* 🔥 SUMMARY */
+  let summary = calculateFullSummary(rows, given, used);
 
-    ["1001","1002","1003","total","recurrent","capital"].forEach(type=>{
+  data.push([]);
+  data.push([]);
 
-      let row = ["", type, ""];
+  ["1001","1002","1003","total","recurrent","capital"].forEach(type=>{
 
-      cols.forEach(col=>{
-        let g = summary[type][col].g;
-        let u = summary[type][col].u;
-        let b = g - u;
+    let row = ["", type, ""];
 
-        row.push(g, u, b);
-      });
+    cols.forEach(col=>{
+      let g = summary[type][col].g;
+      let u = summary[type][col].u;
+      let b = g - u;
 
-      data.push(row);
+      row.push(g, u, b);
     });
 
-    let ws = XLSX.utils.aoa_to_sheet(data);
+    data.push(row);
+  });
 
-    /* WIDTH */
-    ws['!cols'] = [
-      {wch:6},
-      {wch:10},
-      {wch:20},
-      ...Array(cols.length*3).fill({wch:15})
-    ];
+  let ws = XLSX.utils.aoa_to_sheet(data);
 
-    /* MERGE */
-    let merges = [];
+  /* WIDTH */
+  ws['!cols'] = [
+    {wch:6},
+    {wch:10},
+    {wch:20},
+    ...Array(cols.length*3).fill({wch:15})
+  ];
 
-    for(let i=0;i<cols.length;i++){
-      let start = 3 + i*3;
-      merges.push({s:{r:0,c:start}, e:{r:0,c:start+2}});
+  /* MERGES */
+  let merges = [];
+
+  let rowPointer = 0;
+
+  for(let i=0;i<data.length;i++){
+
+    // detect header rows
+    if(data[i][0] === "No"){
+
+      for(let j=0;j<cols.length;j++){
+        let start = 3 + j*3;
+        merges.push({s:{r:i,c:start}, e:{r:i,c:start+2}});
+      }
+
+      merges.push(
+        {s:{r:i,c:0},e:{r:i+1,c:0}},
+        {s:{r:i,c:1},e:{r:i+1,c:1}},
+        {s:{r:i,c:2},e:{r:i+1,c:2}}
+      );
     }
-
-    merges.push(
-      {s:{r:0,c:0},e:{r:1,c:0}},
-      {s:{r:0,c:1},e:{r:1,c:1}},
-      {s:{r:0,c:2},e:{r:1,c:2}}
-    );
-
-    ws['!merges'] = merges;
-
-    XLSX.utils.book_append_sheet(wb, ws, name);
   }
+
+  ws['!merges'] = merges;
+
+  XLSX.utils.book_append_sheet(wb, ws, name);
+}
 
   /* =========================
      🔥 SHEET 1 — FULL TABLE
