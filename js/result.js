@@ -467,10 +467,11 @@ async function exportExcel(){
     return row;
   }
 
-  function buildSheet(name, cols){
+function buildSheet(name, cols){
 
   let data = [];
 
+  /* 🔥 HEADER CREATOR */
   function addHeaders(){
 
     let header1 = [
@@ -491,11 +492,12 @@ async function exportExcel(){
     data.push(header2);
   }
 
-  /* 🔥 FIRST HEADER */
+  /* FIRST HEADER */
   addHeaders();
 
   let chunkSize = 50;
 
+  /* 🔥 SPLIT INTO 50 ROW BLOCKS */
   for(let start=0; start<rows.length; start+=chunkSize){
 
     let end = Math.min(start+chunkSize, rows.length);
@@ -504,14 +506,14 @@ async function exportExcel(){
       data.push(getRowData(i, cols));
     }
 
-    /* 🔥 IF NOT LAST → ADD GAP + HEADERS AGAIN */
+    /* ADD GAP + HEADER (NOT LAST BLOCK) */
     if(end < rows.length){
 
       for(let s=0;s<5;s++){
         data.push([]);
       }
 
-      addHeaders(); // 🔥 REPEAT HEADERS
+      addHeaders(); // repeat header
     }
   }
 
@@ -536,74 +538,85 @@ async function exportExcel(){
     data.push(row);
   });
 
+  /* CREATE SHEET */
   let ws = XLSX.utils.aoa_to_sheet(data);
-    
-/* STYLE */
-for(let R=0; R<data.length; R++){
-  for(let C=0; C<(data[R]?.length || 0); C++){
 
-    let ref = XLSX.utils.encode_cell({r:R,c:C});
-    let cell = ws[ref];
-    if(!cell) continue;
+  /* =========================
+     🔥 STYLE (FIXED + CLEAN)
+  ========================= */
 
-    let isEmptyRow = !data[R] || data[R].every(v => v === "" || v === undefined);
+  for(let R=0; R<data.length; R++){
+    for(let C=0; C<(data[R]?.length || 0); C++){
 
-    let isHeader1 = data[R][0] === "No";
-    let isHeader2 = (R > 0 && data[R-1]?.[0] === "No");
+      let ref = XLSX.utils.encode_cell({r:R,c:C});
+      let cell = ws[ref];
+      if(!cell) continue;
 
-    let isDataRow = !isEmptyRow && !isHeader1 && !isHeader2;
+      let isEmptyRow = !data[R] || data[R].every(v => v === "" || v === undefined);
 
-    if(isEmptyRow){
-      cell.s = {};
-      continue;
-    }
-
-    cell.s = {
-      border:{
-        top:{style:"thin"},
-        bottom:{style:"thin"},
-        left:{style:"thin"},
-        right:{style:"thin"}
-      },
       let isHeader1 = data[R][0] === "No";
-let isHeader2 = (R > 0 && data[R-1]?.[0] === "No");
+      let isHeader2 = (R > 0 && data[R-1]?.[0] === "No");
 
-cell.s.alignment = {
-  horizontal: (isHeader1 || isHeader2) 
-    ? "center"     // 🔥 headers centered
-    : (C>=3 ? "right" : "left"), // data same as before
-  vertical: "center"
+      let isDataRow = !isEmptyRow && !isHeader1 && !isHeader2;
+
+      /* SKIP EMPTY ROWS */
+      if(isEmptyRow){
+        cell.s = {};
+        continue;
+      }
+
+      /* BASE STYLE */
+      cell.s = {
+        border:{
+          top:{style:"thin"},
+          bottom:{style:"thin"},
+          left:{style:"thin"},
+          right:{style:"thin"}
+        }
+      };
+
+      /* 🔥 ALIGNMENT */
+      cell.s.alignment = {
+        horizontal: (isHeader1 || isHeader2)
+          ? "center"
+          : (C>=3 ? "right" : "left"),
+        vertical: "center"
+      };
+
+      /* HEADER COLORS */
+      if(isHeader1){
+        cell.s.fill = { fgColor:{rgb:"BFBFBF"} };
+        cell.s.font = { bold:true };
+      }
+
+      if(isHeader2){
+        cell.s.fill = { fgColor:{rgb:"808080"} };
+        cell.s.font = { bold:true };
+      }
+
+      /* BALANCE COLUMN */
+      if((C-3)%3===2 && C>=3){
+        cell.s.fill = { fgColor:{rgb:"D9D9D9"} };
+      }
+
+      /* NUMBER FORMAT */
+      if(isDataRow && C>=3){
+        cell.z = "#,##0.00";
+      }
+
+      /* DARK ROWS */
+      let name = data[R]?.[1];
+      if(name === "total" || name === "capital"){
+        cell.s.fill = cell.s.fill || {};
+        cell.s.fill.fgColor = { rgb:"A6A6A6" };
+        cell.s.font = { bold:true };
+      }
+    }
   }
-    };
 
-    if(isHeader1){
-      cell.s.fill = { fgColor:{rgb:"BFBFBF"} };
-      cell.s.font = { bold:true };
-    }
-
-    if(isHeader2 && C>=3){
-      cell.s.fill = { fgColor:{rgb:"808080"} };
-      cell.s.font = { bold:true };
-    }
-
-    if((C-3)%3===2 && C>=3){
-      cell.s.fill = { fgColor:{rgb:"D9D9D9"} };
-    }
-
-    if(isDataRow && C>=3){
-      cell.z = "#,##0.00";
-    }
-
-    let name = data[R]?.[1];
-    if(name === "total" || name === "capital"){
-      cell.s.fill = cell.s.fill || {};
-      cell.s.fill.fgColor = { rgb:"A6A6A6" };
-      cell.s.font = { bold:true };
-    }
-  }
-}
-
-  /* WIDTH */
+  /* =========================
+     🔥 WIDTH
+  ========================= */
   ws['!cols'] = [
     {wch:6},
     {wch:10},
@@ -611,14 +624,13 @@ cell.s.alignment = {
     ...Array(cols.length*3).fill({wch:15})
   ];
 
-  /* MERGES */
+  /* =========================
+     🔥 MERGES (FOR EACH HEADER BLOCK)
+  ========================= */
   let merges = [];
-
-  let rowPointer = 0;
 
   for(let i=0;i<data.length;i++){
 
-    // detect header rows
     if(data[i][0] === "No"){
 
       for(let j=0;j<cols.length;j++){
@@ -636,6 +648,7 @@ cell.s.alignment = {
 
   ws['!merges'] = merges;
 
+  /* ADD TO WORKBOOK */
   XLSX.utils.book_append_sheet(wb, ws, name);
 }
 
