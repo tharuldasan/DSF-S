@@ -18,9 +18,22 @@ const DS = [
 ];
 
 function getVoteCode(vote){
+
   if(!vote) return "";
+
+  // 🔥 remove brackets content (e.g. "(11)")
+  vote = vote.replace(/\(.*?\)/g, "");
+
+  // 🔥 split by "-"
   let parts = vote.split("-");
-  return parts[parts.length - 1]; // last part
+
+  // 🔥 get last part
+  let last = parts[parts.length - 1];
+
+  // 🔥 extract ONLY numbers
+  let match = last.match(/\d+/);
+
+  return match ? match[0] : "";
 }
 
 function calculateFullSummary(rows, given, used){
