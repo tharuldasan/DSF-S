@@ -573,7 +573,7 @@ cell.s.alignment = {
     ? "center"     // 🔥 headers centered
     : (C>=3 ? "right" : "left"), // data same as before
   vertical: "center"
-};
+  }
     };
 
     if(isHeader1){
