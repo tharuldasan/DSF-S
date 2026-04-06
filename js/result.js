@@ -495,7 +495,7 @@ function buildSheet(name, cols){
   /* FIRST HEADER */
   addHeaders();
 
-  let chunkSize = 50;
+  let chunkSize = 40;
 
   /* 🔥 SPLIT INTO 50 ROW BLOCKS */
   for(let start=0; start<rows.length; start+=chunkSize){
