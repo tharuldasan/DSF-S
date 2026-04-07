@@ -4,16 +4,14 @@ const SUPABASE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZ
 const { createClient } = supabase;
 const supabaseClient = createClient(SUPABASE_URL, SUPABASE_KEY);
 
-/* 🔥 LOAD HISTORY */
 async function loadHistory(){
 
-  let key = localStorage.getItem("historyKey"); // e.g. Kalutara_5
+  let key = localStorage.getItem("historyKey");
   let fileId = localStorage.getItem("currentFile");
 
   const { data: sessionData } = await supabaseClient.auth.getSession();
   let userEmail = sessionData.session.user.email;
 
-  /* 🔥 GET FILE */
   let { data } = await supabaseClient
     .from("files")
     .select("*")
@@ -21,48 +19,37 @@ async function loadHistory(){
     .eq("id", fileId)
     .single();
 
-  let file = data?.data;
-
-  if(!file) return;
+  let file = data.data;
 
   let history = file.history?.[key] || {
     given: [],
     used: []
   };
 
-  /* 🔥 GET ROW INDEX */
   let index = parseInt(key.split("_")[1]) - 1;
 
-  /* 🔥 LOAD ROWS (HEAD + VOTE) */
-  let { data: rows } = await supabaseClient
-    .from("rows")
-    .select("*");
+  let { data: rows } = await supabaseClient.from("rows").select("*");
 
-  let head = rows?.[index]?.head || "";
-  let vote = rows?.[index]?.vote || "";
+  let head = rows[index]?.head || "";
+  let vote = rows[index]?.vote || "";
 
-  /* 🔥 BUILD TOP INFO */
   let html = `
-    <div style="
-      margin-bottom:20px;
-      padding:15px;
-      background:#f3f4f6;
-      border-radius:12px;
-      text-align:left;
-    ">
-      <div><b>Head:</b> ${head}</div>
-      <div><b>Vote:</b> ${vote}</div>
+    <div style="margin-bottom:15px;">
+      <button onclick="downloadPDF()">Download PDF</button>
+    </div>
+
+    <div style="margin-bottom:15px;">
+      <b>Head:</b> ${head} <br>
+      <b>Vote:</b> ${vote}
     </div>
   `;
 
-  /* 🔥 TABLES */
   html += buildTable("Allo / Distribution", history.given);
   html += buildTable("Expenditure", history.used);
 
   document.getElementById("historyTable").innerHTML = html;
 }
 
-/* 🔥 TABLE BUILDER */
 function buildTable(title, data){
 
   let html = `<h3>${title}</h3>`;
@@ -90,5 +77,10 @@ function buildTable(title, data){
   return html;
 }
 
-/* RUN */
+/* PDF */
+function downloadPDF(){
+  let element = document.getElementById("historyTable");
+  html2pdf().from(element).save("Item_History.pdf");
+}
+
 window.onload = loadHistory;
