@@ -43,7 +43,7 @@ async function generateDSReport(){
     return;
   }
 
-  let targetDate = `${day}/${month}/${year}`;
+  let targetDate = new Date(year, month-1, day).toLocaleDateString();
 
   let file = await getCurrentFile();
   let rows = await loadRows();
