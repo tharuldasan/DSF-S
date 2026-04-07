@@ -8,6 +8,7 @@ let currentKey = "";
 let currentType = "";
 let lastSearch = null;
 let highlightTimer = null;
+let selectedDS = "";
 
 const DS = [
   "Total Allocation", // ✅ NEW FIRST
@@ -16,6 +17,98 @@ const DS = [
   "Madurawala","Millaniya","Palindanuwara",
   "Matugama","Walallawita","Ingiriya"
 ];
+
+function openDateModal(e, ds, row){
+  e.preventDefault();
+
+  if(ds === "Total Allocation") return; // only DS
+
+  selectedDS = { ds, row };
+
+  document.getElementById("dateModal").style.display = "flex";
+}
+
+function closeDateModal(){
+  document.getElementById("dateModal").style.display = "none";
+}
+
+async function generateDSReport(){
+
+  let day = document.getElementById("dateDay").value;
+  let month = document.getElementById("dateMonth").value;
+  let year = document.getElementById("dateYear").value;
+
+  if(!day || !month || !year){
+    alert("Fill all fields");
+    return;
+  }
+
+  let targetDate = `${day}/${month}/${year}`;
+
+  let file = await getCurrentFile();
+  let rows = await loadRows();
+
+  let given = file.given || {};
+  let used = file.used || {};
+  let history = file.history || {};
+
+  let ds = selectedDS.ds;
+
+  let html = `
+    <h2>${ds} Report (${targetDate})</h2>
+    <button onclick="downloadPDF()">Download PDF</button>
+    <table>
+      <tr>
+        <th>No</th>
+        <th>Head</th>
+        <th>Vote</th>
+        <th>Allo</th>
+        <th>Expenditure</th>
+      </tr>
+  `;
+
+  for(let i=0;i<rows.length;i++){
+
+    let key = ds + "_" + (i+1);
+
+    let h = history[key];
+
+    if(!h) continue;
+
+    let g = 0;
+    let u = 0;
+
+    // FILTER BY DATE
+    h.given.forEach(x=>{
+      if(x.date === targetDate) g += x.amount;
+    });
+
+    h.used.forEach(x=>{
+      if(x.date === targetDate) u += x.amount;
+    });
+
+    // ❌ skip zero rows
+    if(g === 0 && u === 0) continue;
+
+    html += `
+      <tr>
+        <td>${i+1}</td>
+        <td>${rows[i].head}</td>
+        <td>${rows[i].vote}</td>
+        <td>${formatRs(g)}</td>
+        <td>${formatRs(u)}</td>
+      </tr>
+    `;
+  }
+
+  html += "</table>";
+
+  localStorage.setItem("dsReportHTML", html);
+
+  window.open("ds-report.html", "_blank");
+
+  closeDateModal();
+}
 
 function getVoteCode(vote){
 
@@ -288,13 +381,13 @@ async function render(){
   html += `
     <td class="clickable"
       onclick="edit('${key}','given')"
-      oncontextmenu="viewHistory(event,'${key}')">
+      oncontextmenu="openDateModal(event,'${col}','${i+1}')">
       ${formatRs(g)}
     </td>
 
     <td class="clickable"
       ${col === "Total Allocation" ? "" : `onclick="edit('${key}','used')"` }
-      oncontextmenu="viewHistory(event,'${key}')">
+      oncontextmenu="openDateModal(event,'${col}','${i+1}')">
       ${formatRs(u)}
     </td>
 
