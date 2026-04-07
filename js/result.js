@@ -8,7 +8,7 @@ let currentKey = "";
 let currentType = "";
 let lastSearch = null;
 let highlightTimer = null;
-let selectedDS = "";
+let selectedDS = null;
 
 const DS = [
   "Total Allocation", // ✅ NEW FIRST
@@ -56,7 +56,6 @@ async function generateDSReport(){
 
   let html = `
     <h2>${ds} Report (${targetDate})</h2>
-    <button onclick="downloadPDF()">Download PDF</button>
     <table>
       <tr>
         <th>No</th>
@@ -108,6 +107,17 @@ async function generateDSReport(){
   window.open("ds-report.html", "_blank");
 
   closeDateModal();
+}
+
+function handleRightClick(e, ds, row){
+  e.preventDefault();
+  e.stopPropagation(); // 🔥 VERY IMPORTANT
+
+  if(ds === "Total Allocation") return;
+
+  selectedDS = { ds, row };
+
+  document.getElementById("dateModal").style.display = "flex";
 }
 
 function getVoteCode(vote){
@@ -381,13 +391,13 @@ async function render(){
   html += `
     <td class="clickable"
       onclick="edit('${key}','given')"
-      oncontextmenu="openDateModal(event,'${col}','${i+1}')">
+      oncontextmenu="handleRightClick(event,'${col}',${i+1})">
       ${formatRs(g)}
     </td>
 
     <td class="clickable"
       ${col === "Total Allocation" ? "" : `onclick="edit('${key}','used')"` }
-      oncontextmenu="openDateModal(event,'${col}','${i+1}')">
+      oncontextmenu="handleRightClick(event,'${col}',${i+1})">
       ${formatRs(u)}
     </td>
 
