@@ -1,17 +1,31 @@
-const SUPABASE_URL = "https://voenpsxzpirhuysviyul.supabase.co";
+const SUPABASE_URL = "https://voenpsxzpirhuysviyul.supabase.co"; 
 const SUPABASE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InZvZW5wc3h6cGlyaHV5c3ZpeXVsIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzUwMzEzNzMsImV4cCI6MjA5MDYwNzM3M30.MpA_0Gykvv9-ZQA1jkBCk1zcp-t-9jkwHacaHG2-MYw";
 
 const { createClient } = supabase;
 const supabaseClient = createClient(SUPABASE_URL, SUPABASE_KEY);
 
+/* 🔥 LOAD HISTORY */
 async function loadHistory(){
 
   let key = localStorage.getItem("historyKey"); // e.g. Kalutara_5
-  let file = await getCurrentFile();
+  let fileId = localStorage.getItem("currentFile");
+
+  const { data: sessionData } = await supabaseClient.auth.getSession();
+  let userEmail = sessionData.session.user.email;
+
+  /* 🔥 GET FILE */
+  let { data } = await supabaseClient
+    .from("files")
+    .select("*")
+    .eq("user_email", userEmail)
+    .eq("id", fileId)
+    .single();
+
+  let file = data?.data;
 
   if(!file) return;
 
-  let history = (file.history && file.history[key]) || {
+  let history = file.history?.[key] || {
     given: [],
     used: []
   };
@@ -19,53 +33,62 @@ async function loadHistory(){
   /* 🔥 GET ROW INDEX */
   let index = parseInt(key.split("_")[1]) - 1;
 
-  /* 🔥 LOAD ROWS */
-  let rows = await loadRows();
+  /* 🔥 LOAD ROWS (HEAD + VOTE) */
+  let { data: rows } = await supabaseClient
+    .from("rows")
+    .select("*");
 
-  let head = rows[index]?.head || "";
-  let vote = rows[index]?.vote || "";
+  let head = rows?.[index]?.head || "";
+  let vote = rows?.[index]?.vote || "";
 
-  /* 🔥 BUILD HEADER */
+  /* 🔥 BUILD TOP INFO */
   let html = `
-    <div style="margin-bottom:20px; text-align:left;">
-      <b>Head:</b> ${head} <br>
-      <b>Vote:</b> ${vote}
+    <div style="
+      margin-bottom:20px;
+      padding:15px;
+      background:#f3f4f6;
+      border-radius:12px;
+      text-align:left;
+    ">
+      <div><b>Head:</b> ${head}</div>
+      <div><b>Vote:</b> ${vote}</div>
     </div>
   `;
 
-  /* 🔥 TABLE BUILDER */
-  function buildTable(title, data){
-
-    let t = `<h3>${title}</h3>`;
-
-    t += `
-    <table>
-      <tr>
-        <th>Date</th>
-        <th>Status</th>
-        <th>Amount</th>
-      </tr>
-    `;
-
-    data.forEach(h=>{
-      t += `
-        <tr>
-          <td>${h.date}</td>
-          <td>${h.mode}</td>
-          <td>Rs. ${h.amount}</td>
-        </tr>
-      `;
-    });
-
-    t += "</table><br>";
-    return t;
-  }
-
+  /* 🔥 TABLES */
   html += buildTable("Allo / Distribution", history.given);
   html += buildTable("Expenditure", history.used);
 
   document.getElementById("historyTable").innerHTML = html;
 }
 
+/* 🔥 TABLE BUILDER */
+function buildTable(title, data){
+
+  let html = `<h3>${title}</h3>`;
+
+  html += `
+  <table>
+  <tr>
+    <th>Date</th>
+    <th>Status</th>
+    <th>Amount</th>
+  </tr>
+  `;
+
+  data.forEach(h=>{
+    html += `
+    <tr>
+      <td>${h.date}</td>
+      <td>${h.mode}</td>
+      <td>Rs. ${Number(h.amount).toLocaleString(undefined,{minimumFractionDigits:2})}</td>
+    </tr>`;
+  });
+
+  html += "</table><br>";
+
+  return html;
+}
+
 /* RUN */
-loadHistory();
+window.onload = loadHistory;
