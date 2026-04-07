@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>DS Report</title>
+  <link rel="stylesheet" href="css/style.css">
+
+  <!-- PDF LIB -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+</head>
+<body>
+
+<div class="container">
+  <div class="card">
+
+    <div style="margin-bottom:20px;">
+      <button onclick="downloadPDF()">Download PDF</button>
+    </div>
+
+    <div id="report"></div>
+
+  </div>
+</div>
+
+<script>
+  // load table
+  document.getElementById("report").innerHTML =
+    localStorage.getItem("dsReportHTML");
+
+  function downloadPDF(){
+    let element = document.getElementById("report");
+    html2pdf().from(element).save("DS_Report.pdf");
+  }
+</script>
+
+</body>
+</html>
