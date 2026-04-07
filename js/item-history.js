@@ -6,27 +6,60 @@ const supabaseClient = createClient(SUPABASE_URL, SUPABASE_KEY);
 
 async function loadHistory(){
 
-  let key = localStorage.getItem("historyKey");
-  let fileId = localStorage.getItem("currentFile");
+  let key = localStorage.getItem("historyKey"); // e.g. Kalutara_5
+  let file = await getCurrentFile();
 
-  const { data: sessionData } = await supabaseClient.auth.getSession();
-  let userEmail = sessionData.session.user.email;
+  if(!file) return;
 
-  let { data } = await supabaseClient
-    .from("files")
-    .select("*")
-    .eq("user_email", userEmail)
-    .eq("id", fileId)
-    .single();
-
-  let file = data.data;
-
-  let history = file.history?.[key] || {
+  let history = (file.history && file.history[key]) || {
     given: [],
     used: []
   };
 
-  let html = "";
+  /* 🔥 GET ROW INDEX */
+  let index = parseInt(key.split("_")[1]) - 1;
+
+  /* 🔥 LOAD ROWS */
+  let rows = await loadRows();
+
+  let head = rows[index]?.head || "";
+  let vote = rows[index]?.vote || "";
+
+  /* 🔥 BUILD HEADER */
+  let html = `
+    <div style="margin-bottom:20px; text-align:left;">
+      <b>Head:</b> ${head} <br>
+      <b>Vote:</b> ${vote}
+    </div>
+  `;
+
+  /* 🔥 TABLE BUILDER */
+  function buildTable(title, data){
+
+    let t = `<h3>${title}</h3>`;
+
+    t += `
+    <table>
+      <tr>
+        <th>Date</th>
+        <th>Status</th>
+        <th>Amount</th>
+      </tr>
+    `;
+
+    data.forEach(h=>{
+      t += `
+        <tr>
+          <td>${h.date}</td>
+          <td>${h.mode}</td>
+          <td>Rs. ${h.amount}</td>
+        </tr>
+      `;
+    });
+
+    t += "</table><br>";
+    return t;
+  }
 
   html += buildTable("Allo / Distribution", history.given);
   html += buildTable("Expenditure", history.used);
@@ -34,31 +67,5 @@ async function loadHistory(){
   document.getElementById("historyTable").innerHTML = html;
 }
 
-function buildTable(title, data){
-
-  let html = `<h3>${title}</h3>`;
-
-  html += `
-  <table>
-  <tr>
-    <th>Date</th>
-    <th>Status</th>
-    <th>Amount</th>
-  </tr>
-  `;
-
-  data.forEach(h=>{
-    html += `
-    <tr>
-      <td>${h.date}</td>
-      <td>${h.mode}</td>
-      <td>Rs. ${Number(h.amount).toLocaleString(undefined,{minimumFractionDigits:2})}</td>
-    </tr>`;
-  });
-
-  html += "</table><br>";
-
-  return html;
-}
-
-window.onload = loadHistory;
+/* RUN */
+loadHistory();
