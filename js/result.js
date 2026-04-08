@@ -64,7 +64,7 @@ async function generateDSReport(){
   let ds = selectedDS.ds;
 
   let html = `
-    <h2>${ds} Report (${targetDate})</h2>
+   <h2>${ds} DS Report (${targetDate})</h2>
 
     <table>
       <tr>
@@ -112,6 +112,7 @@ async function generateDSReport(){
   html += "</table>";
 
   localStorage.setItem("dsReportHTML", html);
+  localStorage.setItem("dsReportName", ds);
 
   window.open("ds-report.html", "_blank");
 
