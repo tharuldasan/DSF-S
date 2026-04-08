@@ -359,7 +359,7 @@ function viewHistory(e, key){
 ========================= */
 function goBack(){ history.back(); }
 function goDashboard(){ window.location="dashboard.html"; } 
-      }
+      
   
 
   if(type === "minze"){
