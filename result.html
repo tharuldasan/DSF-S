@@ -8,54 +8,41 @@
 </head>
 <body>
 
-<div style="display:flex; gap:20px; align-items:center; margin-bottom:10px;">
-
-  <label>
-    Add Mode
-    <input type="checkbox" id="addMode" onchange="toggleMode('add')">
-  </label>
-
-  <label>
-    Minze Mode
-    <input type="checkbox" id="minzeMode" onchange="toggleMode('minze')">
-  </label>
-
-</div>
-  
 <div class="container">
   <div class="card">
 
     <h2 id="fileTitle"></h2>
 
-    <!-- ADD MODE + SEARCH -->
+    <!-- 🔥 MODE BAR -->
     <div class="mode-bar">
 
-  <div class="mode-item">
-    <span>Add Mode</span>
-    <label class="switch">
-      <input type="checkbox" id="addMode" onchange="toggleMode('add')">
-      <span class="slider"></span>
-    </label>
-  </div>
+      <div class="mode-item">
+        <span>Add Mode</span>
+        <label class="switch">
+          <input type="checkbox" id="addMode" onchange="toggleMode('add')">
+          <span class="slider"></span>
+        </label>
+      </div>
 
-  <div class="mode-item">
-    <span>Minze Mode</span>
-    <label class="switch">
-      <input type="checkbox" id="minzeMode" onchange="toggleMode('minze')">
-      <span class="slider"></span>
-    </label>
-  </div>
+      <div class="mode-item">
+        <span>Minze Mode</span>
+        <label class="switch">
+          <input type="checkbox" id="minzeMode" onchange="toggleMode('minze')">
+          <span class="slider"></span>
+        </label>
+      </div>
 
-</div>
+    </div>
 
+    <!-- 🔍 SEARCH BUTTON -->
     <div style="text-align:center; margin-bottom:15px;">
-  <button onclick="openSearch()">Search</button>
-</div>
+      <button onclick="openSearch()">Search</button>
+    </div>
 
-    
-
+    <!-- TABLE -->
     <div id="totals"></div>
 
+    <!-- ACTION BUTTONS -->
     <div class="action-buttons">
       <button onclick="goBack()">⬅ Back</button>
       <button onclick="exportExcel()">Export Excel</button>
@@ -87,26 +74,26 @@
     <input id="searchVote" placeholder="Vote">
 
     <div class="custom-select" onclick="toggleDropdown()">
-  <span id="searchDS">Ds</span>
+      <span id="searchDS">Ds</span>
 
-  <div id="dropdownList" class="dropdown-list">
-    <div onclick="selectDS('Ds')">Ds</div>
-    <div onclick="selectDS('Kalutara')">Kalutara</div>
-    <div onclick="selectDS('Panadura')">Panadura</div>
-    <div onclick="selectDS('Bandaragama')">Bandaragama</div>
-    <div onclick="selectDS('Agalawatta')">Agalawatta</div>
-    <div onclick="selectDS('Beruwala')">Beruwala</div>
-    <div onclick="selectDS('Bulathsinhala')">Bulathsinhala</div>
-    <div onclick="selectDS('Dodangoda')">Dodangoda</div>
-    <div onclick="selectDS('Horana')">Horana</div>
-    <div onclick="selectDS('Madurawala')">Madurawala</div>
-    <div onclick="selectDS('Millaniya')">Millaniya</div>
-    <div onclick="selectDS('Palindanuwara')">Palindanuwara</div>
-    <div onclick="selectDS('Matugama')">Matugama</div>
-    <div onclick="selectDS('Walallawita')">Walallawita</div>
-    <div onclick="selectDS('Ingiriya')">Ingiriya</div>
-  </div>
-</div>
+      <div id="dropdownList" class="dropdown-list">
+        <div onclick="selectDS('Ds')">Ds</div>
+        <div onclick="selectDS('Kalutara')">Kalutara</div>
+        <div onclick="selectDS('Panadura')">Panadura</div>
+        <div onclick="selectDS('Bandaragama')">Bandaragama</div>
+        <div onclick="selectDS('Agalawatta')">Agalawatta</div>
+        <div onclick="selectDS('Beruwala')">Beruwala</div>
+        <div onclick="selectDS('Bulathsinhala')">Bulathsinhala</div>
+        <div onclick="selectDS('Dodangoda')">Dodangoda</div>
+        <div onclick="selectDS('Horana')">Horana</div>
+        <div onclick="selectDS('Madurawala')">Madurawala</div>
+        <div onclick="selectDS('Millaniya')">Millaniya</div>
+        <div onclick="selectDS('Palindanuwara')">Palindanuwara</div>
+        <div onclick="selectDS('Matugama')">Matugama</div>
+        <div onclick="selectDS('Walallawita')">Walallawita</div>
+        <div onclick="selectDS('Ingiriya')">Ingiriya</div>
+      </div>
+    </div>
 
     <br><br>
     <button onclick="doSearch()">Search</button>
@@ -123,6 +110,41 @@
   </div>
 </div>
 
+<!-- DATE MODAL -->
+<div id="dateModal" class="modal">
+  <div class="modal-content">
+
+    <h3>Enter Date</h3>
+
+    <input id="dateDay" type="number" placeholder="Day" class="input">
+
+    <select id="dateMonth" class="input">
+      <option value="">Select Month</option>
+      <option value="1">January</option>
+      <option value="2">February</option>
+      <option value="3">March</option>
+      <option value="4">April</option>
+      <option value="5">May</option>
+      <option value="6">June</option>
+      <option value="7">July</option>
+      <option value="8">August</option>
+      <option value="9">September</option>
+      <option value="10">October</option>
+      <option value="11">November</option>
+      <option value="12">December</option>
+    </select>
+
+    <input id="dateYear" type="number" placeholder="Year" class="input">
+
+    <div style="margin-top:15px;">
+      <button onclick="generateDSReport()">Enter</button>
+      <button onclick="closeDateModal()">Close</button>
+    </div>
+
+  </div>
+</div>
+
+<!-- SCRIPTS -->
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="js/result.js"></script>
 
@@ -143,45 +165,5 @@ window.onload = function(){
 };
 </script>
 
-<div id="dateModal" class="modal">
-  <div class="modal-content">
-
-    <h3>Enter Date</h3>
-
-    <input id="dateDay" type="number" placeholder="Day" class="input">
-
-    <select id="dateMonth" style="
-  padding:10px;
-  border-radius:10px;
-  border:1px solid #ccc;
-  width:100%;
-  font-size:16px;
-  background:white;
-">
-  <option value="">Select Month</option>
-  <option value="1">January</option>
-  <option value="2">February</option>
-  <option value="3">March</option>
-  <option value="4">April</option>
-  <option value="5">May</option>
-  <option value="6">June</option>
-  <option value="7">July</option>
-  <option value="8">August</option>
-  <option value="9">September</option>
-  <option value="10">October</option>
-  <option value="11">November</option>
-  <option value="12">December</option>
-</select>
-
-    <input id="dateYear" type="number" placeholder="Year" class="input">
-
-    <div style="margin-top:15px;">
-      <button onclick="generateDSReport()">Enter</button>
-      <button onclick="closeDateModal()">Close</button>
-    </div>
-
-  </div>
-</div>
-  
 </body>
 </html>
