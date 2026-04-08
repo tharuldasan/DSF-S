@@ -35,7 +35,7 @@ async function loadHistory(){
 
   let html = `
     <div style="margin-bottom:15px;">
-      <button onclick="downloadPDF()">Download PDF</button>
+      <button id="historyPdfBtn" onclick="downloadHistoryPDF()">Download PDF</button>
     </div>
 
     <div style="margin-bottom:15px;">
@@ -78,9 +78,21 @@ function buildTable(title, data){
 }
 
 /* PDF */
-function downloadPDF(){
+function downloadHistoryPDF(){
+
+  let btn = document.getElementById("historyPdfBtn");
+
+  // 🔥 hide button before export
+  btn.style.display = "none";
+
   let element = document.getElementById("historyTable");
-  html2pdf().from(element).save("Item_History.pdf");
+
+  html2pdf().from(element).save("Item_History.pdf").then(()=>{
+
+    // 🔥 show button again
+    btn.style.display = "block";
+
+  });
 }
 
 window.onload = loadHistory;
