@@ -63,8 +63,15 @@ async function generateDSReport(){
   let history = file.history || {};
   let ds = selectedDS.ds;
 
-  let html = `
-   <h2>${ds} DS Report (${targetDate})</h2>
+let html = `
+  <h3 style="text-align:center; margin-bottom:5px;">
+    ${ds}
+  </h3>
+
+  <h2 style="text-align:center;">
+    DS Report (${targetDate})
+  </h2>
+`;
 
     <table>
       <tr>
