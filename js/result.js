@@ -370,7 +370,7 @@ function goDashboard(){ window.location="dashboard.html"; }
       document.getElementById("addMode").checked = false;
     }
   }
-}
+
 
 /* =========================
    LOAD DATA
