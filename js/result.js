@@ -27,6 +27,18 @@ const DS = [
   "Matugama","Walallawita","Ingiriya"
 ];
 
+
+function handleHeaderRightClick(e, ds){
+  e.preventDefault();
+  e.stopPropagation();
+
+  if(ds === "Total Allocation") return;
+
+  selectedDS = { ds };
+
+  document.getElementById("dateModal").style.display = "flex";
+}
+
 /* =========================
    MODE CONTROL
 ========================= */
@@ -337,11 +349,11 @@ function buildSummaryRow(title, data){
    HISTORY
 ========================= */
 function viewHistory(e, key){
-  e.preventDefault();
+  if(e) e.preventDefault();
+
   localStorage.setItem("historyKey", key);
   window.location = "item-history.html";
 }
-
 /* =========================
    NAV
 ========================= */
