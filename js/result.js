@@ -73,7 +73,7 @@ async function generateDSReport(){
         <th>Head</th>
         <th>Vote</th>
         <th>Allocation Today</th>
-        <th>Expenditure (Up To Now)</th>
+        <th>Expenditure (Up To Last Month)</th>
       </tr>
   `;
 
