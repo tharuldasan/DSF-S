@@ -83,17 +83,17 @@ function buildTable(title, data){
 function downloadHistoryPDF(){
 
   let btn = document.getElementById("historyPdfBtn");
-
-  // 🔥 hide button before export
   btn.style.display = "none";
 
   let element = document.getElementById("historyTable");
 
-  html2pdf().from(element).save("Item_History.pdf").then(()=>{
-
-    // 🔥 show button again
+  html2pdf().set({
+    margin: 5,
+    filename: 'Item_History.pdf',
+    html2canvas: { scale: 2 },
+    jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }
+  }).from(element).save().then(()=>{
     btn.style.display = "block";
-
   });
 }
 
