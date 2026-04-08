@@ -19,6 +19,30 @@ const DS = [
 ];
 
 
+let addMode = false;
+let minzeMode = false;
+
+function toggleMode(type){
+
+  if(type === "add"){
+    addMode = document.getElementById("addMode").checked;
+
+    if(addMode){
+      minzeMode = false;
+      document.getElementById("minzeMode").checked = false;
+    }
+  }
+
+  if(type === "minze"){
+    minzeMode = document.getElementById("minzeMode").checked;
+
+    if(minzeMode){
+      addMode = false;
+      document.getElementById("addMode").checked = false;
+    }
+  }
+}
+
 function handleHeaderRightClick(e, ds){
   e.preventDefault();
   e.stopPropagation();
