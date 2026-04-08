@@ -63,23 +63,17 @@ async function generateDSReport(){
   let history = file.history || {};
   let ds = selectedDS.ds;
 
-let html = `
-  <h3 style="text-align:center; margin-bottom:5px;">
-    ${ds}
-  </h3>
-
-  <h2 style="text-align:center;">
-    DS Report (${targetDate})
-  </h2>
+  let html = `
+    <h3 style="text-align:center;">${ds}</h3>
+    <h2 style="text-align:center;">DS Report (${targetDate})</h2>
 
     <table>
       <tr>
         <th>No</th>
         <th>Head</th>
         <th>Vote</th>
-        <th>Allo</th>
-        <th>Expenditure</th>
-        <th>Balance</th>
+        <th>Allocation Today</th>
+        <th>Expenditure (Up To Now)</th>
       </tr>
   `;
 
@@ -90,27 +84,31 @@ let html = `
 
     if(!h) continue;
 
-    let g = 0;
-    let u = 0;
+    let allocationToday = 0;
+    let totalExpenditure = 0;
 
+    /* 🔥 Allocation = ONLY selected day */
     h.given.forEach(x=>{
-      if(x.date === targetDate) g += x.amount;
+      if(x.date === targetDate){
+        allocationToday += Number(x.amount);
+      }
     });
 
+    /* 🔥 Expenditure = ALL TIME */
     h.used.forEach(x=>{
-      if(x.date === targetDate) u += x.amount;
+      totalExpenditure += Number(x.amount);
     });
 
-    if(g === 0 && u === 0) continue;
+    /* ❌ Skip empty rows */
+    if(allocationToday === 0 && totalExpenditure === 0) continue;
 
     html += `
       <tr>
         <td>${i+1}</td>
         <td>${rows[i].head}</td>
         <td>${rows[i].vote}</td>
-        <td>${formatRs(g)}</td>
-        <td>${formatRs(u)}</td>
-        <td>${formatRs(g-u)}</td>
+        <td>${formatRs(allocationToday)}</td>
+        <td>${formatRs(totalExpenditure)}</td>
       </tr>
     `;
   }
@@ -118,7 +116,6 @@ let html = `
   html += "</table>";
 
   localStorage.setItem("dsReportHTML", html);
-  localStorage.setItem("dsReportName", ds);
 
   window.open("ds-report.html", "_blank");
 
