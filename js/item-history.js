@@ -7,6 +7,7 @@ const supabaseClient = createClient(SUPABASE_URL, SUPABASE_KEY);
 async function loadHistory(){
 
   let key = localStorage.getItem("historyKey");
+  let dsName = key.split("_")[0]; // 🔥 extract DS
   let fileId = localStorage.getItem("currentFile");
 
   const { data: sessionData } = await supabaseClient.auth.getSession();
@@ -39,6 +40,7 @@ async function loadHistory(){
     </div>
 
     <div style="margin-bottom:15px;">
+      <b>DS:</b> ${dsName} <br>
       <b>Head:</b> ${head} <br>
       <b>Vote:</b> ${vote}
     </div>
