@@ -49,19 +49,21 @@ th, td {
   function downloadPDF(){
 
   let btn = document.getElementById("pdfBtn");
-
-  // 🔥 hide button
   btn.style.display = "none";
 
   let element = document.getElementById("report");
 
-  html2pdf().from(element).save("DS_Report.pdf").then(()=>{
-    
-    // 🔥 show button again after download
+  html2pdf().set({
+    margin: 5,
+    filename: 'DS_Report.pdf',
+    image: { type: 'jpeg', quality: 1 },
+    html2canvas: { scale: 2 },
+    jsPDF: { unit: 'mm', format: 'a4', orientation: 'landscape' } // 🔥 FIX
+  }).from(element).save().then(()=>{
     btn.style.display = "block";
-
   });
 }
+  
 </script>
 
 </body>
