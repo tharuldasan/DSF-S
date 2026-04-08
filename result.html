@@ -28,16 +28,31 @@
     <h2 id="fileTitle"></h2>
 
     <!-- ADD MODE + SEARCH -->
-    <div class="add-mode-row">
-      <span>Add Mode</span>
+    <div class="mode-bar">
 
-      <label class="switch">
-        <input type="checkbox" id="plusToggle" checked>
-        <span class="slider"></span>
-      </label>
+  <div class="mode-item">
+    <span>Add Mode</span>
+    <label class="switch">
+      <input type="checkbox" id="addMode" onchange="toggleMode('add')">
+      <span class="slider"></span>
+    </label>
+  </div>
 
-      <button onclick="openSearch()" style="margin-left:400px;">Search</button>
-    </div>
+  <div class="mode-item">
+    <span>Minze Mode</span>
+    <label class="switch">
+      <input type="checkbox" id="minzeMode" onchange="toggleMode('minze')">
+      <span class="slider"></span>
+    </label>
+  </div>
+
+</div>
+
+    <div style="text-align:center; margin-bottom:15px;">
+  <button onclick="openSearch()">Search</button>
+</div>
+
+    
 
     <div id="totals"></div>
 
