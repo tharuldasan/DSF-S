@@ -13,7 +13,7 @@
   <div class="card">
 
     <div style="margin-bottom:20px;">
-      <button onclick="downloadPDF()">Download PDF</button>
+      <button id="pdfBtn" onclick="downloadPDF()">Download PDF</button>
     </div>
 
     <div id="report"></div>
@@ -27,9 +27,21 @@
     localStorage.getItem("dsReportHTML");
 
   function downloadPDF(){
-    let element = document.getElementById("report");
-    html2pdf().from(element).save("DS_Report.pdf");
-  }
+
+  let btn = document.getElementById("pdfBtn");
+
+  // 🔥 hide button
+  btn.style.display = "none";
+
+  let element = document.getElementById("report");
+
+  html2pdf().from(element).save("DS_Report.pdf").then(()=>{
+    
+    // 🔥 show button again after download
+    btn.style.display = "block";
+
+  });
+}
 </script>
 
 </body>
