@@ -18,6 +18,18 @@ const DS = [
   "Matugama","Walallawita","Ingiriya"
 ];
 
+
+function handleHeaderRightClick(e, ds){
+  e.preventDefault();
+  e.stopPropagation();
+
+  if(ds === "Total Allocation") return;
+
+  selectedDS = { ds };
+
+  document.getElementById("dateModal").style.display = "flex";
+}
+
 function openDateModal(e, ds, row){
   e.preventDefault();
 
@@ -48,14 +60,12 @@ async function generateDSReport(){
   let file = await getCurrentFile();
   let rows = await loadRows();
 
-  let given = file.given || {};
-  let used = file.used || {};
   let history = file.history || {};
-
   let ds = selectedDS.ds;
 
   let html = `
     <h2>${ds} Report (${targetDate})</h2>
+
     <table>
       <tr>
         <th>No</th>
@@ -63,13 +73,13 @@ async function generateDSReport(){
         <th>Vote</th>
         <th>Allo</th>
         <th>Expenditure</th>
+        <th>Balance</th>
       </tr>
   `;
 
   for(let i=0;i<rows.length;i++){
 
     let key = ds + "_" + (i+1);
-
     let h = history[key];
 
     if(!h) continue;
@@ -77,7 +87,6 @@ async function generateDSReport(){
     let g = 0;
     let u = 0;
 
-    // FILTER BY DATE
     h.given.forEach(x=>{
       if(x.date === targetDate) g += x.amount;
     });
@@ -86,7 +95,6 @@ async function generateDSReport(){
       if(x.date === targetDate) u += x.amount;
     });
 
-    // ❌ skip zero rows
     if(g === 0 && u === 0) continue;
 
     html += `
@@ -96,6 +104,7 @@ async function generateDSReport(){
         <td>${rows[i].vote}</td>
         <td>${formatRs(g)}</td>
         <td>${formatRs(u)}</td>
+        <td>${formatRs(g-u)}</td>
       </tr>
     `;
   }
@@ -345,7 +354,12 @@ async function render(){
     <th rowspan="2">No</th>
     <th rowspan="2">Head</th>
     <th rowspan="2">Vote</th>
-    ${DS.map(d=>`<th colspan="3">${d}</th>`).join("")}
+    ${DS.map(d=>`
+  <th colspan="3"
+      oncontextmenu="handleHeaderRightClick(event,'${d}')">
+      ${d}
+  </th>
+    `).join("")}
   </tr>
   <tr>
     ${DS.map(d=>`
@@ -391,15 +405,15 @@ async function render(){
   html += `
     <td class="clickable"
       onclick="edit('${key}','given')"
-      oncontextmenu="handleRightClick(event,'${col}',${i+1})">
+      oncontextmenu="viewHistory(event,'${key}')">
       ${formatRs(g)}
-    </td>
+  </td>
 
-    <td class="clickable"
+  <td class="clickable"
       ${col === "Total Allocation" ? "" : `onclick="edit('${key}','used')"` }
-      oncontextmenu="handleRightClick(event,'${col}',${i+1})">
+      oncontextmenu="viewHistory(event,'${key}')">
       ${formatRs(u)}
-    </td>
+  </td>
 
     <td class="balance-cell">${formatRs(g-u)}</td>
   `;
