@@ -358,9 +358,8 @@ function viewHistory(e, key){
    NAV
 ========================= */
 function goBack(){ history.back(); }
-function goDashboard(){ window.location="dashboard.html"; }      minzeMode = false;
-      document.getElementById("minzeMode").checked = false;
-    }
+function goDashboard(){ window.location="dashboard.html"; } 
+      }
   
 
   if(type === "minze"){
@@ -376,19 +375,6 @@ function goDashboard(){ window.location="dashboard.html"; }      minzeMode = fal
 /* =========================
    LOAD DATA
 ========================= */
-async function loadRows(){
-
-  let { data, error } = await supabaseClient
-    .from("rows")
-    .select("*");
-
-  if(error){
-    console.log(error);
-    return [];
-  }
-
-  return data || [];
-}
 
 async function getCurrentFile(){
 
