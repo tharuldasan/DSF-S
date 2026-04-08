@@ -361,7 +361,7 @@ function goBack(){ history.back(); }
 function goDashboard(){ window.location="dashboard.html"; }      minzeMode = false;
       document.getElementById("minzeMode").checked = false;
     }
-  }
+  
 
   if(type === "minze"){
     minzeMode = document.getElementById("minzeMode").checked;
