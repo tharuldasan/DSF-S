@@ -8,21 +8,35 @@
   <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
 
 <style>
-#report, #historyTable {
+#report {
   width: 100%;
-  max-width: 100%;
+  overflow-x: auto;
 }
 
+/* 🔥 FIX WIDTH */
 table {
   width: 100%;
   border-collapse: collapse;
-  table-layout: fixed; /* 🔥 VERY IMPORTANT */
+  table-layout: fixed;
 }
 
+/* 🔥 SMALLER TEXT */
 th, td {
-  word-wrap: break-word;
-  font-size: 10px; /* 🔥 shrink text */
+  font-size: 9px;
   padding: 4px;
+  text-align: center;
+  word-break: break-word;
+}
+
+/* 🔥 HEADER */
+th {
+  background: #2d5bd1;
+  color: white;
+}
+
+/* 🔥 WRAP CONTENT */
+td {
+  white-space: normal;
 }
 </style>
   
@@ -54,11 +68,15 @@ th, td {
   let element = document.getElementById("report");
 
   html2pdf().set({
-    margin: 5,
+    margin: 3,
     filename: 'DS_Report.pdf',
-    image: { type: 'jpeg', quality: 1 },
-    html2canvas: { scale: 2 },
-    jsPDF: { unit: 'mm', format: 'a4', orientation: 'landscape' } // 🔥 FIX
+    html2canvas: { scale: 2, useCORS: true },
+    jsPDF: {
+      unit: 'mm',
+      format: 'a4',
+      orientation: 'landscape'
+    },
+    pagebreak: { mode: ['avoid-all', 'css', 'legacy'] }
   }).from(element).save().then(()=>{
     btn.style.display = "block";
   });
