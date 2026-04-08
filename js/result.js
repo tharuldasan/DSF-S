@@ -470,13 +470,56 @@ html += buildFullSummaryRow("capital", summary["capital"]);
   applyHighlight();
 }
 /* EDIT */
-function edit(key,type){
-  currentKey = key;
-  currentType = type;
+async function edit(key, type){
 
-  document.getElementById("modalTitle").innerText = key;
-  document.getElementById("modalInput").value = "";
-  document.getElementById("modal").style.display = "flex";
+  let val = prompt("Enter amount:");
+  if(val === null) return;
+
+  val = Number(val);
+  if(isNaN(val)) return;
+
+  let file = await getCurrentFile();
+
+  if(!file.given) file.given = {};
+  if(!file.used) file.used = {};
+  if(!file.history) file.history = {};
+
+  if(!file.history[key]) file.history[key] = { given: [], used: [] };
+
+  let current = type === "given"
+    ? (file.given[key] || 0)
+    : (file.used[key] || 0);
+
+  let newValue = val;
+  let mode = "Changed";
+
+  /* 🔥 MODE LOGIC */
+  if(addMode){
+    newValue = current + val;
+    mode = "Added";
+  }
+  else if(minzeMode){
+    newValue = current - val;
+    mode = "Minzed";
+  }
+
+  /* SAVE VALUE */
+  if(type === "given"){
+    file.given[key] = newValue;
+  }else{
+    file.used[key] = newValue;
+  }
+
+  /* SAVE HISTORY */
+  file.history[key][type].push({
+    amount: val,
+    mode: mode,
+    date: new Date().toLocaleDateString()
+  });
+
+  await saveFile(file);
+
+  render();
 }
 
 async function saveModal(){
