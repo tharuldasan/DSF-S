@@ -71,7 +71,6 @@ let html = `
   <h2 style="text-align:center;">
     DS Report (${targetDate})
   </h2>
-`;
 
     <table>
       <tr>
