@@ -8,15 +8,28 @@
 
 <div class="container">
   <div class="card">
-    <h2>History</h2>
 
+    <h2 style="text-align:center;">History</h2>
+
+    <!-- 🔍 SEARCH -->
+    <div style="text-align:center; margin:15px 0;">
+      <input id="searchInput" placeholder="Search files..."
+        oninput="searchFiles()"
+        style="width:80%; padding:10px; border-radius:10px; border:1px solid #ccc;">
+    </div>
+
+    <!-- 📁 FILE LIST -->
     <div id="files"></div>
 
-    <button onclick="window.location='dashboard.html'">⬅ Back</button>
+    <!-- BACK -->
+    <div style="margin-top:20px; text-align:center;">
+      <button onclick="window.location='dashboard.html'">⬅ Back</button>
+    </div>
+
   </div>
 </div>
 
-<!-- RENAME MODAL -->
+<!-- 🔥 RENAME MODAL -->
 <div id="renameModal" class="modal">
   <div class="modal-content">
     <h3>Rename File</h3>
