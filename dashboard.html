@@ -9,24 +9,39 @@
 <div class="container">
   <div class="card">
 
-    <h2 style="margin-bottom:20px;">Dashboard</h2>
+    <h2 style="margin-bottom:20px; text-align:center;">Dashboard</h2>
 
-    <!-- BUTTON ROW -->
+    <!-- 🔥 ACTION BUTTONS -->
     <div class="dashboard-actions">
-      <button onclick="createNew()">Create New</button>
-      <button onclick="goHistory()">History</button>
-      <button onclick="goAdmin()">Administrator</button>
-      <button onclick="logout()" class="logout-btn">Logout</button>
+      <button onclick="createNew()">➕ Create New</button>
+      <button onclick="goHistory()">📜 History</button>
+      <button onclick="goAdmin()">⚙ Administrator</button>
+      <button onclick="logout()" class="logout-btn">🚪 Logout</button>
     </div>
+
+    <!-- 🔍 SEARCH -->
+    <div style="margin:20px 0; text-align:center;">
+      <input 
+        id="searchInput" 
+        placeholder="Search files..." 
+        oninput="searchFiles()" 
+        style="width:80%; padding:10px; border-radius:10px; border:1px solid #ccc;"
+      >
+    </div>
+
+    <!-- 📁 FILE LIST -->
+    <div id="fileList" class="file-list"></div>
 
   </div>
 </div>
 
-<!-- CREATE FILE MODAL -->
+<!-- 🔥 CREATE FILE MODAL -->
 <div id="createModal" class="modal">
   <div class="modal-content">
     <h3>Create New File</h3>
+
     <input id="fileNameInput" placeholder="Enter file name">
+
     <div class="modal-buttons">
       <button onclick="createFileConfirm()">Create</button>
       <button onclick="closeCreateModal()">Cancel</button>
@@ -34,8 +49,11 @@
   </div>
 </div>
 
+<!-- 🔥 SUPABASE -->
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+<!-- 🔥 DASHBOARD SCRIPT -->
 <script src="js/dashboard.js"></script>
-  
+
 </body>
 </html>
