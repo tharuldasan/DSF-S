@@ -352,6 +352,74 @@ function viewHistory(e, key){
   window.location = "item-history.html";
 }
 
+function edit(key, type){
+
+  currentKey = key;
+  currentType = type;
+
+  document.getElementById("modalInput").value = "";
+  document.getElementById("modalTitle").innerText =
+    (type === "given" ? "Enter Allocation" : "Enter Expenditure");
+
+  document.getElementById("modal").style.display = "flex";
+}
+
+async function saveModal(){
+
+  let val = Number(document.getElementById("modalInput").value);
+  if(isNaN(val)){
+    closeModal();
+    return;
+  }
+
+  let file = await getCurrentFile();
+
+  if(!file.given) file.given = {};
+  if(!file.used) file.used = {};
+  if(!file.history) file.history = {};
+
+  if(!file.history[currentKey]){
+    file.history[currentKey] = { given: [], used: [] };
+  }
+
+  let current = currentType === "given"
+    ? (file.given[currentKey] || 0)
+    : (file.used[currentKey] || 0);
+
+  let newValue = val;
+  let mode = "Changed";
+
+  if(addMode){
+    newValue = current + val;
+    mode = "Added";
+  }
+  else if(minzeMode){
+    newValue = current - val;
+    mode = "Minzed";
+  }
+
+  if(currentType === "given"){
+    file.given[currentKey] = newValue;
+  }else{
+    file.used[currentKey] = newValue;
+  }
+
+  file.history[currentKey][currentType].push({
+    amount: val,
+    mode: mode,
+    date: new Date().toLocaleDateString()
+  });
+
+  await saveFile(file);
+
+  closeModal();
+  render();
+}
+
+function closeModal(){
+  document.getElementById("modal").style.display = "none";
+}
+
 /* =========================
    NAV
 ========================= */
