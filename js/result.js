@@ -22,6 +22,18 @@ const DS = [
   "Matugama","Walallawita","Ingiriya"
 ];
 
+window.onload = function(){
+
+  // ✅ FORCE DEFAULT MODE
+  addMode = true;
+  minzeMode = false;
+
+  document.getElementById("addMode").checked = true;
+  document.getElementById("minzeMode").checked = false;
+
+  render();
+};
+
 /* =========================
    MODE CONTROL
 ========================= */
