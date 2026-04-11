@@ -1,11 +1,15 @@
-/* SUPABASE CONFIG */
+/* =========================
+   SUPABASE CONFIG
+========================= */
 const SUPABASE_URL = "https://voenpsxzpirhuysviyul.supabase.co";
 const SUPABASE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InZvZW5wc3h6cGlyaHV5c3ZpeXVsIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzUwMzEzNzMsImV4cCI6MjA5MDYwNzM3M30.MpA_0Gykvv9-ZQA1jkBCk1zcp-t-9jkwHacaHG2-MYw";
 
 const { createClient } = supabase;
 const supabaseClient = createClient(SUPABASE_URL, SUPABASE_KEY);
 
-/* LOGIN */
+/* =========================
+   LOGIN
+========================= */
 let loading = false;
 
 async function login(){
@@ -22,22 +26,31 @@ async function login(){
     return;
   }
 
-  let { error } = await supabaseClient.auth.signInWithPassword({
+  const { data, error } = await supabaseClient.auth.signInWithPassword({
     email,
     password
   });
 
   if(error){
     alert(error.message);
-  }else{
-    localStorage.setItem("user", email);
-    window.location.href = "dashboard.html";
+    loading = false;
+    return;
   }
+
+  // ✅ FIXED (IMPORTANT)
+  localStorage.setItem("currentUser", data.user.email);
+
+  // ❌ REMOVE OLD (optional but safer)
+  localStorage.removeItem("user");
+
+  window.location.href = "dashboard.html";
 
   loading = false;
 }
 
-/* SIGNUP */
+/* =========================
+   SIGNUP
+========================= */
 async function signup(){
 
   if(loading) return;
@@ -52,7 +65,7 @@ async function signup(){
     return;
   }
 
-  let { error } = await supabaseClient.auth.signUp({
+  const { data, error } = await supabaseClient.auth.signUp({
     email,
     password
   });
@@ -66,12 +79,18 @@ async function signup(){
   loading = false;
 }
 
+/* =========================
+   AUTO LOGIN
+========================= */
 window.onload = async function(){
 
   const { data } = await supabaseClient.auth.getSession();
 
   if(data.session){
-    // only auto login if NOT logging out
+
+    // ✅ SAVE USER AUTOMATICALLY
+    localStorage.setItem("currentUser", data.session.user.email);
+
     if(!localStorage.getItem("loggedOut")){
       window.location.href = "dashboard.html";
     }
