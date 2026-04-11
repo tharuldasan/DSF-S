@@ -402,3 +402,39 @@ input:checked + .slider{
 input:checked + .slider:before{
   transform:translateX(24px);
 }
+
+.file-list {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.file-card {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 12px;
+  border-radius: 10px;
+  background: #f5f5f5;
+  cursor: pointer;
+}
+
+.file-card:hover {
+  background: #e0e0e0;
+}
+
+.file-actions button {
+  margin-left: 5px;
+}
+
+.dashboard-actions {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+  justify-content: center;
+}
+
+.logout-btn {
+  background: red;
+  color: white;
+}
