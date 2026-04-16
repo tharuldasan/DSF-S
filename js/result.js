@@ -52,7 +52,7 @@ function handleHeaderRightClick(e, ds){
 
   if(ds === "Total Allocation") return;
 
-  selectedDS = ds;
+  selectedDS = { ds: ds };
   document.getElementById("dateModal").style.display = "flex";
 }
 
@@ -182,57 +182,80 @@ function calculateFullSummary(rows, given, used){
   return summary;
 }
 
-/* =========================
-   EDIT
-========================= */
-async function edit(key, type){
+async function generateDSReport(){
 
-  let val = prompt("Enter amount:");
-  if(val === null) return;
+  let day = document.getElementById("dateDay").value;
+  let month = document.getElementById("dateMonth").value;
+  let year = document.getElementById("dateYear").value;
 
-  val = Number(val);
-  if(isNaN(val)) return;
+  if(!day || !month || !year){
+    alert("Fill all fields");
+    return;
+  }
+
+  let targetDate = new Date(year, month-1, day).toLocaleDateString();
 
   let file = await getCurrentFile();
+  let rows = await loadRows();
 
-  if(!file.given) file.given = {};
-  if(!file.used) file.used = {};
-  if(!file.history) file.history = {};
+  let history = file.history || {};
+  let ds = selectedDS.ds;
 
-  if(!file.history[key]){
-    file.history[key] = { given: [], used: [] };
+  let html = `
+    <h3 style="text-align:center;">${ds}</h3>
+    <h2 style="text-align:center;">DS Report (${targetDate})</h2>
+
+    <table>
+      <tr>
+        <th>No</th>
+        <th>Head</th>
+        <th>Vote</th>
+        <th>Allocation Today</th>
+        <th>Expenditure (Up To Now)</th>
+      </tr>
+  `;
+
+  for(let i=0;i<rows.length;i++){
+
+    let key = ds + "_" + (i+1);
+    let h = history[key];
+
+    if(!h) continue;
+
+    let allocationToday = 0;
+    let totalExpenditure = 0;
+
+    h.given?.forEach(x=>{
+      if(x.date === targetDate){
+        allocationToday += Number(x.amount);
+      }
+    });
+
+    h.used?.forEach(x=>{
+      totalExpenditure += Number(x.amount);
+    });
+
+    if(allocationToday === 0 && totalExpenditure === 0) continue;
+
+    html += `
+      <tr>
+        <td>${i+1}</td>
+        <td>${rows[i].head}</td>
+        <td>${rows[i].vote}</td>
+        <td>${formatRs(allocationToday)}</td>
+        <td>${formatRs(totalExpenditure)}</td>
+      </tr>
+    `;
   }
 
-  let current = type==="given"
-    ? (file.given[key]||0)
-    : (file.used[key]||0);
+  html += "</table>";
 
-  let newValue = val;
-  let mode = "Changed";
+  localStorage.setItem("dsReportHTML", html);
 
-  if(addMode){
-    newValue = current + val;
-    mode = "Added";
-  }
-  else if(minzeMode){
-    newValue = current - val;
-    mode = "Minzed";
-  }
+  // 🔥 IMPORTANT FIX (no popup block)
+  window.location.href = "ds-report.html";
 
-  if(type==="given"){
-    file.given[key] = newValue;
-  }else{
-    file.used[key] = newValue;
-  }
-
-  file.history[key][type].push({
-    amount: val,
-    mode: mode,
-    date: new Date().toLocaleDateString()
-  });
-
-  await saveFile(file);
-  render();
+  closeDateModal();
 }
 
 /* =========================
