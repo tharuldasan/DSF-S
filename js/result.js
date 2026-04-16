@@ -335,9 +335,10 @@ async function generateDSReport(){
       }
     });
 
-    h.used?.forEach(x=>{
-      totalExpenditure += Number(x.amount);
-    });
+    let key = ds + "_" + (i+1);
+
+// 🔥 use actual stored value instead of history
+totalExpenditure = file.used?.[key] || 0;
 
     if(allocationToday === 0 && totalExpenditure === 0) continue;
 
