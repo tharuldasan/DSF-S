@@ -438,3 +438,7 @@ input:checked + .slider:before{
   background: red;
   color: white;
 }
+
+.highlight-cell {
+  background: yellow !important;
+}
