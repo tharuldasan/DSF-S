@@ -303,7 +303,13 @@ async function generateDSReport(){
   let rows = await loadRows();
 
   let history = file.history || {};
-  let ds = selectedDS.ds;
+   
+  if(!selectedDS){
+  alert("Select a DS first");
+  return;
+}
+
+let ds = selectedDS.ds;
 
   let html = `
     <h3 style="text-align:center;">${ds}</h3>
@@ -321,37 +327,34 @@ async function generateDSReport(){
 
   for(let i=0;i<rows.length;i++){
 
-    let key = ds + "_" + (i+1);
-    let h = history[key];
+  let key = ds + "_" + (i+1);
+  let h = history[key] || { given: [], used: [] };
 
-    if(!h) continue;
+  let allocationToday = 0;
+  let totalExpenditure = 0;
 
-    let allocationToday = 0;
-    let totalExpenditure = 0;
+  // allocation (ONLY selected date)
+  h.given?.forEach(x=>{
+    if(x.date === targetDate){
+      allocationToday += Number(x.amount);
+    }
+  });
 
-    h.given?.forEach(x=>{
-      if(x.date === targetDate){
-        allocationToday += Number(x.amount);
-      }
-    });
+  // 🔥 FIXED expenditure (REAL DATA)
+  totalExpenditure = file.used?.[key] || 0;
 
-    let key = ds + "_" + (i+1);
+  if(allocationToday === 0 && totalExpenditure === 0) continue;
 
-// 🔥 use actual stored value instead of history
-totalExpenditure = file.used?.[key] || 0;
-
-    if(allocationToday === 0 && totalExpenditure === 0) continue;
-
-    html += `
-      <tr>
-        <td>${i+1}</td>
-        <td>${rows[i].head}</td>
-        <td>${rows[i].vote}</td>
-        <td>${formatRs(allocationToday)}</td>
-        <td>${formatRs(totalExpenditure)}</td>
-      </tr>
-    `;
-  }
+  html += `
+    <tr>
+      <td>${i+1}</td>
+      <td>${rows[i].head}</td>
+      <td>${rows[i].vote}</td>
+      <td>${formatRs(allocationToday)}</td>
+      <td>${formatRs(totalExpenditure)}</td>
+    </tr>
+  `;
+}
 
   html += "</table>";
 
