@@ -22,6 +22,10 @@ const DS = [
   "Matugama","Walallawita","Ingiriya"
 ];
 
+function closeDateModal(){
+  document.getElementById("dateModal").style.display = "none";
+}
+
 /* =========================
    MODE CONTROL
 ========================= */
