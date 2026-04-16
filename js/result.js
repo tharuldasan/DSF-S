@@ -27,6 +27,106 @@ function closeDateModal(){
 }
 
 /* =========================
+   SEARCH SYSTEM
+========================= */
+
+let lastSearch = null;
+let highlightTimer = null;
+
+/* OPEN SEARCH MODAL */
+function openSearch(){
+  document.getElementById("searchModal").style.display = "flex";
+}
+
+/* CLOSE SEARCH */
+function closeSearch(){
+  document.getElementById("searchModal").style.display = "none";
+}
+
+/* SEARCH ACTION */
+function doSearch(){
+
+  let head = document.getElementById("searchHead").value.trim();
+  let vote = document.getElementById("searchVote").value.trim();
+  let ds = document.getElementById("searchDS").innerText;
+
+  lastSearch = { head, vote, ds };
+
+  applyHighlight();
+
+  closeSearch();
+}
+
+/* =========================
+   HIGHLIGHT RESULT
+========================= */
+function applyHighlight(){
+
+  if(!lastSearch) return;
+
+  let { head, vote, ds } = lastSearch;
+
+  // remove old highlight
+  document.querySelectorAll(".highlight-cell").forEach(c=>{
+    c.classList.remove("highlight-cell");
+  });
+
+  let found = false;
+
+  let rows = document.querySelectorAll("#totals table tr");
+
+  rows.forEach(row=>{
+
+    let cells = row.children;
+
+    if(cells.length > 3){
+
+      let headVal = cells[1].innerText.trim();
+      let voteVal = cells[2].innerText.trim();
+
+      if(headVal === head && voteVal === vote){
+
+        let index = DS.indexOf(ds);
+
+        if(index !== -1){
+
+          let start = 3 + index*3;
+
+          for(let i=0;i<3;i++){
+            let cell = cells[start+i];
+
+            cell.classList.add("highlight-cell");
+
+            cell.scrollIntoView({
+              behavior: "smooth",
+              block: "center",
+              inline: "center"
+            });
+          }
+        }
+
+        found = true;
+      }
+    }
+  });
+
+  if(!found){
+    alert("Not found");
+  }
+
+  // auto remove highlight after 1 min
+  if(highlightTimer){
+    clearTimeout(highlightTimer);
+  }
+
+  highlightTimer = setTimeout(()=>{
+    document.querySelectorAll(".highlight-cell").forEach(c=>{
+      c.classList.remove("highlight-cell");
+    });
+  }, 60000);
+}
+
+/* =========================
    MODE CONTROL
 ========================= */
 function toggleMode(type){
