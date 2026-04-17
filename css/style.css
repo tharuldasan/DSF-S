@@ -442,3 +442,15 @@ input:checked + .slider:before{
 .highlight-cell {
   background: yellow !important;
 }
+
+.dropdown-list{
+  display: none;
+  position: absolute;
+  background: white;
+  border: 1px solid #ccc;
+  z-index: 1000;
+}
+
+.dropdown-list.show{
+  display: block;
+}
