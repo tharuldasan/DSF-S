@@ -73,27 +73,31 @@
     <input id="searchHead" placeholder="Head">
     <input id="searchVote" placeholder="Vote">
 
-    <div class="custom-select">
-      <span id="searchDS">Ds</span>
+    <div class="dropdown">
 
-      <div id="dropdownList" class="dropdown-list">
-        <div onclick="selectDS('Ds')">Ds</div>
-        <div onclick="selectDS('Kalutara')">Kalutara</div>
-        <div onclick="selectDS('Panadura')">Panadura</div>
-        <div onclick="selectDS('Bandaragama')">Bandaragama</div>
-        <div onclick="selectDS('Agalawatta')">Agalawatta</div>
-        <div onclick="selectDS('Beruwala')">Beruwala</div>
-        <div onclick="selectDS('Bulathsinhala')">Bulathsinhala</div>
-        <div onclick="selectDS('Dodangoda')">Dodangoda</div>
-        <div onclick="selectDS('Horana')">Horana</div>
-        <div onclick="selectDS('Madurawala')">Madurawala</div>
-        <div onclick="selectDS('Millaniya')">Millaniya</div>
-        <div onclick="selectDS('Palindanuwara')">Palindanuwara</div>
-        <div onclick="selectDS('Matugama')">Matugama</div>
-        <div onclick="selectDS('Walallawita')">Walallawita</div>
-        <div onclick="selectDS('Ingiriya')">Ingiriya</div>
-      </div>
-    </div>
+  <div id="searchDS" class="dropdown-btn">
+    Select DS
+  </div>
+
+  <div id="dropdownList" class="dropdown-content">
+    <div onclick="selectDS('Ds')">Ds</div>
+    <div onclick="selectDS('Kalutara')">Kalutara</div>
+    <div onclick="selectDS('Panadura')">Panadura</div>
+    <div onclick="selectDS('Bandaragama')">Bandaragama</div>
+    <div onclick="selectDS('Agalawatta')">Agalawatta</div>
+    <div onclick="selectDS('Beruwala')">Beruwala</div>
+    <div onclick="selectDS('Bulathsinhala')">Bulathsinhala</div>
+    <div onclick="selectDS('Dodangoda')">Dodangoda</div>
+    <div onclick="selectDS('Horana')">Horana</div>
+    <div onclick="selectDS('Madurawala')">Madurawala</div>
+    <div onclick="selectDS('Millaniya')">Millaniya</div>
+    <div onclick="selectDS('Palindanuwara')">Palindanuwara</div>
+    <div onclick="selectDS('Matugama')">Matugama</div>
+    <div onclick="selectDS('Walallawita')">Walallawita</div>
+    <div onclick="selectDS('Ingiriya')">Ingiriya</div>
+  </div>
+
+</div>
 
     <br><br>
     <button onclick="doSearch()">Search</button>
