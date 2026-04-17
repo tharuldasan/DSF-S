@@ -335,13 +335,37 @@ let ds = selectedDS.ds;
 
   // allocation (ONLY selected date)
   h.given?.forEach(x=>{
-    if(x.date === targetDate){
+  if(x.date === targetDate){
+
+    if(x.mode === "Added"){
       allocationToday += Number(x.amount);
     }
-  });
+    else if(x.mode === "Minzed"){
+      allocationToday -= Number(x.amount);
+    }
+    else if(x.mode === "Changed"){
+      allocationToday = Number(x.amount);
+    }
+
+  }
+});
 
   // 🔥 FIXED expenditure (REAL DATA)
-  totalExpenditure = file.used?.[key] || 0;
+  let totalExpenditure = 0;
+
+h.used?.forEach(x=>{
+
+  if(x.mode === "Added"){
+    totalExpenditure += Number(x.amount);
+  }
+  else if(x.mode === "Minzed"){
+    totalExpenditure -= Number(x.amount);
+  }
+  else if(x.mode === "Changed"){
+    totalExpenditure = Number(x.amount);
+  }
+
+});
 
   if(allocationToday === 0 && totalExpenditure === 0) continue;
 
