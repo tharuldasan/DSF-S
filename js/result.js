@@ -26,6 +26,14 @@ function closeDateModal(){
   document.getElementById("dateModal").style.display = "none";
 }
 
+function toggleDropdown(){
+  let list = document.getElementById("dropdownList");
+  list.classList.toggle("show");
+}
+
+// click only on text
+document.getElementById("searchDS").onclick = toggleDropdown;
+
 /* =========================
    SEARCH SYSTEM
 ========================= */
