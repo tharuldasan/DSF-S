@@ -31,13 +31,13 @@ function toggleDropdown(){
   list.classList.toggle("show");
 }
 
-// click only on text
-window.addEventListener("DOMContentLoaded", () => {
-  let el = document.getElementById("searchDS");
-  if(el){
-    el.onclick = toggleDropdown;
-  }
-});
+function selectDS(value){
+
+  document.getElementById("searchDS").innerText = value;
+
+  // close dropdown after select
+  document.getElementById("dropdownList").classList.remove("show");
+}
 
 /* =========================
    SEARCH SYSTEM
@@ -507,6 +507,16 @@ function buildSummaryRow(title, data){
   row += "</tr>";
   return row;
 }
+
+window.addEventListener("DOMContentLoaded", () => {
+
+  let dsBtn = document.getElementById("searchDS");
+
+  if(dsBtn){
+    dsBtn.addEventListener("click", toggleDropdown);
+  }
+
+});
 
 /* =========================
    HISTORY
