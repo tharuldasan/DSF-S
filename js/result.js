@@ -32,7 +32,12 @@ function toggleDropdown(){
 }
 
 // click only on text
-document.getElementById("searchDS").onclick = toggleDropdown;
+window.addEventListener("DOMContentLoaded", () => {
+  let el = document.getElementById("searchDS");
+  if(el){
+    el.onclick = toggleDropdown;
+  }
+});
 
 /* =========================
    SEARCH SYSTEM
