@@ -358,9 +358,6 @@ let ds = selectedDS.ds;
   }
 });
 
-  // 🔥 FIXED expenditure (REAL DATA)
-  let totalExpenditure = 0;
-
 h.used?.forEach(x=>{
 
   if(x.mode === "Added"){
