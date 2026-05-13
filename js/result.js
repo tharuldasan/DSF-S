@@ -865,21 +865,21 @@ let colWidths = [
 // 🔥 BIG SIZE FOR MONEY COLUMNS
 cols.forEach(() => {
 
-  // FT sheet
-  if(name === "FT"){
+// 🔥 FULL SHEET = HALF SIZE
+if(name === "FT"){
 
-    colWidths.push({ wch: 30 }); // Allocation
-    colWidths.push({ wch: 30 }); // Expenditure
-    colWidths.push({ wch: 30 }); // Balance
-  }
+  colWidths.push({ wch: 15 });
+  colWidths.push({ wch: 15 });
+  colWidths.push({ wch: 15 });
+}
 
-  // TA + DS sheets
-  else{
+// 🔥 TA + EACH DS = CURRENT BIG SIZE
+else{
 
-    colWidths.push({ wch: 45 }); // Allocation
-    colWidths.push({ wch: 45 }); // Expenditure
-    colWidths.push({ wch: 45 }); // Balance
-  }
+  colWidths.push({ wch: 30 });
+  colWidths.push({ wch: 30 });
+  colWidths.push({ wch: 30 });
+}
 
 });
 
