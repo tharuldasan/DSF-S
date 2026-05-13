@@ -135,26 +135,27 @@
     <h3>Enter Date</h3>
 
     <!-- 🔥 MONTHLY TOGGLE -->
-    <div style="margin-top:10px; margin-bottom:15px;">
+    <div style="
+  margin-top:10px;
+  margin-bottom:15px;
+  display:flex;
+  justify-content:center;
+  align-items:center;
+  gap:12px;
+">
 
-      <label style="
-        display:flex;
-        gap:10px;
-        align-items:center;
-        justify-content:center;
-      ">
+  <span>Monthly Report</span>
 
-        <input
-          type="checkbox"
-          id="monthlyToggle"
-          onchange="toggleMonthlyReport()"
-        >
+  <label class="switch">
+    <input
+      type="checkbox"
+      id="monthlyToggle"
+      onchange="toggleMonthlyReport()"
+    >
+    <span class="slider"></span>
+  </label>
 
-        Monthly Report
-
-      </label>
-
-    </div>
+</div>
 
     <!-- 🔥 DAY INPUT -->
     <div id="dayContainer">
