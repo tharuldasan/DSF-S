@@ -824,11 +824,11 @@ async function exportExcel(){
         }
 
         // SUMMARY ROWS
-        let name = data[R]?.[1];
+        let rowName = data[R]?.[1];
 
         if(
-          name === "total" ||
-          name === "capital"
+          rowName === "total" ||
+          rowName === "capital"
         ){
 
           cell.s.fill = {
@@ -840,7 +840,7 @@ async function exportExcel(){
           };
         }
 
-        // number format
+        // NUMBER FORMAT
         if(C >= 3){
           cell.z = '#,##0.00';
         }
@@ -851,40 +851,59 @@ async function exportExcel(){
        WIDTHS
     ========================= */
 
-// 🔥 CLEAN COLUMN WIDTHS
+    ws['!cols'] = [
+      { wpx: 60 },   // No
+      { wpx: 90 },   // Head
+      { wpx: 180 },  // Vote
 
-// 🔥 PERFECT COLUMN WIDTHS
+      ...Array(cols.length).flatMap(() => [
 
-ws['!cols'] = [
-  { wpx: 60 },   // No
-  { wpx: 90 },   // Head
-  { wpx: 180 },  // Vote
+        // ONLY THESE LARGE
+        { wpx: name === "FT" ? 220 : 660 }, // Allo
+        { wpx: name === "FT" ? 220 : 660 }, // Exp
+        { wpx: name === "FT" ? 220 : 660 }  // Balance
 
-  ...Array(cols.length).flatMap(() => [
+      ])
+    ];
 
-    // 🔥 ONLY THESE 3 BIG
-    { wpx: name === "FT" ? 220 : 660 }, // Allo/Distribution
-    { wpx: name === "FT" ? 220 : 660 }, // Expenditure
-    { wpx: name === "FT" ? 220 : 660 }  // Balance
+    /* =========================
+       ROW HEIGHTS
+    ========================= */
 
-  ])
-];
-     
-     // 🔥 ALIGNMENT + WRAP
-Object.keys(ws).forEach(cell => {
+    ws['!rows'] = [];
 
-  if(cell[0] === "!") return;
+    for(let i=0; i<data.length; i++){
 
-  if(!ws[cell].s) ws[cell].s = {};
+      if(data[i]?.[0] === "No"){
 
-  ws[cell].s.alignment = {
-    wrapText: true,
-    vertical: "center",
-    horizontal: "center"
-  };
+        ws['!rows'][i] = {
+          hpx: 28
+        };
 
-});
-     
+        ws['!rows'][i+1] = {
+          hpx: 38
+        };
+      }
+    }
+
+    /* =========================
+       ALIGNMENTS
+    ========================= */
+
+    Object.keys(ws).forEach(cell => {
+
+      if(cell[0] === "!") return;
+
+      if(!ws[cell].s) ws[cell].s = {};
+
+      ws[cell].s.alignment = {
+        vertical: "center",
+        horizontal:
+          ws[cell].s.alignment?.horizontal || "left"
+      };
+
+    });
+
     /* =========================
        MERGES
     ========================= */
@@ -932,18 +951,18 @@ Object.keys(ws).forEach(cell => {
   buildSheet("TA", ["Total Allocation"]);
 
   /* =========================
-     GROUPED DS SHEETS
+     INDIVIDUAL DS SHEETS
   ========================= */
 
   let pureDS = DS.filter(d => d !== "Total Allocation");
 
-pureDS.forEach(ds=>{
+  pureDS.forEach(ds=>{
 
-  let sheetName = ds.substring(0, 31); // excel limit
+    let sheetName = ds.substring(0, 31);
 
-  buildSheet(sheetName, [ds]);
+    buildSheet(sheetName, [ds]);
 
-});
+  });
 
   /* =========================
      SAVE
