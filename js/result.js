@@ -853,35 +853,22 @@ async function exportExcel(){
 
 // 🔥 CLEAN COLUMN WIDTHS
 
-if(name === "FT"){
+// 🔥 PERFECT COLUMN WIDTHS
 
-  ws['!cols'] = [
-    { wpx: 70 },   // No
-    { wpx: 120 },  // Head
-    { wpx: 260 },  // Vote
+ws['!cols'] = [
+  { wpx: 60 },   // No
+  { wpx: 90 },   // Head
+  { wpx: 180 },  // Vote
 
-    ...Array(cols.length).flatMap(() => [
-      { wpx: 220 }, // Allo/Distribution
-      { wpx: 220 }, // Expenditure
-      { wpx: 220 }  // Balance
-    ])
-  ];
+  ...Array(cols.length).flatMap(() => [
 
-}else{
+    // 🔥 ONLY THESE 3 BIG
+    { wpx: name === "FT" ? 220 : 660 }, // Allo/Distribution
+    { wpx: name === "FT" ? 220 : 660 }, // Expenditure
+    { wpx: name === "FT" ? 220 : 660 }  // Balance
 
-  ws['!cols'] = [
-    { wpx: 70 },   // No
-    { wpx: 120 },  // Head
-    { wpx: 260 },  // Vote
-
-    ...Array(cols.length).flatMap(() => [
-      { wpx: 660 }, // Allo/Distribution
-      { wpx: 660 }, // Expenditure
-      { wpx: 660 }  // Balance
-    ])
-  ];
-
-}
+  ])
+];
      
      // 🔥 ALIGNMENT + WRAP
 Object.keys(ws).forEach(cell => {
