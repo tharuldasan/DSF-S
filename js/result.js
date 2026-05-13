@@ -851,7 +851,7 @@ async function exportExcel(){
        WIDTHS
     ========================= */
 
-   if(name === "FT"){
+if(name === "FT"){
 
   // FULL TABLE
   ws['!cols'] = [
@@ -860,24 +860,24 @@ async function exportExcel(){
     { wch: 24 },
 
     ...Array(cols.length).flatMap(() => [
-      { wpx: 440 }, // 220 x2
-      { wpx: 440 },
-      { wpx: 440 }
+      { wch: 60 },
+      { wch: 60 },
+      { wch: 60 }
     ])
   ];
 
 }else{
 
-  // TA + SINGLE DS SHEETS
+  // TA + SINGLE DS
   ws['!cols'] = [
     { wch: 6 },
     { wch: 14 },
     { wch: 24 },
 
     ...Array(cols.length).flatMap(() => [
-      { wpx: 660 }, // 220 x3
-      { wpx: 660 },
-      { wpx: 660 }
+      { wch: 90 },
+      { wch: 90 },
+      { wch: 90 }
     ])
   ];
 
