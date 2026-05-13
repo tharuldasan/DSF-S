@@ -860,29 +860,29 @@ if(name === "FT"){
     { wch: 24 },
 
     ...Array(cols.length).flatMap(() => [
-      { wch: 60 },
-      { wch: 60 },
-      { wch: 60 }
+      { wch: 55 }, // ≈ 220px x2 look
+      { wch: 55 },
+      { wch: 55 }
     ])
   ];
 
 }else{
 
-  // TA + SINGLE DS
+  // TA + SINGLE DS SHEETS
   ws['!cols'] = [
     { wch: 6 },
     { wch: 14 },
     { wch: 24 },
 
     ...Array(cols.length).flatMap(() => [
-      { wch: 90 },
-      { wch: 90 },
-      { wch: 90 }
+      { wch: 85 }, // ≈ 220px x3 look
+      { wch: 85 },
+      { wch: 85 }
     ])
   ];
 
 }
-
+     
     /* =========================
        MERGES
     ========================= */
