@@ -401,20 +401,56 @@ h.given?.forEach(x=>{
   }
 });
 
+// selected limit date
+let selectedDate;
+
+if(document.getElementById("monthlyToggle").checked){
+
+  // end of selected month
+  selectedDate = new Date(year, month, 0);
+
+}else{
+
+  // exact selected day
+  selectedDate = new Date(year, month-1, day);
+
+}
+
 h.used?.forEach(x=>{
 
-  if(x.mode === "Added"){
-    totalExpenditure += Number(x.amount);
-  }
-  else if(x.mode === "Minzed"){
-    totalExpenditure -= Number(x.amount);
-  }
-  else if(x.mode === "Changed"){
-    totalExpenditure = Number(x.amount);
+  // parse saved date safely
+  let parts = x.date.split("/");
+
+  let recordDate = new Date(
+    parts[2],       // year
+    parts[0]-1,     // month
+    parts[1]        // day
+  );
+
+  // include ONLY past/current dates
+  if(recordDate <= selectedDate){
+
+    if(x.mode === "Added"){
+
+      totalExpenditure += Number(x.amount);
+
+    }
+    else if(x.mode === "Minzed"){
+
+      totalExpenditure -= Number(x.amount);
+
+    }
+    else if(x.mode === "Changed"){
+
+      totalExpenditure = Number(x.amount);
+
+    }
+
   }
 
 });
 
+     
   if(allocationToday === 0 && totalExpenditure === 0) continue;
 
   html += `
