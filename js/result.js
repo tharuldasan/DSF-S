@@ -858,33 +858,13 @@ async function exportExcel(){
 
       ...Array(cols.length).flatMap(() => [
 
-       // ONLY THESE LARGE
-{ wch: name === "FT" ? 30 : 90 },
-{ wch: name === "FT" ? 30 : 90 },
-{ wch: name === "FT" ? 30 : 90 }
+        // Allocation / Expenditure / Balance
+        { wpx: 220 },
+        { wpx: 220 },
+        { wpx: 220 }
 
       ])
     ];
-
-    /* =========================
-       ROW HEIGHTS
-    ========================= */
-
-ws['!rows'] = [];
-
-for(let i=0; i<data.length; i++){
-
-  if(data[i]?.[0] === "No"){
-
-    ws['!rows'][i] = {
-      hpx: 28
-    };
-
-    ws['!rows'][i+1] = {
-      hpx: 38
-    };
-  }
-}
 
     /* =========================
        ALIGNMENTS
