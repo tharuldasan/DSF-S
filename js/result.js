@@ -851,17 +851,37 @@ async function exportExcel(){
        WIDTHS
     ========================= */
 
-   ws['!cols'] = [
-  { wch: 6 },   // No
-  { wch: 14 },  // Head
-  { wch: 24 },  // Vote
+   if(name === "FT"){
 
-  ...Array(cols.length).flatMap(() => [
-    { wch: 30 }, // Allo/Distribution
-    { wch: 30 }, // Expenditure
-    { wch: 30 }  // Balance
-  ])
-];
+  // FULL TABLE
+  ws['!cols'] = [
+    { wch: 6 },
+    { wch: 14 },
+    { wch: 24 },
+
+    ...Array(cols.length).flatMap(() => [
+      { wpx: 440 }, // 220 x2
+      { wpx: 440 },
+      { wpx: 440 }
+    ])
+  ];
+
+}else{
+
+  // TA + SINGLE DS SHEETS
+  ws['!cols'] = [
+    { wch: 6 },
+    { wch: 14 },
+    { wch: 24 },
+
+    ...Array(cols.length).flatMap(() => [
+      { wpx: 660 }, // 220 x3
+      { wpx: 660 },
+      { wpx: 660 }
+    ])
+  ];
+
+}
 
     /* =========================
        MERGES
