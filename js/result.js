@@ -595,6 +595,339 @@ function closeModal(){
   document.getElementById("modal").style.display = "none";
 }
 
+async function exportExcel(){
+
+  let file = await getCurrentFile();
+
+  if(!file){
+    alert("No file found");
+    return;
+  }
+
+  let rows = await loadRows();
+
+  let given = file.given || {};
+  let used = file.used || {};
+
+  let wb = XLSX.utils.book_new();
+
+  /* =========================
+     HELPER
+  ========================= */
+
+  function getRowData(i, cols){
+
+    let row = [
+      i + 1,
+      rows[i]?.head || "",
+      rows[i]?.vote || ""
+    ];
+
+    cols.forEach(col=>{
+
+      let key = col + "_" + (i+1);
+
+      let g = given[key] || 0;
+      let u = used[key] || 0;
+
+      // TOTAL ALLOCATION AUTO CALC
+      if(col === "Total Allocation"){
+
+        let total = 0;
+
+        DS.forEach(c=>{
+          if(c !== "Total Allocation"){
+            total += given[c+"_"+(i+1)] || 0;
+          }
+        });
+
+        u = total;
+      }
+
+      row.push(g);
+      row.push(u);
+      row.push(g - u);
+    });
+
+    return row;
+  }
+
+  /* =========================
+     BUILD SHEET
+  ========================= */
+
+  function buildSheet(name, cols){
+
+    let data = [];
+
+    function addHeaders(){
+
+      let h1 = [
+        "No",
+        "Head",
+        "Vote",
+        ...cols.flatMap(c=>[c,"",""])
+      ];
+
+      let h2 = [
+        "",
+        "",
+        "",
+        ...cols.flatMap(c=>[
+          c === "Total Allocation"
+            ? "Received"
+            : "Allo/Distribution",
+
+          c === "Total Allocation"
+            ? "Issued"
+            : "Expenditure",
+
+          "Balance"
+        ])
+      ];
+
+      data.push(h1);
+      data.push(h2);
+    }
+
+    addHeaders();
+
+    let chunkSize = 40;
+
+    for(let start=0; start<rows.length; start += chunkSize){
+
+      let end = Math.min(start + chunkSize, rows.length);
+
+      for(let i=start; i<end; i++){
+        data.push(getRowData(i, cols));
+      }
+
+      // repeat headers
+      if(end < rows.length){
+
+        for(let s=0; s<3; s++){
+          data.push([]);
+        }
+
+        addHeaders();
+      }
+    }
+
+    /* =========================
+       SUMMARY
+    ========================= */
+
+    let summary = calculateFullSummary(rows, given, used);
+
+    data.push([]);
+    data.push([]);
+
+    ["1001","1002","1003","total","recurrent","capital"]
+    .forEach(type=>{
+
+      let row = ["", type, ""];
+
+      cols.forEach(col=>{
+
+        let g = summary[type][col].g;
+        let u = summary[type][col].u;
+        let b = g - u;
+
+        row.push(g);
+        row.push(u);
+        row.push(b);
+      });
+
+      data.push(row);
+    });
+
+    /* =========================
+       CREATE SHEET
+    ========================= */
+
+    let ws = XLSX.utils.aoa_to_sheet(data);
+
+    /* =========================
+       STYLING
+    ========================= */
+
+    for(let R=0; R<data.length; R++){
+
+      for(let C=0; C<(data[R]?.length || 0); C++){
+
+        let ref = XLSX.utils.encode_cell({r:R,c:C});
+
+        let cell = ws[ref];
+
+        if(!cell) continue;
+
+        let isHeader1 = data[R][0] === "No";
+        let isHeader2 = R>0 && data[R-1]?.[0] === "No";
+
+        let isEmpty =
+          !data[R] ||
+          data[R].every(v => v === "" || v === undefined);
+
+        if(isEmpty){
+          cell.s = {};
+          continue;
+        }
+
+        cell.s = {
+          border:{
+            top:{style:"thin"},
+            bottom:{style:"thin"},
+            left:{style:"thin"},
+            right:{style:"thin"}
+          },
+
+          alignment:{
+            horizontal:
+              (isHeader1 || isHeader2)
+                ? "center"
+                : (C >= 3 ? "right" : "left"),
+
+            vertical:"center"
+          }
+        };
+
+        // HEADER 1
+        if(isHeader1){
+
+          cell.s.fill = {
+            fgColor:{rgb:"BFBFBF"}
+          };
+
+          cell.s.font = {
+            bold:true
+          };
+        }
+
+        // HEADER 2
+        if(isHeader2){
+
+          cell.s.fill = {
+            fgColor:{rgb:"808080"}
+          };
+
+          cell.s.font = {
+            bold:true
+          };
+        }
+
+        // BALANCE COLUMN
+        if(C >= 3 && ((C-3)%3===2)){
+
+          cell.s.fill = {
+            fgColor:{rgb:"E7E7E7"}
+          };
+        }
+
+        // SUMMARY ROWS
+        let name = data[R]?.[1];
+
+        if(
+          name === "total" ||
+          name === "capital"
+        ){
+
+          cell.s.fill = {
+            fgColor:{rgb:"A6A6A6"}
+          };
+
+          cell.s.font = {
+            bold:true
+          };
+        }
+
+        // number format
+        if(C >= 3){
+          cell.z = '#,##0.00';
+        }
+      }
+    }
+
+    /* =========================
+       WIDTHS
+    ========================= */
+
+    ws['!cols'] = [
+      {wch:6},
+      {wch:14},
+      {wch:20},
+
+      ...Array(cols.length * 3).fill({wch:12})
+    ];
+
+    /* =========================
+       MERGES
+    ========================= */
+
+    let merges = [];
+
+    for(let i=0;i<data.length;i++){
+
+      if(data[i][0] === "No"){
+
+        // merge main headers
+        for(let j=0;j<cols.length;j++){
+
+          let start = 3 + (j*3);
+
+          merges.push({
+            s:{r:i,c:start},
+            e:{r:i,c:start+2}
+          });
+        }
+
+        merges.push(
+          {s:{r:i,c:0},e:{r:i+1,c:0}},
+          {s:{r:i,c:1},e:{r:i+1,c:1}},
+          {s:{r:i,c:2},e:{r:i+1,c:2}}
+        );
+      }
+    }
+
+    ws['!merges'] = merges;
+
+    XLSX.utils.book_append_sheet(wb, ws, name);
+  }
+
+  /* =========================
+     FULL TABLE
+  ========================= */
+
+  buildSheet("FT", DS);
+
+  /* =========================
+     TOTAL ALLOCATION
+  ========================= */
+
+  buildSheet("TA", ["Total Allocation"]);
+
+  /* =========================
+     GROUPED DS SHEETS
+  ========================= */
+
+  let pureDS = DS.filter(d => d !== "Total Allocation");
+
+  for(let i=0; i<pureDS.length; i += 3){
+
+    let group = pureDS.slice(i, i+3);
+
+    let name =
+      group.map(x=>x.substring(0,2)).join("");
+
+    buildSheet(name, group);
+  }
+
+  /* =========================
+     SAVE
+  ========================= */
+
+  XLSX.writeFile(wb, file.name + ".xlsx");
+}
+
 /* =========================
    NAV
 ========================= */
