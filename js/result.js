@@ -851,37 +851,60 @@ async function exportExcel(){
        WIDTHS
     ========================= */
 
+// 🔥 COLUMN WIDTHS
 if(name === "FT"){
 
-  // FULL TABLE
   ws['!cols'] = [
-    { wch: 6 },
-    { wch: 16 },
-    { wch: 28 },
+    { wch: 10 }, // No
+    { wch: 18 }, // Head
+    { wch: 35 }, // Vote
 
     ...Array(cols.length).flatMap(() => [
-      { wch: 70 }, // 220px x2 look
-      { wch: 70 },
-      { wch: 70 }
+      { wch: 30 }, // Allo
+      { wch: 30 }, // Exp
+      { wch: 30 }  // Balance
     ])
   ];
 
 }else{
 
-  // TA + SINGLE DS
   ws['!cols'] = [
-    { wch: 6 },
-    { wch: 16 },
-    { wch: 28 },
+    { wch: 10 }, // No
+    { wch: 18 }, // Head
+    { wch: 35 }, // Vote
 
     ...Array(cols.length).flatMap(() => [
-      { wch: 105 }, // 220px x3 look
-      { wch: 105 },
-      { wch: 105 }
+      { wch: 45 }, // Allo
+      { wch: 45 }, // Exp
+      { wch: 45 }  // Balance
     ])
   ];
 
 }
+     // 🔥 BETTER ROW HEIGHTS
+ws['!rows'] = [];
+
+for(let i = 0; i < 500; i++){
+
+  ws['!rows'].push({
+    hpt: i < 2 ? 35 : 24
+  });
+
+}
+     // 🔥 ALIGNMENT + WRAP
+Object.keys(ws).forEach(cell => {
+
+  if(cell[0] === "!") return;
+
+  if(!ws[cell].s) ws[cell].s = {};
+
+  ws[cell].s.alignment = {
+    wrapText: true,
+    vertical: "center",
+    horizontal: "center"
+  };
+
+});
      
     /* =========================
        MERGES
