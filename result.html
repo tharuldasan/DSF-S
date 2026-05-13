@@ -56,7 +56,9 @@
 <div id="modal" class="modal">
   <div class="modal-content">
     <h3 id="modalTitle"></h3>
+
     <input id="modalInput" type="number">
+
     <div class="modal-buttons">
       <button onclick="saveModal()">Save</button>
       <button onclick="closeModal()">Cancel</button>
@@ -66,41 +68,48 @@
 
 <!-- SEARCH MODAL -->
 <div id="searchModal" class="modal">
+
   <div class="modal-content">
 
     <h3>Search</h3>
 
     <input id="searchHead" placeholder="Head">
+
     <input id="searchVote" placeholder="Vote">
 
+    <!-- 🔥 DS DROPDOWN -->
     <div class="dropdown">
 
-  <div id="searchDS" class="dropdown-btn">
-    Select DS
-  </div>
+      <div id="searchDS" class="dropdown-btn">
+        Select DS
+      </div>
 
-  <div id="dropdownList" class="dropdown-content">
-    <div onclick="selectDS('Ds')">Ds</div>
-    <div onclick="selectDS('Kalutara')">Kalutara</div>
-    <div onclick="selectDS('Panadura')">Panadura</div>
-    <div onclick="selectDS('Bandaragama')">Bandaragama</div>
-    <div onclick="selectDS('Agalawatta')">Agalawatta</div>
-    <div onclick="selectDS('Beruwala')">Beruwala</div>
-    <div onclick="selectDS('Bulathsinhala')">Bulathsinhala</div>
-    <div onclick="selectDS('Dodangoda')">Dodangoda</div>
-    <div onclick="selectDS('Horana')">Horana</div>
-    <div onclick="selectDS('Madurawala')">Madurawala</div>
-    <div onclick="selectDS('Millaniya')">Millaniya</div>
-    <div onclick="selectDS('Palindanuwara')">Palindanuwara</div>
-    <div onclick="selectDS('Matugama')">Matugama</div>
-    <div onclick="selectDS('Walallawita')">Walallawita</div>
-    <div onclick="selectDS('Ingiriya')">Ingiriya</div>
-  </div>
+      <div id="dropdownList" class="dropdown-content">
 
-</div>
+        <div onclick="selectDS('Ds')">Ds</div>
+        <div onclick="selectDS('Kalutara')">Kalutara</div>
+        <div onclick="selectDS('Panadura')">Panadura</div>
+        <div onclick="selectDS('Bandaragama')">Bandaragama</div>
+        <div onclick="selectDS('Agalawatta')">Agalawatta</div>
+        <div onclick="selectDS('Beruwala')">Beruwala</div>
+        <div onclick="selectDS('Bulathsinhala')">Bulathsinhala</div>
+        <div onclick="selectDS('Dodangoda')">Dodangoda</div>
+        <div onclick="selectDS('Horana')">Horana</div>
+        <div onclick="selectDS('Madurawala')">Madurawala</div>
+        <div onclick="selectDS('Millaniya')">Millaniya</div>
+        <div onclick="selectDS('Palindanuwara')">Palindanuwara</div>
+        <div onclick="selectDS('Matugama')">Matugama</div>
+        <div onclick="selectDS('Walallawita')">Walallawita</div>
+        <div onclick="selectDS('Ingiriya')">Ingiriya</div>
+
+      </div>
+
+    </div>
 
     <br><br>
+
     <button onclick="doSearch()">Search</button>
+
     <button onclick="closeSearch()">Cancel</button>
 
   </div>
@@ -108,22 +117,62 @@
 
 <!-- CUSTOM POPUP -->
 <div id="popup" class="modal">
+
   <div class="modal-content">
+
     <p id="popupText"></p>
+
     <button onclick="closePopup()">OK</button>
+
   </div>
 </div>
 
-<!-- DATE MODAL -->
+<!-- 🔥 DATE MODAL -->
 <div id="dateModal" class="modal">
+
   <div class="modal-content">
 
     <h3>Enter Date</h3>
 
-    <input id="dateDay" type="number" placeholder="Day" class="input">
+    <!-- 🔥 MONTHLY TOGGLE -->
+    <div style="margin-top:10px; margin-bottom:15px;">
 
+      <label style="
+        display:flex;
+        gap:10px;
+        align-items:center;
+        justify-content:center;
+      ">
+
+        <input
+          type="checkbox"
+          id="monthlyToggle"
+          onchange="toggleMonthlyReport()"
+        >
+
+        Monthly Report
+
+      </label>
+
+    </div>
+
+    <!-- 🔥 DAY INPUT -->
+    <div id="dayContainer">
+
+      <input
+        id="dateDay"
+        type="number"
+        placeholder="Day"
+        class="input"
+      >
+
+    </div>
+
+    <!-- 🔥 MONTH -->
     <select id="dateMonth" class="input">
+
       <option value="">Select Month</option>
+
       <option value="1">January</option>
       <option value="2">February</option>
       <option value="3">March</option>
@@ -136,13 +185,28 @@
       <option value="10">October</option>
       <option value="11">November</option>
       <option value="12">December</option>
+
     </select>
 
-    <input id="dateYear" type="number" placeholder="Year" class="input">
+    <!-- 🔥 YEAR -->
+    <input
+      id="dateYear"
+      type="number"
+      placeholder="Year"
+      class="input"
+    >
 
+    <!-- 🔥 BUTTONS -->
     <div style="margin-top:15px;">
-      <button onclick="generateDSReport()">Enter</button>
-      <button onclick="closeDateModal()">Close</button>
+
+      <button onclick="generateDSReport()">
+        Enter
+      </button>
+
+      <button onclick="closeDateModal()">
+        Close
+      </button>
+
     </div>
 
   </div>
@@ -150,13 +214,21 @@
 
 <!-- SCRIPTS -->
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
 <script src="js/result.js"></script>
 
 <script>
 function loadTitle(){
+
   let user = localStorage.getItem("currentUser");
-  let files = JSON.parse(localStorage.getItem("files_" + user)||"[]");
+
+  let files =
+    JSON.parse(
+      localStorage.getItem("files_" + user) || "[]"
+    );
+
   let id = localStorage.getItem("currentFile");
+
   let file = files.find(f => f.id === id);
 
   document.getElementById("fileTitle").innerText =
@@ -164,7 +236,9 @@ function loadTitle(){
 }
 
 window.onload = function(){
+
   loadTitle();
+
   render();
 };
 </script>
