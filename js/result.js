@@ -851,15 +851,15 @@ async function exportExcel(){
        WIDTHS
     ========================= */
 
-    ws['!cols'] = [
-  {wch:6},
-  {wch:14},
-  {wch:20},
+   ws['!cols'] = [
+  { wch: 6 },   // No
+  { wch: 14 },  // Head
+  { wch: 24 },  // Vote
 
   ...Array(cols.length).flatMap(() => [
-    { wpx:220 }, // Allo/Distribution
-    { wpx:220 }, // Expenditure
-    { wpx:220 }  // Balance
+    { wch: 30 }, // Allo/Distribution
+    { wch: 30 }, // Expenditure
+    { wch: 30 }  // Balance
   ])
 ];
 
