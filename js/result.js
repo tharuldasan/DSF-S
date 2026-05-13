@@ -851,46 +851,38 @@ async function exportExcel(){
        WIDTHS
     ========================= */
 
-// 🔥 COLUMN WIDTHS
+// 🔥 CLEAN COLUMN WIDTHS
+
 if(name === "FT"){
 
   ws['!cols'] = [
-    { wch: 10 }, // No
-    { wch: 18 }, // Head
-    { wch: 35 }, // Vote
+    { wpx: 70 },   // No
+    { wpx: 120 },  // Head
+    { wpx: 260 },  // Vote
 
     ...Array(cols.length).flatMap(() => [
-      { wch: 30 }, // Allo
-      { wch: 30 }, // Exp
-      { wch: 30 }  // Balance
+      { wpx: 220 }, // Allo/Distribution
+      { wpx: 220 }, // Expenditure
+      { wpx: 220 }  // Balance
     ])
   ];
 
 }else{
 
   ws['!cols'] = [
-    { wch: 10 }, // No
-    { wch: 18 }, // Head
-    { wch: 35 }, // Vote
+    { wpx: 70 },   // No
+    { wpx: 120 },  // Head
+    { wpx: 260 },  // Vote
 
     ...Array(cols.length).flatMap(() => [
-      { wch: 45 }, // Allo
-      { wch: 45 }, // Exp
-      { wch: 45 }  // Balance
+      { wpx: 660 }, // Allo/Distribution
+      { wpx: 660 }, // Expenditure
+      { wpx: 660 }  // Balance
     ])
   ];
 
 }
-     // 🔥 BETTER ROW HEIGHTS
-ws['!rows'] = [];
-
-for(let i = 0; i < 500; i++){
-
-  ws['!rows'].push({
-    hpt: i < 2 ? 35 : 24
-  });
-
-}
+     
      // 🔥 ALIGNMENT + WRAP
 Object.keys(ws).forEach(cell => {
 
