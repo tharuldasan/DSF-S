@@ -301,16 +301,36 @@ function calculateFullSummary(rows, given, used){
 
 async function generateDSReport(){
 
-  let day = document.getElementById("dateDay").value;
-  let month = document.getElementById("dateMonth").value;
-  let year = document.getElementById("dateYear").value;
+let monthly =
+  document.getElementById("monthlyToggle").checked;
+
+let day =
+  document.getElementById("dateDay").value;
+
+let month =
+  document.getElementById("dateMonth").value;
+
+let year =
+  document.getElementById("dateYear").value;
+
+if(monthly){
+
+  if(!month || !year){
+    alert("Fill month and year");
+    return;
+  }
+
+}else{
 
   if(!day || !month || !year){
     alert("Fill all fields");
     return;
   }
+}
 
-  let targetDate = new Date(year, month-1, day).toLocaleDateString();
+let targetDate =
+  new Date(year, month-1, day || 1)
+  .toLocaleDateString();
 
   let file = await getCurrentFile();
   let rows = await loadRows();
@@ -333,8 +353,15 @@ let ds = selectedDS.ds;
         <th>No</th>
         <th>Head</th>
         <th>Vote</th>
-        <th>Allocation Today</th>
-        <th>Expenditure (Up To Now)</th>
+<th>
+  ${
+    monthly
+      ? "Allocation This Month"
+      : "Allocation Today"
+  }
+</th>
+
+<th>Expenditure (Up To Now)</th>
       </tr>
   `;
 
@@ -346,9 +373,21 @@ let ds = selectedDS.ds;
   let allocationToday = 0;
   let totalExpenditure = 0;
 
-  // allocation (ONLY selected date)
-  h.given?.forEach(x=>{
-  if(x.date === targetDate){
+h.given?.forEach(x=>{
+
+  let d = new Date(x.date);
+
+  let sameMonth =
+    d.getMonth() + 1 == Number(month) &&
+    d.getFullYear() == Number(year);
+
+  let sameDay =
+    x.date === targetDate;
+
+  if(
+    (monthly && sameMonth) ||
+    (!monthly && sameDay)
+  ){
 
     if(x.mode === "Added"){
       allocationToday += Number(x.amount);
@@ -359,7 +398,6 @@ let ds = selectedDS.ds;
     else if(x.mode === "Changed"){
       allocationToday = Number(x.amount);
     }
-
   }
 });
 
@@ -398,6 +436,21 @@ h.used?.forEach(x=>{
   window.location.href = "ds-report.html";
 
   closeDateModal();
+}
+
+function toggleMonthlyReport(){
+
+  let enabled =
+    document.getElementById("monthlyToggle").checked;
+
+  let dayBox =
+    document.getElementById("dayContainer");
+
+  if(enabled){
+    dayBox.style.display = "none";
+  }else{
+    dayBox.style.display = "block";
+  }
 }
 
 /* =========================
