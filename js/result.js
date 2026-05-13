@@ -361,7 +361,7 @@ let ds = selectedDS.ds;
   }
 </th>
 
-<th>Expenditure (Up To Now)</th>
+<th>Expenditure (Up to Last Month)</th>
       </tr>
   `;
 
