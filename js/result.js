@@ -852,12 +852,16 @@ async function exportExcel(){
     ========================= */
 
     ws['!cols'] = [
-      {wch:6},
-      {wch:14},
-      {wch:20},
+  {wch:6},
+  {wch:14},
+  {wch:20},
 
-      ...Array(cols.length * 3).fill({wch:12})
-    ];
+  ...Array(cols.length).flatMap(() => [
+    { wpx:220 }, // Allo/Distribution
+    { wpx:220 }, // Expenditure
+    { wpx:220 }  // Balance
+  ])
+];
 
     /* =========================
        MERGES
@@ -911,15 +915,13 @@ async function exportExcel(){
 
   let pureDS = DS.filter(d => d !== "Total Allocation");
 
-  for(let i=0; i<pureDS.length; i += 3){
+pureDS.forEach(ds=>{
 
-    let group = pureDS.slice(i, i+3);
+  let sheetName = ds.substring(0, 31); // excel limit
 
-    let name =
-      group.map(x=>x.substring(0,2)).join("");
+  buildSheet(sheetName, [ds]);
 
-    buildSheet(name, group);
-  }
+});
 
   /* =========================
      SAVE
