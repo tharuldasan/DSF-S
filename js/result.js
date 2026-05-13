@@ -346,7 +346,15 @@ let ds = selectedDS.ds;
 
   let html = `
     <h3 style="text-align:center;">${ds}</h3>
-    <h2 style="text-align:center;">DS Report (${targetDate})</h2>
+    <h2 style="text-align:center;">
+  DS Report (
+    ${
+      monthly
+        ? `${String(month).padStart(2,'0')}/${year}`
+        : `${String(day).padStart(2,'0')}/${String(month).padStart(2,'0')}/${year}`
+    }
+  )
+</h2>
 
     <table>
       <tr>
