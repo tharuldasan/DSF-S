@@ -851,20 +851,39 @@ async function exportExcel(){
        WIDTHS
     ========================= */
 
-    ws['!cols'] = [
-      { wpx: 60 },   // No
-      { wpx: 90 },   // Head
-      { wpx: 180 },  // Vote
+/* =========================
+   WIDTHS
+========================= */
 
-      ...Array(cols.length).flatMap(() => [
+// 🔥 NORMAL COLUMNS
+let colWidths = [
+  { wch: 8 },   // No
+  { wch: 18 },  // Head
+  { wch: 28 }   // Vote
+];
 
-        // Allocation / Expenditure / Balance
-        { wpx: 220 },
-        { wpx: 220 },
-        { wpx: 220 }
+// 🔥 BIG SIZE FOR MONEY COLUMNS
+cols.forEach(() => {
 
-      ])
-    ];
+  // FT sheet
+  if(name === "FT"){
+
+    colWidths.push({ wch: 30 }); // Allocation
+    colWidths.push({ wch: 30 }); // Expenditure
+    colWidths.push({ wch: 30 }); // Balance
+  }
+
+  // TA + DS sheets
+  else{
+
+    colWidths.push({ wch: 45 }); // Allocation
+    colWidths.push({ wch: 45 }); // Expenditure
+    colWidths.push({ wch: 45 }); // Balance
+  }
+
+});
+
+ws['!cols'] = colWidths;
 
     /* =========================
        ALIGNMENTS
