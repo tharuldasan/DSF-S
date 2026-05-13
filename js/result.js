@@ -858,10 +858,10 @@ async function exportExcel(){
 
       ...Array(cols.length).flatMap(() => [
 
-        // ONLY THESE LARGE
-        { wpx: name === "FT" ? 220 : 660 }, // Allo
-        { wpx: name === "FT" ? 220 : 660 }, // Exp
-        { wpx: name === "FT" ? 220 : 660 }  // Balance
+       // ONLY THESE LARGE
+{ wch: name === "FT" ? 30 : 90 },
+{ wch: name === "FT" ? 30 : 90 },
+{ wch: name === "FT" ? 30 : 90 }
 
       ])
     ];
@@ -870,21 +870,21 @@ async function exportExcel(){
        ROW HEIGHTS
     ========================= */
 
-    ws['!rows'] = [];
+ws['!rows'] = [];
 
-    for(let i=0; i<data.length; i++){
+for(let i=0; i<data.length; i++){
 
-      if(data[i]?.[0] === "No"){
+  if(data[i]?.[0] === "No"){
 
-        ws['!rows'][i] = {
-          hpx: 28
-        };
+    ws['!rows'][i] = {
+      hpx: 28
+    };
 
-        ws['!rows'][i+1] = {
-          hpx: 38
-        };
-      }
-    }
+    ws['!rows'][i+1] = {
+      hpx: 38
+    };
+  }
+}
 
     /* =========================
        ALIGNMENTS
