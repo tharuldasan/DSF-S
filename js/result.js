@@ -856,28 +856,28 @@ if(name === "FT"){
   // FULL TABLE
   ws['!cols'] = [
     { wch: 6 },
-    { wch: 14 },
-    { wch: 24 },
+    { wch: 16 },
+    { wch: 28 },
 
     ...Array(cols.length).flatMap(() => [
-      { wch: 55 }, // ≈ 220px x2 look
-      { wch: 55 },
-      { wch: 55 }
+      { wch: 70 }, // 220px x2 look
+      { wch: 70 },
+      { wch: 70 }
     ])
   ];
 
 }else{
 
-  // TA + SINGLE DS SHEETS
+  // TA + SINGLE DS
   ws['!cols'] = [
     { wch: 6 },
-    { wch: 14 },
-    { wch: 24 },
+    { wch: 16 },
+    { wch: 28 },
 
     ...Array(cols.length).flatMap(() => [
-      { wch: 85 }, // ≈ 220px x3 look
-      { wch: 85 },
-      { wch: 85 }
+      { wch: 105 }, // 220px x3 look
+      { wch: 105 },
+      { wch: 105 }
     ])
   ];
 
